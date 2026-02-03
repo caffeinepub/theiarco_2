@@ -1,51 +1,92 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix frontend build/runtime configuration causing deployment failure (Vite env + blank-screen safeguards)",
+  "title": "Publisher Profile page routed by publisher ID",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Align frontend configuration with the existing ICP build/deploy templates so the deployed frontend loads correctly (no runtime crash/blank screen).",
+      "summary": "Add an authenticated Publisher Profile route addressed by publisher ID and rendered within the existing authenticated AppLayout.",
       "acceptanceCriteria": [
-        "A fresh build and deploy run completes successfully without errors.",
-        "The deployed app is reachable and the frontend loads without a blank screen."
+        "Navigating to `/publishers/<publisherId>` renders the Publisher Profile page inside the existing AppLayout (sidebar/header remain visible).",
+        "The route parameter is treated as a publisher ID and used to load the correct publisher record."
       ],
       "file_operations": [
         {
-          "path": "frontend/.env",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Update the Internet Identity environment variable naming to the Vite-compatible convention (e.g., switch from II_URL to VITE_II_URL) so the value is injected at build time and does not break the deployed bundle. Verify the component's usage instructions before implementing."
+          "description": "Register a new TanStack Router route for the Publisher Profile page at `/publishers/<id>` (parameterized segment) under the existing authenticated root route so it renders inside AppLayout."
         },
         {
-          "path": "frontend/src/hooks/useInternetIdentity.ts",
-          "operation": "modify",
-          "description": "Remove dependency on Node-style process.env and read the Internet Identity provider URL from Vite runtime env (import.meta.env) with a safe fallback to the default IC URL; this prevents production runtime errors that can lead to a blank screen. Use the authorization component guidance for Internet Identity integration as the reference; verify the component's usage instructions before implementing."
+          "path": "frontend/src/pages/PublisherProfile.tsx",
+          "operation": "create",
+          "description": "Create the Publisher Profile page component that reads the route publisher ID parameter and renders within the existing authenticated app layout via the router Outlet."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add minimal, non-invasive frontend diagnostics/guardrails so if deployment/build issues surface again, the failing step is easier to identify and the app renders an error screen instead of a blank page.",
+      "summary": "Make publisher names in the Publishers table navigate to the selected publisher’s profile route using that publisher’s ID.",
       "acceptanceCriteria": [
-        "If a failure occurs, the exact error output is available and identifies the failing step.",
-        "After fixes, a subsequent build + deploy completes successfully.",
-        "No changes are made to read-only frontend paths listed in SYSTEM_CONTEXT.frontend.immutablePaths."
+        "Clicking a publisher’s name in the table navigates to `/publishers/<id>` for that row.",
+        "The existing Edit/Delete actions continue to work unchanged."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/ErrorBoundary.tsx",
-          "operation": "create",
-          "description": "Create a small application-level ErrorBoundary that catches unexpected runtime errors and renders a user-visible fallback screen (and logs details to console) to avoid a blank page in production. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/pages/Publishers.tsx",
+          "operation": "modify",
+          "description": "Replace the current non-functional name button handler with TanStack Router navigation (e.g., Link or navigate) to the Publisher Profile route using the row’s publisher.id, without changing existing filters, inactive styling, or Edit/Delete behaviors."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Implement Publisher Profile UI showing the selected publisher’s details including heading, group, overseer/assistant statuses, and privileges.",
+      "acceptanceCriteria": [
+        "The publisher full name is shown as the primary heading at the top of the page.",
+        "Group number, overseer status, assistant status, and privileges are visible and reflect the backend values for the selected publisher.",
+        "Overseer and Assistant are rendered as \"Yes\" or \"No\" (in English)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/PublisherProfile.tsx",
+          "operation": "modify",
+          "description": "Render the publisher’s fullName as the page heading and display fieldServiceGroup, isGroupOverseer (Yes/No), isGroupAssistant (Yes/No), and privileges (publisher/servant/elder) using existing UI primitives (e.g., shadcn-ui components). Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Add a Back to Publishers button on the Publisher Profile page that navigates back to the Publishers list.",
+      "acceptanceCriteria": [
+        "The Publisher Profile page includes a visible \"Back to Publishers\" button at the top.",
+        "Clicking the button navigates to `/publishers`."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/PublisherProfile.tsx",
+          "operation": "modify",
+          "description": "Add a \"Back to Publishers\" control at the top of the page using TanStack Router navigation (Link or navigate) to `/publishers`, using existing button styling/components (e.g., shadcn-ui Button). Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Fetch a single publisher by ID via the existing backend API and handle loading and not-found states on the Publisher Profile page.",
+      "acceptanceCriteria": [
+        "The frontend calls the backend to fetch a publisher by ID (using the existing backend method) when the Publisher Profile page loads.",
+        "While the publisher is loading, the page shows a loading state (in English).",
+        "If the publisher ID does not exist (backend returns null/empty), the page shows a clear \"not found\" message (in English) and still provides a way to return to `/publishers`."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a React Query hook to fetch a single publisher by ID using the existing backend capability (actor.getPublisher), with query enabling tied to actor availability."
         },
         {
-          "path": "frontend/src/main.tsx",
+          "path": "frontend/src/pages/PublisherProfile.tsx",
           "operation": "modify",
-          "description": "Wrap the application render with the new ErrorBoundary so unexpected runtime errors become visible and diagnosable rather than producing a blank screen. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add minimal runtime error surfacing around auth-gated routing (e.g., ensure failures during initialization/render show a visible error state rather than silently failing). Keep changes limited to composition (no edits under frontend/src/components/ui). Verify the component's usage instructions before implementing."
+          "description": "Use the route publisher ID parameter to call the single-publisher query hook; show an English loading state while fetching and an English \"not found\" state when the backend returns null, including a visible way to return to `/publishers`."
         }
       ]
     }

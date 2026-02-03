@@ -10,14 +10,13 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface Privileges {
-  'servant' : boolean,
-  'publisher' : boolean,
-  'elder' : boolean,
-}
 export interface Publisher {
   'id' : PublisherId,
-  'privileges' : Privileges,
+  'privileges' : {
+    'servant' : boolean,
+    'publisher' : boolean,
+    'elder' : boolean,
+  },
   'fieldServiceGroup' : bigint,
   'fullName' : string,
   'isGroupOverseer' : boolean,
@@ -26,7 +25,7 @@ export interface Publisher {
   'isGroupAssistant' : boolean,
 }
 export type PublisherId = bigint;
-export interface UserProfile { 'congregation' : string, 'name' : string }
+export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -36,7 +35,7 @@ export interface _SERVICE {
     [
       string,
       bigint,
-      Privileges,
+      { 'servant' : boolean, 'publisher' : boolean, 'elder' : boolean },
       boolean,
       boolean,
       [] | [boolean],
@@ -45,6 +44,7 @@ export interface _SERVICE {
     PublisherId
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'deletePublisher' : ActorMethod<[PublisherId], undefined>,
   'getAllPublishers' : ActorMethod<[], Array<Publisher>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
@@ -53,6 +53,18 @@ export interface _SERVICE {
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'togglePublisherActiveState' : ActorMethod<[PublisherId], undefined>,
+  'updatePublisher' : ActorMethod<
+    [
+      PublisherId,
+      string,
+      bigint,
+      { 'servant' : boolean, 'publisher' : boolean, 'elder' : boolean },
+      boolean,
+      boolean,
+      boolean,
+    ],
+    undefined
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

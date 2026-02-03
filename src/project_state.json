@@ -1,170 +1,342 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 22,
-  "summary": "ICP starter app scaffold with Motoko backend authorization/access-control plus migration support, and a React (Vite/Tailwind/shadcn-ui) frontend featuring Internet Identity login, basic app layout/pages, and an initial Publishers management UI, with build/deploy templates.",
+  "projectStateVersion": 3,
+  "summary": "Theiarco is an Internet Computer (ICP) dapp consisting of a Motoko backend canister and a React (Vite) frontend. Users authenticate with DFINITY Internet Identity, after which the app presents an authenticated dashboard shell (header + sidebar + routed pages). The main implemented domain feature is “Publishers” management: the frontend fetches publishers from the canister and provides add/edit/delete workflows via modal dialogs, optimistic delete with rollback, toast notifications, and a client-side filter bar (name search, field service group filter, and show-inactive toggle). The backend also includes a role-based access control (RBAC) system initialized via a canister method that uses an admin token (from the canister environment) and a user-provided secret; publisher and user-profile APIs are guarded by this access control.",
   "existing_features": [
     {
       "id": "IF-1",
-      "title": "Motoko backend canister scaffold",
+      "title": "Motoko role-based access control (RBAC) with admin bootstrap token",
       "synonyms": [
-        "backend main canister",
-        "motoko core"
+        "AccessControl",
+        "UserRole",
+        "#admin/#user/#guest"
       ],
-      "description": "Base Motoko canister entrypoint (main.mo) with supporting modules and build configuration for deployment.",
+      "description": "Implements roles (admin/user/guest), stores per-principal roles in a Map, supports initializing/registering callers, admin checks, role assignment (admin-only), and a hasPermission helper used to guard canister APIs. The first principal to initialize with the correct admin token becomes admin; others become users; anonymous callers are treated as guests.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-2",
-      "title": "Backend authorization & access control modules",
+      "title": "Authorization canister mixin APIs",
       "synonyms": [
-        "authorization mixin",
-        "access-control"
+        "MixinAuthorization",
+        "_initializeAccessControlWithSecret",
+        "getCallerUserRole",
+        "assignCallerUserRole",
+        "isCallerAdmin"
       ],
-      "description": "Reusable authorization layer implemented in Motoko (MixinAuthorization and access-control) to support authenticated/authorized calls.",
+      "description": "Exposes authorization-related methods on the canister via a Motoko mixin: initialization using the CAFFEINE_ADMIN_TOKEN environment variable and a user-provided secret; querying the caller’s role; assigning roles (guarded by admin logic inside AccessControl); and querying whether the caller is admin.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-3",
-      "title": "React (Vite) frontend scaffold with Tailwind",
+      "title": "Access-controlled user profile storage and APIs (backend)",
       "synonyms": [
-        "frontend scaffold",
-        "vite react"
+        "UserProfile",
+        "getCallerUserProfile",
+        "getUserProfile",
+        "saveCallerUserProfile"
       ],
-      "description": "Frontend application bootstrapped with Vite + React, Tailwind styling, and environment/config wiring to talk to the backend canister.",
+      "description": "Provides simple profile persistence keyed by Principal with permission checks: users can save and read their own profile; admins can read any user profile; unauthorized access traps.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-4",
-      "title": "Internet Identity authentication flow",
+      "title": "Publisher domain model and in-canister storage",
       "synonyms": [
-        "II login",
-        "DFINITY Internet Identity"
+        "Publisher type",
+        "publishers Map",
+        "nextPublisherId"
       ],
-      "description": "Login page and hooks to authenticate via Internet Identity, manage identity/agent, and create an authenticated actor for backend calls.",
+      "description": "Defines a Publisher record (id, fullName, fieldServiceGroup, privileges, overseer/assistant flags, isActive, notes) stored in an in-memory Map keyed by Nat with an auto-incrementing id counter.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-5",
-      "title": "App layout with header/sidebar navigation",
+      "title": "Publisher creation API (backend addPublisher) with defaults",
       "synonyms": [
-        "AppLayout",
-        "Header",
-        "Sidebar"
+        "addPublisher",
+        "create publisher"
       ],
-      "description": "Basic UI shell components providing a consistent layout structure for pages.",
+      "description": "Authenticated canister method to create a publisher, assign an auto-incrementing id, and apply defaults for optional isActive (defaults to true) and notes (defaults to empty string) when null is provided.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-6",
-      "title": "Initial pages: Login and Coming Soon",
+      "title": "Publisher update API (backend updatePublisher)",
       "synonyms": [
-        "Login page",
-        "ComingSoon page"
+        "updatePublisher",
+        "edit publisher"
       ],
-      "description": "Initial route/page components to support authentication entry and placeholder content.",
+      "description": "Authenticated canister method to update an existing publisher’s name, group, privileges, overseer/assistant flags, and active status. Traps with a clear message if the publisher id does not exist.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-7",
-      "title": "shadcn/ui component library integrated",
+      "title": "Publisher deletion API (backend deletePublisher)",
       "synonyms": [
-        "shadcn-ui",
-        "ui components"
+        "deletePublisher",
+        "remove publisher"
       ],
-      "description": "shadcn/ui component set added to build template (accordion/dialog/button/etc.) with shared utilities and lint rules.",
+      "description": "Authenticated canister method to delete a publisher by id. Traps if the id does not exist; otherwise removes it from storage.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-8",
-      "title": "Build/deploy templates for ICP project",
+      "title": "Publisher read/list and active toggle APIs (backend)",
       "synonyms": [
-        "build-template",
-        "dockerfile",
-        "deploy scripts"
+        "getPublisher",
+        "getAllPublishers",
+        "togglePublisherActiveState"
       ],
-      "description": "Project build template assets including Dockerfile, deploy.sh, ICP YAML/config, workspace/package configs, and helper scripts for image management.",
+      "description": "Authenticated canister methods to fetch one publisher, list all publishers, and toggle a publisher’s isActive flag; missing ids trap for toggle.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-9",
-      "title": "Publishers page with add-publisher flow (frontend)",
+      "title": "Internet Identity authentication provider (frontend)",
       "synonyms": [
-        "Publishers UI",
-        "AddPublisherModal",
-        "publisher management"
+        "InternetIdentityProvider",
+        "useInternetIdentity",
+        "AuthClient integration"
       ],
-      "description": "Frontend feature implementing a Publishers page and modal-driven add flow, including supporting hooks (e.g., useAddPublisher/useQueries), backend actor wiring, and local utilities (e.g., StorageClient/url params) to support the data flow.",
+      "description": "React context/provider using @dfinity/auth-client to initialize/load stored sessions, perform login with Internet Identity (configured by II_URL), provide logout (clear) functionality, and expose login state flags and errors. Uses a long maxTimeToLive (30 days).",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-10",
-      "title": "Backend migration module",
+      "title": "Frontend actor creation hook with auth bootstrap",
       "synonyms": [
-        "migration.mo",
-        "canister migrations"
+        "useActor",
+        "createActorWithConfig",
+        "_initializeAccessControlWithSecret"
       ],
-      "description": "Introduces/extends a backend migration module to support state evolution over time, coordinated from the main canister entrypoint.",
+      "description": "Creates a canister actor via React Query: returns an anonymous actor when not authenticated and an identity-bound actor when authenticated. On authenticated actor creation, extracts a secret token from the URL hash (caffeineAdminToken) and calls _initializeAccessControlWithSecret, then invalidates/refetches other queries so data is loaded under the new actor context.",
       "reqIds": [],
       "version": 1
     },
     {
       "id": "IF-11",
-      "title": "Publishers edit/update flow (frontend)",
+      "title": "Secure URL/hash parameter utilities with session persistence",
       "synonyms": [
-        "EditPublisherModal",
-        "UpdatePublisher",
-        "publisher update UI"
+        "urlParams",
+        "getSecretParameter",
+        "getSecretFromHash",
+        "sessionStorage persistence"
       ],
-      "description": "Extends the Publishers UI with an edit publisher modal and update hook (e.g., useUpdatePublisher) integrated with existing authenticated actor/data hooks, enabling users to modify an existing publisher from the Publishers page.",
+      "description": "Utilities to read parameters from query string or hash, persist values in sessionStorage, and safely extract secrets from the URL hash while removing them from the address bar using history.replaceState.",
       "reqIds": [],
       "version": 1
     },
     {
-      "id": "feature-retry-the-build-deployment-using-the-existing-icp-build-deploy-templates-and-current-project-configuration-targeting-the-same-environment-canisters-as-the-previous-failed-attempt",
-      "title": "Retry the build + deployment using the existing ICP build/deploy templates and current project configuration, targeting the same environment/canisters as the previous failed attempt.",
+      "id": "IF-12",
+      "title": "Auth-gated routing with placeholder sections",
+      "synonyms": [
+        "TanStack Router",
+        "ComingSoon pages",
+        "protected routes"
+      ],
+      "description": "Defines routes for multiple app sections. The root component gates the UI: unauthenticated users see Login; authenticated users see the app layout. Most routes render a reusable ComingSoon placeholder component; Publishers is fully implemented.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-13",
+      "title": "Authenticated app shell UI with navigation and logout",
+      "synonyms": [
+        "AppLayout",
+        "Header",
+        "Sidebar"
+      ],
+      "description": "Implements the authenticated shell: a responsive/collapsible sidebar with navigation links and active-state styling, a header with a mobile menu toggle and logout button, and a main outlet region for routed content. Logout clears Internet Identity state and clears the React Query cache.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-14",
+      "title": "Global toast notifications integration",
+      "synonyms": [
+        "Sonner",
+        "Toaster"
+      ],
+      "description": "AppLayout mounts a global Sonner Toaster (top-right). Domain workflows (add/edit/delete) use toast.success/toast.error for user feedback.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-15",
+      "title": "Publishers list query hook (frontend)",
+      "synonyms": [
+        "useGetAllPublishers",
+        "React Query publishers query"
+      ],
+      "description": "React Query hook that fetches all publishers from the backend (actor.getAllPublishers) and only runs when the actor is available and not currently fetching.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-16",
+      "title": "Add Publisher workflow (modal + mutation)",
+      "synonyms": [
+        "AddPublisherModal",
+        "useAddPublisher"
+      ],
+      "description": "Modal form to add a publisher with required fields (Full Name, Field Service Group, Privileges) and optional checkboxes (Group Overseer, Group Assistant, Mark as Inactive). Validates required input, maps a single privilege selection into the backend privileges object, submits via actor.addPublisher, shows success/error toasts, and invalidates the publishers query on success.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-17",
+      "title": "Edit Publisher workflow (modal + mutation)",
+      "synonyms": [
+        "EditPublisherModal",
+        "useUpdatePublisher"
+      ],
+      "description": "Modal form to edit an existing publisher, pre-filled from the selected publisher. Maps backend privileges to a UI option and back to backend format on save. Submits via actor.updatePublisher, shows success/error toasts, disables actions while pending, and invalidates the publishers query on success.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-18",
+      "title": "Delete Publisher workflow with optimistic UI",
+      "synonyms": [
+        "useDeletePublisher",
+        "optimistic delete",
+        "AlertDialog confirmation"
+      ],
+      "description": "Provides a delete action per publisher that opens a confirmation dialog. Deletion uses a React Query mutation that optimistically removes the publisher from the cached list, rolls back on error, shows an error toast on failure, and invalidates the publishers query when settled. On success, the page shows a success toast.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-19",
+      "title": "Publishers table UI with privilege rendering and inactive styling",
+      "synonyms": [
+        "Publishers page",
+        "publishers table",
+        "renderPrivileges"
+      ],
+      "description": "Renders publishers in a table with loading and empty states. Displays overseer/assistant badges, converts privilege booleans into readable labels (including a fallback to “Unbaptized Publisher”), and styles inactive publishers with a light gray row background.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-20",
+      "title": "Publishers page filter bar UI",
+      "synonyms": [
+        "search input",
+        "group dropdown",
+        "show inactive checkbox"
+      ],
+      "description": "Renders a filter bar above the publishers table containing: a name search input (placeholder “Search by name…”), a “Filter by Group” select with options All Groups (default), Group 1–4, and a “Show Inactive Publishers” checkbox (off by default).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-21",
+      "title": "Client-side publishers filtering with combined AND logic",
+      "synonyms": [
+        "filteredPublishers",
+        "useMemo filtering"
+      ],
+      "description": "Implements immediate client-side filtering over the fetched publishers list: case-insensitive substring match on publisher.fullName, optional group matching by fieldServiceGroup, and active-status filtering that hides inactive publishers unless showInactive is enabled. All active filters are combined with logical AND.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-22",
+      "title": "Tailwind + shadcn/ui theming with Theiarco primary color",
+      "synonyms": [
+        "OKLCH theme variables",
+        "theiarco-primary",
+        "Tailwind config"
+      ],
+      "description": "Configures Tailwind with CSS-variable-driven OKLCH theme tokens (light/dark), adds a custom Theiarco primary color token (and utility classes), and uses shadcn/ui primitives across the UI for consistent styling.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-authenticated-route-for-a-publisher-profile-page-that-is-addressed-by-publisher-id-in-the-url-e-g-publishers-id-and-renders-within-the-existing-authenticated-app-layout",
+      "title": "Add a new authenticated route for a Publisher Profile page that is addressed by publisher ID in the URL (e.g., `/publishers/:id`) and renders within the existing authenticated app layout.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-if-the-deployment-fails-again-capture-the-full-error-output-including-the-failing-command-and-stack-trace-logs-and-implement-the-minimal-project-change-s-needed-to-resolve-the-root-cause-then-re-run-deployment-until-it-succeeds",
-      "title": "If the deployment fails again, capture the full error output (including the failing command and stack trace/logs) and implement the minimal project change(s) needed to resolve the root cause, then re-run deployment until it succeeds.",
+      "id": "feature-make-each-publisher-name-in-the-publishers-table-clickable-so-that-clicking-it-navigates-to-that-publisher-s-profile-route-using-the-publisher-s-id",
+      "title": "Make each publisher name in the Publishers table clickable so that clicking it navigates to that publisher’s profile route using the publisher’s ID.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-implement-the-publisher-profile-page-ui-to-display-the-selected-publisher-s-details-full-name-as-the-page-heading-group-number-overseer-status-yes-no-assistant-status-yes-no-and-privileges",
+      "title": "Implement the Publisher Profile page UI to display the selected publisher’s details: full name as the page heading, group number, overseer status (Yes/No), assistant status (Yes/No), and privileges.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-back-to-publishers-button-at-the-top-of-the-publisher-profile-page-that-returns-the-user-to-the-publishers-list-page-publishers",
+      "title": "Add a \"Back to Publishers\" button at the top of the Publisher Profile page that returns the user to the Publishers list page (`/publishers`).",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-frontend-data-fetching-support-for-a-single-publisher-by-id-using-the-existing-backend-api-and-handle-the-states-for-loading-and-publisher-not-found-on-the-publisher-profile-page",
+      "title": "Add frontend data fetching support for a single publisher by ID using the existing backend API, and handle the states for loading and \"publisher not found\" on the Publisher Profile page.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "architecturalNotes": [
-    "Frontend uses Internet Identity; authentication state is handled via custom hooks (e.g., useInternetIdentity/useActor) to create an authenticated actor for backend calls.",
-    "UI layer is scaffolded with Tailwind + shadcn/ui component primitives; reusable layout components (header/sidebar) establish the page shell.",
-    "Backend includes a dedicated authorization/access-control layer (mixin/module) intended to gate protected canister methods.",
-    "Frontend now includes a Publishers feature with dedicated data hooks (e.g., useAddPublisher/useQueries) that call the authenticated backend actor and manage request/query state.",
-    "Backend now includes a migration module to handle state/schema evolution, integrated with main canister logic.",
-    "Authorization/access-control layer was updated (component:authorization:v4.0.0); main canister and authorization modules were modified accordingly.",
-    "Build template was expanded/standardized (component:core-infrastructure:v1.0.2, component:build-template-react:v1.0.0) to include a full React frontend template, canister YAMLs, and supporting scripts (e.g., prune-unused-images/resize-images).",
-    "Frontend template now includes additional custom ESLint rules to enforce Internet Identity provider usage and avoid BigInt in query keys (require-internet-identity-provider, no-bigint-in-query-keys).",
-    "Frontend Publishers feature now includes an edit/update workflow (EditPublisherModal + useUpdatePublisher) alongside the existing add flow, using the authenticated backend actor pattern.",
-    "Project is a single-user app: backend authorization/admin checks should be removed/disabled so any authenticated Internet Identity user has full access to all canister methods."
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Add Publisher Profile page routed by publisher ID (e.g., /publishers/:id) with details view and back button; make publisher names clickable to navigate to it.",
+      "reqIds": [],
+      "status": "pending"
+    }
   ],
-  "knownIssues": [
-    "Deployment failed when attempting to ship the Edit Publishers feature (deployment error encountered; user requested retry)."
+  "architectural_notes": [
+    "Monorepo split between Motoko canister code (backend/) and a React frontend (frontend/) communicating through generated canister bindings/actor interface imported from frontend/src/backend.",
+    "Backend authorization is implemented as a reusable Motoko module (authorization/access-control.mo) and exposed via a Motoko mixin (authorization/MixinAuthorization.mo) included into the main actor.",
+    "RBAC bootstrap pattern: canister reads CAFFEINE_ADMIN_TOKEN from environment; callers invoke _initializeAccessControlWithSecret(userSecret) to be registered. First caller providing the correct token becomes admin; others become users.",
+    "Frontend authentication is encapsulated in a React context/provider (InternetIdentityProvider) built on @dfinity/auth-client with persisted session loading and explicit login/logout actions.",
+    "Frontend uses TanStack Router for client-side routing with an auth-gated root component (unauthenticated users see Login; authenticated users see AppLayout and nested routes).",
+    "Data fetching and mutations use @tanstack/react-query. A dedicated actor hook (useActor) creates an identity-bound actor, calls backend initialization, and then invalidates/refetches other queries when the actor changes.",
+    "UI layer uses Tailwind CSS + shadcn/ui primitives (dialogs, tables, inputs, selects, alert-dialog, buttons, scroll-area) with lucide-react icons and Sonner for toasts.",
+    "Publishers filtering is done entirely client-side using useMemo over the already-fetched publishers list, updating immediately on UI state changes.",
+    "Publisher Profile page should be routed by publisher ID (recommended route: /publishers/:id)."
   ],
-  "isFixRequest": true,
+  "known_issues": [
+    "Backend data (publishers map, userProfiles map, nextPublisherId, and access control role map) is kept in in-memory (non-stable) variables/maps; state will reset on canister upgrade unless migrated to stable storage.",
+    "Potential Candid optional interop mismatch: backend addPublisher expects isActive : ?Bool and notes : ?Text, while the frontend calls actor.addPublisher with a plain boolean and string; depending on generated JS/TS bindings, Option values may need explicit encoding (e.g., []/[value]).",
+    "Backend initialization hard-depends on CAFFEINE_ADMIN_TOKEN being set; otherwise _initializeAccessControlWithSecret traps, preventing authenticated usage.",
+    "Publishers list UI has no explicit error state rendering for failures of useGetAllPublishers (only loading/empty states).",
+    "Delete confirmation dialog does not disable the confirm action or show an in-dialog pending state during deletion, allowing potential double-submission.",
+    "Field Service Group options (1–4) and privileges options are hard-coded in the UI rather than driven by backend configuration/data.",
+    "Publishers table name button has a stubbed click handler (“Profile navigation will be added later”), indicating incomplete navigation to a publisher profile/details view.",
+    "Frontend has placeholder routes (ComingSoon) for many sections (Dashboard, Pioneers, Territories, etc.) and does not yet implement a UI for the backend user profile APIs.",
+    "Duplicate/overlapping global CSS files appear to exist (frontend/index.css and frontend/src/index.css); only one is imported by main.tsx, which could cause confusion or drift over time."
+  ],
+  "isFixRequest": false,
+  "gameProjectType": "none",
   "projectName": "Theiarco",
   "clarification_mode": "instant",
-  "clarification_rounds": 0,
-  "requiresBackendChanges": true,
-  "requiresFrontendChanges": true
+  "clarification_rounds": 0
 }

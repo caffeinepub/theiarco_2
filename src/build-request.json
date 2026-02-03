@@ -1,51 +1,109 @@
 {
   "kind": "build_request",
-  "title": "Retry failed deployment and fix underlying deployment error",
+  "title": "Add Publisher Profile page routed by publisher ID",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Retry the build + deployment using the existing ICP build/deploy templates and current project configuration, targeting the same environment/canisters as the previous failed attempt.",
-      "target": "unknown",
+      "text": "Add a new authenticated route for a Publisher Profile page that is addressed by publisher ID in the URL (e.g., `/publishers/:id`) and renders within the existing authenticated app layout.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-2",
+          "msg-3"
         ],
         "quotes": [
-          "Try again."
+          "Create a Publisher Profile page",
+          "Publisher profile page should be routed by publisher ID."
         ]
       },
       "acceptanceCriteria": [
-        "A fresh build and deploy run completes successfully without errors.",
-        "The deployed app is reachable and the frontend loads without a blank screen."
+        "Navigating to `/publishers/<publisherId>` renders the Publisher Profile page inside the existing AppLayout (sidebar/header remain visible).",
+        "The route parameter is treated as a publisher ID and used to load the correct publisher record."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "If the deployment fails again, capture the full error output (including the failing command and stack trace/logs) and implement the minimal project change(s) needed to resolve the root cause, then re-run deployment until it succeeds.",
-      "target": "both",
+      "text": "Make each publisher name in the Publishers table clickable so that clicking it navigates to that publisher’s profile route using the publisher’s ID.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-2"
         ],
         "quotes": [
-          "Try again."
+          "Make the publisher names in the table clickable. When clicked, navigate to a Publisher Profile page showing that publisher's details."
         ]
       },
       "acceptanceCriteria": [
-        "If a failure occurs, the exact error output is available and identifies the failing step.",
-        "After fixes, a subsequent build + deploy completes successfully.",
-        "No changes are made to read-only frontend paths listed in SYSTEM_CONTEXT.frontend.immutablePaths."
+        "Clicking a publisher’s name in the table navigates to `/publishers/<id>` for that row.",
+        "The existing Edit/Delete actions continue to work unchanged."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Implement the Publisher Profile page UI to display the selected publisher’s details: full name as the page heading, group number, overseer status (Yes/No), assistant status (Yes/No), and privileges.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "The Publisher Profile page should display: - Publisher's full name as the heading at the top - Group number - Overseer status (Yes or No) - Assistant status (Yes or No)  - Privileges"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The publisher full name is shown as the primary heading at the top of the page.",
+        "Group number, overseer status, assistant status, and privileges are visible and reflect the backend values for the selected publisher.",
+        "Overseer and Assistant are rendered as \"Yes\" or \"No\" (in English)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Add a \"Back to Publishers\" button at the top of the Publisher Profile page that returns the user to the Publishers list page (`/publishers`).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Add a \"Back to Publishers\" button at the top that returns to the Publishers list page."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Publisher Profile page includes a visible \"Back to Publishers\" button at the top.",
+        "Clicking the button navigates to `/publishers`."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add frontend data fetching support for a single publisher by ID using the existing backend API, and handle the states for loading and \"publisher not found\" on the Publisher Profile page.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2",
+          "msg-3"
+        ],
+        "quotes": [
+          "navigate to a Publisher Profile page showing that publisher's details.",
+          "Publisher profile page should be routed by publisher ID."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The frontend calls the backend to fetch a publisher by ID (using the existing backend method) when the Publisher Profile page loads.",
+        "While the publisher is loading, the page shows a loading state (in English).",
+        "If the publisher ID does not exist (backend returns null/empty), the page shows a clear \"not found\" message (in English) and still provides a way to return to `/publishers`."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain single-actor with all Motoko logic in backend/main.mo.",
-    "Do not edit any files under frontend/src/components/ui or any paths listed in SYSTEM_CONTEXT.frontend.immutablePaths; compose those components instead."
+    "Do not modify files under frontend.immutablePaths (including frontend/src/main.tsx, frontend/src/hooks/useActor.ts, and frontend/src/hooks/useInternetIdentity.ts[x]).",
+    "Keep all existing Publishers list functionality (filters, add/edit/delete, inactive styling) unchanged aside from adding name-click navigation.",
+    "Respect the single-actor Motoko backend architecture; do not introduce additional backend services."
   ],
   "nonGoals": [
-    "Adding new product features unrelated to resolving the deployment failure.",
-    "Changing the authentication provider (Internet Identity) flow."
+    "Do not add pagination to the Publishers table.",
+    "Do not add additional permission restrictions beyond the existing authenticated-user gating for publisher data.",
+    "Do not change the backend Publisher schema or add new publisher fields."
   ],
   "imageRequirements": {
     "required": [],

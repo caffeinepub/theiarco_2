@@ -8,11 +8,6 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const Privileges = IDL.Record({
-  'servant' : IDL.Bool,
-  'publisher' : IDL.Bool,
-  'elder' : IDL.Bool,
-});
 export const PublisherId = IDL.Nat;
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
@@ -21,7 +16,11 @@ export const UserRole = IDL.Variant({
 });
 export const Publisher = IDL.Record({
   'id' : PublisherId,
-  'privileges' : Privileges,
+  'privileges' : IDL.Record({
+    'servant' : IDL.Bool,
+    'publisher' : IDL.Bool,
+    'elder' : IDL.Bool,
+  }),
   'fieldServiceGroup' : IDL.Nat,
   'fullName' : IDL.Text,
   'isGroupOverseer' : IDL.Bool,
@@ -29,10 +28,7 @@ export const Publisher = IDL.Record({
   'notes' : IDL.Text,
   'isGroupAssistant' : IDL.Bool,
 });
-export const UserProfile = IDL.Record({
-  'congregation' : IDL.Text,
-  'name' : IDL.Text,
-});
+export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -40,7 +36,11 @@ export const idlService = IDL.Service({
       [
         IDL.Text,
         IDL.Nat,
-        Privileges,
+        IDL.Record({
+          'servant' : IDL.Bool,
+          'publisher' : IDL.Bool,
+          'elder' : IDL.Bool,
+        }),
         IDL.Bool,
         IDL.Bool,
         IDL.Opt(IDL.Bool),
@@ -50,6 +50,7 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'deletePublisher' : IDL.Func([PublisherId], [], []),
   'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -62,16 +63,28 @@ export const idlService = IDL.Service({
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
+  'updatePublisher' : IDL.Func(
+      [
+        PublisherId,
+        IDL.Text,
+        IDL.Nat,
+        IDL.Record({
+          'servant' : IDL.Bool,
+          'publisher' : IDL.Bool,
+          'elder' : IDL.Bool,
+        }),
+        IDL.Bool,
+        IDL.Bool,
+        IDL.Bool,
+      ],
+      [],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
-  const Privileges = IDL.Record({
-    'servant' : IDL.Bool,
-    'publisher' : IDL.Bool,
-    'elder' : IDL.Bool,
-  });
   const PublisherId = IDL.Nat;
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
@@ -80,7 +93,11 @@ export const idlFactory = ({ IDL }) => {
   });
   const Publisher = IDL.Record({
     'id' : PublisherId,
-    'privileges' : Privileges,
+    'privileges' : IDL.Record({
+      'servant' : IDL.Bool,
+      'publisher' : IDL.Bool,
+      'elder' : IDL.Bool,
+    }),
     'fieldServiceGroup' : IDL.Nat,
     'fullName' : IDL.Text,
     'isGroupOverseer' : IDL.Bool,
@@ -88,10 +105,7 @@ export const idlFactory = ({ IDL }) => {
     'notes' : IDL.Text,
     'isGroupAssistant' : IDL.Bool,
   });
-  const UserProfile = IDL.Record({
-    'congregation' : IDL.Text,
-    'name' : IDL.Text,
-  });
+  const UserProfile = IDL.Record({ 'name' : IDL.Text });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -99,7 +113,11 @@ export const idlFactory = ({ IDL }) => {
         [
           IDL.Text,
           IDL.Nat,
-          Privileges,
+          IDL.Record({
+            'servant' : IDL.Bool,
+            'publisher' : IDL.Bool,
+            'elder' : IDL.Bool,
+          }),
           IDL.Bool,
           IDL.Bool,
           IDL.Opt(IDL.Bool),
@@ -109,6 +127,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'deletePublisher' : IDL.Func([PublisherId], [], []),
     'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -121,6 +140,23 @@ export const idlFactory = ({ IDL }) => {
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
+    'updatePublisher' : IDL.Func(
+        [
+          PublisherId,
+          IDL.Text,
+          IDL.Nat,
+          IDL.Record({
+            'servant' : IDL.Bool,
+            'publisher' : IDL.Bool,
+            'elder' : IDL.Bool,
+          }),
+          IDL.Bool,
+          IDL.Bool,
+          IDL.Bool,
+        ],
+        [],
+        [],
+      ),
   });
 };
 

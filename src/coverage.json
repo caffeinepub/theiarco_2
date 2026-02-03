@@ -1,56 +1,85 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-03T19:46:35.077Z",
+  "generatedAt": "2026-02-03T21:50:38.884Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 5,
+    "implemented": 5,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Retry the build + deployment using the existing ICP build/deploy templates and current project configuration, targeting the same environment/canisters as the previous failed attempt.",
+        "summary": "Add a new authenticated route for a Publisher Profile page that is addressed by publisher ID in the URL (e.g., `/publishers/:id`) and renders within the existing authenticated app layout.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/.env",
-          "frontend/src/hooks/useInternetIdentity.ts"
+          "frontend/src/App.tsx",
+          "frontend/src/pages/PublisherProfile.tsx"
         ],
         "matchedFiles": [
-          "frontend/.env"
+          "frontend/src/App.tsx",
+          "frontend/src/pages/PublisherProfile.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "If the deployment fails again, capture the full error output (including the failing command and stack trace/logs) and implement the minimal project change(s) needed to resolve the root cause, then re-run deployment until it succeeds.",
+        "summary": "Make each publisher name in the Publishers table clickable so that clicking it navigates to that publisher’s profile route using the publisher’s ID.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/ErrorBoundary.tsx",
-          "frontend/src/main.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/pages/Publishers.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/ErrorBoundary.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/pages/Publishers.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Implement the Publisher Profile page UI to display the selected publisher’s details: full name as the page heading, group number, overseer status (Yes/No), assistant status (Yes/No), and privileges.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/PublisherProfile.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/PublisherProfile.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Add a \"Back to Publishers\" button at the top of the Publisher Profile page that returns the user to the Publishers list page (`/publishers`).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/PublisherProfile.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/PublisherProfile.tsx"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Add frontend data fetching support for a single publisher by ID using the existing backend API, and handle the states for loading and \"publisher not found\" on the Publisher Profile page.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/PublisherProfile.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/PublisherProfile.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/.env",
     "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/ErrorBoundary.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/PublisherProfile.tsx",
+    "frontend/src/pages/Publishers.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

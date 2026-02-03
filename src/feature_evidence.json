@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-retry-the-build-deployment-using-the-existing-icp-build-deploy-templates-and-current-project-configuration-targeting-the-same-environment-canisters-as-the-previous-failed-attempt",
-      "featureTitle": "Retry the build + deployment using the existing ICP build/deploy templates and current project configuration, targeting the same environment/canisters as the previous failed attempt.",
+      "featureId": "feature-add-a-new-authenticated-route-for-a-publisher-profile-page-that-is-addressed-by-publisher-id-in-the-url-e-g-publishers-id-and-renders-within-the-existing-authenticated-app-layout",
+      "featureTitle": "Add a new authenticated route for a Publisher Profile page that is addressed by publisher ID in the URL (e.g., `/publishers/:id`) and renders within the existing authenticated app layout.",
       "files": [
-        "frontend/.env"
+        "frontend/src/App.tsx",
+        "frontend/src/pages/PublisherProfile.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,11 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-if-the-deployment-fails-again-capture-the-full-error-output-including-the-failing-command-and-stack-trace-logs-and-implement-the-minimal-project-change-s-needed-to-resolve-the-root-cause-then-re-run-deployment-until-it-succeeds",
-      "featureTitle": "If the deployment fails again, capture the full error output (including the failing command and stack trace/logs) and implement the minimal project change(s) needed to resolve the root cause, then re-run deployment until it succeeds.",
+      "featureId": "feature-make-each-publisher-name-in-the-publishers-table-clickable-so-that-clicking-it-navigates-to-that-publisher-s-profile-route-using-the-publisher-s-id",
+      "featureTitle": "Make each publisher name in the Publishers table clickable so that clicking it navigates to that publisher’s profile route using the publisher’s ID.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/ErrorBoundary.tsx"
+        "frontend/src/pages/Publishers.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -37,6 +37,64 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-the-publisher-profile-page-ui-to-display-the-selected-publisher-s-details-full-name-as-the-page-heading-group-number-overseer-status-yes-no-assistant-status-yes-no-and-privileges",
+      "featureTitle": "Implement the Publisher Profile page UI to display the selected publisher’s details: full name as the page heading, group number, overseer status (Yes/No), assistant status (Yes/No), and privileges.",
+      "files": [
+        "frontend/src/pages/PublisherProfile.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-back-to-publishers-button-at-the-top-of-the-publisher-profile-page-that-returns-the-user-to-the-publishers-list-page-publishers",
+      "featureTitle": "Add a \"Back to Publishers\" button at the top of the Publisher Profile page that returns the user to the Publishers list page (`/publishers`).",
+      "files": [
+        "frontend/src/pages/PublisherProfile.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-frontend-data-fetching-support-for-a-single-publisher-by-id-using-the-existing-backend-api-and-handle-the-states-for-loading-and-publisher-not-found-on-the-publisher-profile-page",
+      "featureTitle": "Add frontend data fetching support for a single publisher by ID using the existing backend API, and handle the states for loading and \"publisher not found\" on the Publisher Profile page.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/PublisherProfile.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
       ],
       "confidence": "high"
     }

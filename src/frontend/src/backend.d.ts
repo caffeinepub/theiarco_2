@@ -9,7 +9,11 @@ export interface None {
 export type Option<T> = Some<T> | None;
 export interface Publisher {
     id: PublisherId;
-    privileges: Privileges;
+    privileges: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    };
     fieldServiceGroup: bigint;
     fullName: string;
     isGroupOverseer: boolean;
@@ -19,13 +23,7 @@ export interface Publisher {
 }
 export type PublisherId = bigint;
 export interface UserProfile {
-    congregation: string;
     name: string;
-}
-export interface Privileges {
-    servant: boolean;
-    publisher: boolean;
-    elder: boolean;
 }
 export enum UserRole {
     admin = "admin",
@@ -33,8 +31,13 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
-    addPublisher(fullName: string, fieldServiceGroup: bigint, privileges: Privileges, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null, notes: string | null): Promise<PublisherId>;
+    addPublisher(fullName: string, fieldServiceGroup: bigint, privileges: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null, notes: string | null): Promise<PublisherId>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    deletePublisher(id: PublisherId): Promise<void>;
     getAllPublishers(): Promise<Array<Publisher>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -43,4 +46,9 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     togglePublisherActiveState(id: PublisherId): Promise<void>;
+    updatePublisher(id: PublisherId, fullName: string, fieldServiceGroup: bigint, privileges: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean): Promise<void>;
 }

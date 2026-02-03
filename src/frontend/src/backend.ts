@@ -91,7 +91,11 @@ export class ExternalBlob {
 }
 export interface Publisher {
     id: PublisherId;
-    privileges: Privileges;
+    privileges: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    };
     fieldServiceGroup: bigint;
     fullName: string;
     isGroupOverseer: boolean;
@@ -101,13 +105,7 @@ export interface Publisher {
 }
 export type PublisherId = bigint;
 export interface UserProfile {
-    congregation: string;
     name: string;
-}
-export interface Privileges {
-    servant: boolean;
-    publisher: boolean;
-    elder: boolean;
 }
 export enum UserRole {
     admin = "admin",
@@ -116,8 +114,13 @@ export enum UserRole {
 }
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
-    addPublisher(fullName: string, fieldServiceGroup: bigint, privileges: Privileges, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null, notes: string | null): Promise<PublisherId>;
+    addPublisher(fullName: string, fieldServiceGroup: bigint, privileges: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null, notes: string | null): Promise<PublisherId>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    deletePublisher(id: PublisherId): Promise<void>;
     getAllPublishers(): Promise<Array<Publisher>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -126,6 +129,11 @@ export interface backendInterface {
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     togglePublisherActiveState(id: PublisherId): Promise<void>;
+    updatePublisher(id: PublisherId, fullName: string, fieldServiceGroup: bigint, privileges: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean): Promise<void>;
 }
 import type { Publisher as _Publisher, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -144,7 +152,11 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async addPublisher(arg0: string, arg1: bigint, arg2: Privileges, arg3: boolean, arg4: boolean, arg5: boolean | null, arg6: string | null): Promise<PublisherId> {
+    async addPublisher(arg0: string, arg1: bigint, arg2: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    }, arg3: boolean, arg4: boolean, arg5: boolean | null, arg6: string | null): Promise<PublisherId> {
         if (this.processError) {
             try {
                 const result = await this.actor.addPublisher(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg5), to_candid_opt_n2(this._uploadFile, this._downloadFile, arg6));
@@ -169,6 +181,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n3(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async deletePublisher(arg0: PublisherId): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deletePublisher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deletePublisher(arg0);
             return result;
         }
     }
@@ -281,6 +307,24 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.togglePublisherActiveState(arg0);
+            return result;
+        }
+    }
+    async updatePublisher(arg0: PublisherId, arg1: string, arg2: bigint, arg3: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    }, arg4: boolean, arg5: boolean, arg6: boolean): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updatePublisher(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updatePublisher(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
             return result;
         }
     }

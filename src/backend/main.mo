@@ -1,5 +1,6 @@
 import Map "mo:core/Map";
 import Array "mo:core/Array";
+import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
@@ -10,17 +11,16 @@ actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // User Profile System
   public type UserProfile = {
     name : Text;
-    congregation : Text;
+    // Other user metadata if needed
   };
 
   let userProfiles = Map.empty<Principal, UserProfile>();
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view profiles");
+      Runtime.trap("Unauthorized: Only users can access profiles");
     };
     userProfiles.get(caller);
   };
@@ -39,20 +39,17 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Publisher Management System
-  public type PublisherId = Nat;
-
-  public type Privileges = {
-    publisher : Bool;
-    servant : Bool;
-    elder : Bool;
-  };
+  type PublisherId = Nat;
 
   public type Publisher = {
     id : PublisherId;
     fullName : Text;
     fieldServiceGroup : Nat;
-    privileges : Privileges;
+    privileges : {
+      publisher : Bool;
+      servant : Bool;
+      elder : Bool;
+    };
     isGroupOverseer : Bool;
     isGroupAssistant : Bool;
     isActive : Bool;
@@ -65,14 +62,18 @@ actor {
   public shared ({ caller }) func addPublisher(
     fullName : Text,
     fieldServiceGroup : Nat,
-    privileges : Privileges,
+    privileges : {
+      publisher : Bool;
+      servant : Bool;
+      elder : Bool;
+    },
     isGroupOverseer : Bool,
     isGroupAssistant : Bool,
     isActive : ?Bool,
     notes : ?Text,
   ) : async PublisherId {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can add publishers");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can add publishers");
     };
 
     let publisher : Publisher = {
@@ -97,6 +98,50 @@ actor {
     publisher.id;
   };
 
+  public shared ({ caller }) func updatePublisher(
+    id : PublisherId,
+    fullName : Text,
+    fieldServiceGroup : Nat,
+    privileges : {
+      publisher : Bool;
+      servant : Bool;
+      elder : Bool;
+    },
+    isGroupOverseer : Bool,
+    isGroupAssistant : Bool,
+    isActive : Bool,
+  ) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update publishers");
+    };
+
+    switch (publishers.get(id)) {
+      case (null) { Runtime.trap("Publisher not found: " # debug_show(id)) };
+      case (?existing) {
+        let updatedPublisher : Publisher = {
+          existing with
+          fullName;
+          fieldServiceGroup;
+          privileges;
+          isGroupOverseer;
+          isGroupAssistant;
+          isActive;
+        };
+        publishers.add(id, updatedPublisher);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deletePublisher(id : PublisherId) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete publishers");
+    };
+    if (not publishers.containsKey(id)) {
+      Runtime.trap("Delete failed. Publisher with that id does not exist: " # debug_show(id));
+    };
+    publishers.remove(id);
+  };
+
   public query ({ caller }) func getPublisher(id : PublisherId) : async ?Publisher {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view publishers");
@@ -105,15 +150,15 @@ actor {
   };
 
   public shared ({ caller }) func togglePublisherActiveState(id : PublisherId) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can toggle publisher active state");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can toggle publisher state");
     };
 
     switch (publishers.get(id)) {
       case (null) { Runtime.trap("Publisher not found") };
       case (?publisher) {
         let updatedPublisher = {
-          publisher with isActive = not publisher.isActive;
+          publisher with isActive = not publisher.isActive
         };
         publishers.add(id, updatedPublisher);
       };

@@ -4,11 +4,11 @@ import Login from './pages/Login';
 import AppLayout from './components/layout/AppLayout';
 import ComingSoon from './pages/ComingSoon';
 import Publishers from './pages/Publishers';
-import { AlertCircle } from 'lucide-react';
+import PublisherProfile from './pages/PublisherProfile';
 
 // Root component that handles auth state
 function RootComponent() {
-  const { identity, isInitializing, loginError, isLoginError } = useInternetIdentity();
+  const { identity, isInitializing } = useInternetIdentity();
   const isAuthenticated = !!identity;
 
   // Show loading during initialization
@@ -18,27 +18,6 @@ function RootComponent() {
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
           <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if authentication initialization failed
-  if (isLoginError && loginError) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background p-4">
-        <div className="max-w-md text-center space-y-4">
-          <div className="flex justify-center">
-            <AlertCircle className="h-12 w-12 text-destructive" />
-          </div>
-          <h1 className="text-xl font-bold text-foreground">Authentication Error</h1>
-          <p className="text-muted-foreground">{loginError.message}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-          >
-            Retry
-          </button>
         </div>
       </div>
     );
@@ -69,6 +48,12 @@ const publishersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/publishers',
   component: Publishers
+});
+
+const publisherProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/publishers/$id',
+  component: PublisherProfile
 });
 
 const pioneersRoute = createRoute({
@@ -129,6 +114,7 @@ const userProfileRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   dashboardRoute,
   publishersRoute,
+  publisherProfileRoute,
   pioneersRoute,
   territoriesRoute,
   shepherdingRoute,
