@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 22,
+  "summary": "ICP starter app scaffold with Motoko backend authorization/access-control plus migration support, and a React (Vite/Tailwind/shadcn-ui) frontend featuring Internet Identity login, basic app layout/pages, and an initial Publishers management UI, with build/deploy templates.",
+  "existing_features": [
+    {
+      "id": "IF-1",
+      "title": "Motoko backend canister scaffold",
+      "synonyms": [
+        "backend main canister",
+        "motoko core"
+      ],
+      "description": "Base Motoko canister entrypoint (main.mo) with supporting modules and build configuration for deployment.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "Backend authorization & access control modules",
+      "synonyms": [
+        "authorization mixin",
+        "access-control"
+      ],
+      "description": "Reusable authorization layer implemented in Motoko (MixinAuthorization and access-control) to support authenticated/authorized calls.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "React (Vite) frontend scaffold with Tailwind",
+      "synonyms": [
+        "frontend scaffold",
+        "vite react"
+      ],
+      "description": "Frontend application bootstrapped with Vite + React, Tailwind styling, and environment/config wiring to talk to the backend canister.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "Internet Identity authentication flow",
+      "synonyms": [
+        "II login",
+        "DFINITY Internet Identity"
+      ],
+      "description": "Login page and hooks to authenticate via Internet Identity, manage identity/agent, and create an authenticated actor for backend calls.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "App layout with header/sidebar navigation",
+      "synonyms": [
+        "AppLayout",
+        "Header",
+        "Sidebar"
+      ],
+      "description": "Basic UI shell components providing a consistent layout structure for pages.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Initial pages: Login and Coming Soon",
+      "synonyms": [
+        "Login page",
+        "ComingSoon page"
+      ],
+      "description": "Initial route/page components to support authentication entry and placeholder content.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "shadcn/ui component library integrated",
+      "synonyms": [
+        "shadcn-ui",
+        "ui components"
+      ],
+      "description": "shadcn/ui component set added to build template (accordion/dialog/button/etc.) with shared utilities and lint rules.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Build/deploy templates for ICP project",
+      "synonyms": [
+        "build-template",
+        "dockerfile",
+        "deploy scripts"
+      ],
+      "description": "Project build template assets including Dockerfile, deploy.sh, ICP YAML/config, workspace/package configs, and helper scripts for image management.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-9",
+      "title": "Publishers page with add-publisher flow (frontend)",
+      "synonyms": [
+        "Publishers UI",
+        "AddPublisherModal",
+        "publisher management"
+      ],
+      "description": "Frontend feature implementing a Publishers page and modal-driven add flow, including supporting hooks (e.g., useAddPublisher/useQueries), backend actor wiring, and local utilities (e.g., StorageClient/url params) to support the data flow.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-10",
+      "title": "Backend migration module",
+      "synonyms": [
+        "migration.mo",
+        "canister migrations"
+      ],
+      "description": "Introduces/extends a backend migration module to support state evolution over time, coordinated from the main canister entrypoint.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-11",
+      "title": "Publishers edit/update flow (frontend)",
+      "synonyms": [
+        "EditPublisherModal",
+        "UpdatePublisher",
+        "publisher update UI"
+      ],
+      "description": "Extends the Publishers UI with an edit publisher modal and update hook (e.g., useUpdatePublisher) integrated with existing authenticated actor/data hooks, enabling users to modify an existing publisher from the Publishers page.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-retry-the-build-deployment-using-the-existing-icp-build-deploy-templates-and-current-project-configuration-targeting-the-same-environment-canisters-as-the-previous-failed-attempt",
+      "title": "Retry the build + deployment using the existing ICP build/deploy templates and current project configuration, targeting the same environment/canisters as the previous failed attempt.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-if-the-deployment-fails-again-capture-the-full-error-output-including-the-failing-command-and-stack-trace-logs-and-implement-the-minimal-project-change-s-needed-to-resolve-the-root-cause-then-re-run-deployment-until-it-succeeds",
+      "title": "If the deployment fails again, capture the full error output (including the failing command and stack trace/logs) and implement the minimal project change(s) needed to resolve the root cause, then re-run deployment until it succeeds.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [],
+  "architecturalNotes": [
+    "Frontend uses Internet Identity; authentication state is handled via custom hooks (e.g., useInternetIdentity/useActor) to create an authenticated actor for backend calls.",
+    "UI layer is scaffolded with Tailwind + shadcn/ui component primitives; reusable layout components (header/sidebar) establish the page shell.",
+    "Backend includes a dedicated authorization/access-control layer (mixin/module) intended to gate protected canister methods.",
+    "Frontend now includes a Publishers feature with dedicated data hooks (e.g., useAddPublisher/useQueries) that call the authenticated backend actor and manage request/query state.",
+    "Backend now includes a migration module to handle state/schema evolution, integrated with main canister logic.",
+    "Authorization/access-control layer was updated (component:authorization:v4.0.0); main canister and authorization modules were modified accordingly.",
+    "Build template was expanded/standardized (component:core-infrastructure:v1.0.2, component:build-template-react:v1.0.0) to include a full React frontend template, canister YAMLs, and supporting scripts (e.g., prune-unused-images/resize-images).",
+    "Frontend template now includes additional custom ESLint rules to enforce Internet Identity provider usage and avoid BigInt in query keys (require-internet-identity-provider, no-bigint-in-query-keys).",
+    "Frontend Publishers feature now includes an edit/update workflow (EditPublisherModal + useUpdatePublisher) alongside the existing add flow, using the authenticated backend actor pattern.",
+    "Project is a single-user app: backend authorization/admin checks should be removed/disabled so any authenticated Internet Identity user has full access to all canister methods."
+  ],
+  "knownIssues": [
+    "Deployment failed when attempting to ship the Edit Publishers feature (deployment error encountered; user requested retry)."
+  ],
+  "isFixRequest": true,
+  "projectName": "Theiarco",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0,
+  "requiresBackendChanges": true,
+  "requiresFrontendChanges": true
+}

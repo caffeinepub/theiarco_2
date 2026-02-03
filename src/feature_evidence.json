@@ -1,0 +1,44 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-retry-the-build-deployment-using-the-existing-icp-build-deploy-templates-and-current-project-configuration-targeting-the-same-environment-canisters-as-the-previous-failed-attempt",
+      "featureTitle": "Retry the build + deployment using the existing ICP build/deploy templates and current project configuration, targeting the same environment/canisters as the previous failed attempt.",
+      "files": [
+        "frontend/.env"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-if-the-deployment-fails-again-capture-the-full-error-output-including-the-failing-command-and-stack-trace-logs-and-implement-the-minimal-project-change-s-needed-to-resolve-the-root-cause-then-re-run-deployment-until-it-succeeds",
+      "featureTitle": "If the deployment fails again, capture the full error output (including the failing command and stack trace/logs) and implement the minimal project change(s) needed to resolve the root cause, then re-run deployment until it succeeds.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/ErrorBoundary.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

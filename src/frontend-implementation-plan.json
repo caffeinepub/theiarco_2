@@ -1,0 +1,53 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix frontend build/runtime configuration causing deployment failure (Vite env + blank-screen safeguards)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Align frontend configuration with the existing ICP build/deploy templates so the deployed frontend loads correctly (no runtime crash/blank screen).",
+      "acceptanceCriteria": [
+        "A fresh build and deploy run completes successfully without errors.",
+        "The deployed app is reachable and the frontend loads without a blank screen."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/.env",
+          "operation": "modify",
+          "description": "Update the Internet Identity environment variable naming to the Vite-compatible convention (e.g., switch from II_URL to VITE_II_URL) so the value is injected at build time and does not break the deployed bundle. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useInternetIdentity.ts",
+          "operation": "modify",
+          "description": "Remove dependency on Node-style process.env and read the Internet Identity provider URL from Vite runtime env (import.meta.env) with a safe fallback to the default IC URL; this prevents production runtime errors that can lead to a blank screen. Use the authorization component guidance for Internet Identity integration as the reference; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add minimal, non-invasive frontend diagnostics/guardrails so if deployment/build issues surface again, the failing step is easier to identify and the app renders an error screen instead of a blank page.",
+      "acceptanceCriteria": [
+        "If a failure occurs, the exact error output is available and identifies the failing step.",
+        "After fixes, a subsequent build + deploy completes successfully.",
+        "No changes are made to read-only frontend paths listed in SYSTEM_CONTEXT.frontend.immutablePaths."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ErrorBoundary.tsx",
+          "operation": "create",
+          "description": "Create a small application-level ErrorBoundary that catches unexpected runtime errors and renders a user-visible fallback screen (and logs details to console) to avoid a blank page in production. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "Wrap the application render with the new ErrorBoundary so unexpected runtime errors become visible and diagnosable rather than producing a blank screen. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add minimal runtime error surfacing around auth-gated routing (e.g., ensure failures during initialization/render show a visible error state rather than silently failing). Keep changes limited to composition (no edits under frontend/src/components/ui). Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

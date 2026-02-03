@@ -1,0 +1,54 @@
+{
+  "kind": "build_request",
+  "title": "Retry failed deployment and fix underlying deployment error",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Retry the build + deployment using the existing ICP build/deploy templates and current project configuration, targeting the same environment/canisters as the previous failed attempt.",
+      "target": "unknown",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Try again."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A fresh build and deploy run completes successfully without errors.",
+        "The deployed app is reachable and the frontend loads without a blank screen."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "If the deployment fails again, capture the full error output (including the failing command and stack trace/logs) and implement the minimal project change(s) needed to resolve the root cause, then re-run deployment until it succeeds.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Try again."
+        ]
+      },
+      "acceptanceCriteria": [
+        "If a failure occurs, the exact error output is available and identifies the failing step.",
+        "After fixes, a subsequent build + deploy completes successfully.",
+        "No changes are made to read-only frontend paths listed in SYSTEM_CONTEXT.frontend.immutablePaths."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain single-actor with all Motoko logic in backend/main.mo.",
+    "Do not edit any files under frontend/src/components/ui or any paths listed in SYSTEM_CONTEXT.frontend.immutablePaths; compose those components instead."
+  ],
+  "nonGoals": [
+    "Adding new product features unrelated to resolving the deployment failure.",
+    "Changing the authentication provider (Internet Identity) flow."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
