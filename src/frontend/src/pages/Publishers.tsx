@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 import { Plus, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 import AddPublisherModal from '../components/publishers/AddPublisherModal';
 import EditPublisherModal from '../components/publishers/EditPublisherModal';
 import { useGetAllPublishers } from '../hooks/useQueries';
@@ -90,10 +90,6 @@ export default function Publishers() {
     return labels.join(', ');
   };
 
-  const handleNameClick = (publisherId: bigint) => {
-    navigate({ to: `/publishers/${publisherId.toString()}` });
-  };
-
   const handleEditClick = (publisher: Publisher) => {
     setSelectedPublisher(publisher);
     setIsEditModalOpen(true);
@@ -126,6 +122,10 @@ export default function Publishers() {
 
   const handleDeleteCancel = () => {
     setPublisherToDelete(null);
+  };
+
+  const handleNameClick = (publisherId: bigint) => {
+    navigate({ to: `/publishers/${publisherId.toString()}` });
   };
 
   return (

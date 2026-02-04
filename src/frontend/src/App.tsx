@@ -5,6 +5,7 @@ import AppLayout from './components/layout/AppLayout';
 import ComingSoon from './pages/ComingSoon';
 import Publishers from './pages/Publishers';
 import PublisherProfile from './pages/PublisherProfile';
+import Notes from './pages/Notes';
 
 // Root component that handles auth state
 function RootComponent() {
@@ -95,7 +96,7 @@ const fieldServiceGroupsRoute = createRoute({
 const notesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/notes',
-  component: () => <ComingSoon title="Notes" />
+  component: Notes
 });
 
 const tasksRoute = createRoute({

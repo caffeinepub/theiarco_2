@@ -1,85 +1,99 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-03T21:50:38.884Z",
+  "generatedAt": "2026-02-04T04:00:49.045Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 5,
+    "total": 6,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Add a new authenticated route for a Publisher Profile page that is addressed by publisher ID in the URL (e.g., `/publishers/:id`) and renders within the existing authenticated app layout.",
+        "id": "REQ-10",
+        "summary": "On the Notes page (/notes), implement the \"Add Note\" button to open a modal form with the required fields and conditional \"Attach To\" behavior: Title (required), Content (required), Category dropdown (required; options: None, Publishers, Territory, Shepherding, Elder, General), and an \"Attach To\" dropdown that only appears for Publishers/Territory/Shepherding with Territory and Shepherding disabled placeholders as specified.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/pages/PublisherProfile.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "frontend/src/pages/Notes.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/pages/PublisherProfile.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "frontend/src/pages/Notes.tsx"
         ]
       },
       {
-        "id": "REQ-2",
-        "summary": "Make each publisher name in the Publishers table clickable so that clicking it navigates to that publisher’s profile route using the publisher’s ID.",
+        "id": "REQ-11",
+        "summary": "For Category = \"Publishers\" in the Global Notes Add Note modal, populate the \"Attach To\" dropdown with ONLY active publishers (exclude inactive publishers). If a publisher becomes inactive, it must no longer appear in the dropdown for new Global Notes.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Publishers.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Publishers.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx"
         ]
       },
       {
-        "id": "REQ-3",
-        "summary": "Implement the Publisher Profile page UI to display the selected publisher’s details: full name as the page heading, group number, overseer status (Yes/No), assistant status (Yes/No), and privileges.",
+        "id": "REQ-12",
+        "summary": "Wire the Global Notes Add Note modal Submit/Cancel flows: on Submit, call the backend create Global Note API, then close the modal, clear the form fields, and show a green success toast with exact text \"Note created successfully!\" that auto-dismisses after 3 seconds; on Cancel, close the modal without saving.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/PublisherProfile.tsx"
+          "frontend/src/hooks/useCreateGlobalNote.ts",
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "frontend/src/pages/Notes.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/PublisherProfile.tsx"
+          "frontend/src/hooks/useCreateGlobalNote.ts",
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "frontend/src/pages/Notes.tsx"
         ]
       },
       {
-        "id": "REQ-4",
-        "summary": "Add a \"Back to Publishers\" button at the top of the Publisher Profile page that returns the user to the Publishers list page (`/publishers`).",
+        "id": "REQ-13",
+        "summary": "Enforce the separation between Global Notes and Publisher Profile Notes: Global Notes created on /notes must not appear in any Publisher Profile Notes UI; Publisher Profile Notes must not appear on the Global Notes page. Keep them as independent systems even when a Global Note references a publisher.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/hooks/useGlobalNotes.ts",
+          "frontend/src/hooks/useCreateGlobalNote.ts",
           "frontend/src/pages/PublisherProfile.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/PublisherProfile.tsx"
+          "frontend/src/hooks/useGlobalNotes.ts",
+          "frontend/src/hooks/useCreateGlobalNote.ts"
         ]
       },
       {
-        "id": "REQ-5",
-        "summary": "Add frontend data fetching support for a single publisher by ID using the existing backend API, and handle the states for loading and \"publisher not found\" on the Publisher Profile page.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/PublisherProfile.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/PublisherProfile.tsx"
-        ]
+        "id": "REQ-8",
+        "summary": "Implement a new Global Notes backend data model and stable storage that is completely separate from Publisher Profile Notes storage. Global Notes must have their own unique IDs and must only reference a publisher when the note category is exactly \"Publishers\".",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Add backend APIs for creating Global Notes from the Notes page with fields: unique ID (generated), title, content, category, optional attached publisher reference (only for category \"Publishers\"), and an integer timestamp for creation time. Persist Global Notes using stable storage so notes survive canister upgrades.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/PublisherProfile.tsx",
-    "frontend/src/pages/Publishers.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useCreateGlobalNote.ts",
+    "frontend/src/hooks/useGlobalNotes.ts",
+    "frontend/src/pages/Notes.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

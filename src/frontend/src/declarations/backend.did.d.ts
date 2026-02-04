@@ -10,6 +10,14 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface GlobalNote {
+  'id' : bigint,
+  'title' : string,
+  'content' : string,
+  'createdAt' : bigint,
+  'category' : string,
+  'attachedPublisher' : [] | [PublisherId],
+}
 export interface Publisher {
   'id' : PublisherId,
   'privileges' : {
@@ -21,7 +29,6 @@ export interface Publisher {
   'fullName' : string,
   'isGroupOverseer' : boolean,
   'isActive' : boolean,
-  'notes' : string,
   'isGroupAssistant' : boolean,
 }
 export type PublisherId = bigint;
@@ -39,20 +46,30 @@ export interface _SERVICE {
       boolean,
       boolean,
       [] | [boolean],
-      [] | [string],
     ],
     PublisherId
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'createGlobalNote' : ActorMethod<
+    [string, string, string, [] | [PublisherId]],
+    bigint
+  >,
+  'deleteGlobalNote' : ActorMethod<[bigint], undefined>,
   'deletePublisher' : ActorMethod<[PublisherId], undefined>,
+  'getAllGlobalNotes' : ActorMethod<[], Array<GlobalNote>>,
   'getAllPublishers' : ActorMethod<[], Array<Publisher>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getGlobalNote' : ActorMethod<[bigint], [] | [GlobalNote]>,
   'getPublisher' : ActorMethod<[PublisherId], [] | [Publisher]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'togglePublisherActiveState' : ActorMethod<[PublisherId], undefined>,
+  'updateGlobalNote' : ActorMethod<
+    [bigint, string, string, string, [] | [PublisherId]],
+    undefined
+  >,
   'updatePublisher' : ActorMethod<
     [
       PublisherId,

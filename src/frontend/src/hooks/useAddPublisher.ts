@@ -42,8 +42,7 @@ export function useAddPublisher() {
         privilegesObject,
         input.isGroupOverseer,
         input.isGroupAssistant,
-        input.isActive,
-        '' // notes default to empty string
+        input.isActive
       );
 
       return publisherId;

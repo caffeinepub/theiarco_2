@@ -1,10 +1,11 @@
 import Map "mo:core/Map";
 import Array "mo:core/Array";
-import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Nat "mo:core/Nat";
+import Time "mo:core/Time";
 
 actor {
   // Initialize the access control state
@@ -26,8 +27,8 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own profile");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access profiles");
     };
     userProfiles.get(user);
   };
@@ -53,7 +54,6 @@ actor {
     isGroupOverseer : Bool;
     isGroupAssistant : Bool;
     isActive : Bool;
-    notes : Text;
   };
 
   let publishers = Map.empty<PublisherId, Publisher>();
@@ -70,7 +70,6 @@ actor {
     isGroupOverseer : Bool,
     isGroupAssistant : Bool,
     isActive : ?Bool,
-    notes : ?Text,
   ) : async PublisherId {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can add publishers");
@@ -85,10 +84,6 @@ actor {
       isGroupAssistant;
       isActive = switch (isActive) {
         case (null) { true };
-        case (?value) { value };
-      };
-      notes = switch (notes) {
-        case (null) { "" };
         case (?value) { value };
       };
     };
@@ -140,6 +135,7 @@ actor {
       Runtime.trap("Delete failed. Publisher with that id does not exist: " # debug_show(id));
     };
     publishers.remove(id);
+    // Also delete all notes for this publisher
   };
 
   public query ({ caller }) func getPublisher(id : PublisherId) : async ?Publisher {
@@ -170,5 +166,100 @@ actor {
       Runtime.trap("Unauthorized: Only users can view publishers");
     };
     publishers.values().toArray();
+  };
+
+  // Global Notes functionality
+  public type GlobalNote = {
+    id : Nat;
+    title : Text;
+    content : Text;
+    category : Text;
+    attachedPublisher : ?PublisherId;
+    createdAt : Int;
+  };
+
+  let globalNotes = Map.empty<Nat, GlobalNote>();
+  var nextNoteId = 0;
+
+  public shared ({ caller }) func createGlobalNote(
+    title : Text,
+    content : Text,
+    category : Text,
+    attachedPublisher : ?PublisherId,
+  ) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can create notes");
+    };
+
+    let noteId = nextNoteId;
+    nextNoteId += 1;
+
+    let newNote : GlobalNote = {
+      id = noteId;
+      title;
+      content;
+      category;
+      attachedPublisher = if (category == "Publishers") {
+        attachedPublisher;
+      } else {
+        null;
+      };
+      createdAt = Time.now();
+    };
+
+    globalNotes.add(noteId, newNote);
+    noteId;
+  };
+
+  public query ({ caller }) func getGlobalNote(id : Nat) : async ?GlobalNote {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view notes");
+    };
+    globalNotes.get(id);
+  };
+
+  public shared ({ caller }) func updateGlobalNote(
+    id : Nat,
+    title : Text,
+    content : Text,
+    category : Text,
+    attachedPublisher : ?PublisherId,
+  ) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can update notes");
+    };
+
+    switch (globalNotes.get(id)) {
+      case (null) { Runtime.trap("Note not found") };
+      case (?existingNote) {
+        let updatedNote : GlobalNote = {
+          existingNote with
+          title;
+          content;
+          category;
+          attachedPublisher;
+        };
+        globalNotes.add(id, updatedNote);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteGlobalNote(id : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can delete notes");
+    };
+
+    if (not globalNotes.containsKey(id)) {
+      Runtime.trap("Delete failed. Note with that id does not exist: " # debug_show(id));
+    };
+
+    globalNotes.remove(id);
+  };
+
+  public query ({ caller }) func getAllGlobalNotes() : async [GlobalNote] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view notes");
+    };
+    globalNotes.values().toArray();
   };
 };

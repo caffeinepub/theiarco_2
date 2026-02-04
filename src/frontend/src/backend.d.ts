@@ -18,8 +18,15 @@ export interface Publisher {
     fullName: string;
     isGroupOverseer: boolean;
     isActive: boolean;
-    notes: string;
     isGroupAssistant: boolean;
+}
+export interface GlobalNote {
+    id: bigint;
+    title: string;
+    content: string;
+    createdAt: bigint;
+    category: string;
+    attachedPublisher?: PublisherId;
 }
 export type PublisherId = bigint;
 export interface UserProfile {
@@ -35,17 +42,22 @@ export interface backendInterface {
         servant: boolean;
         publisher: boolean;
         elder: boolean;
-    }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null, notes: string | null): Promise<PublisherId>;
+    }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null): Promise<PublisherId>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    createGlobalNote(title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<bigint>;
+    deleteGlobalNote(id: bigint): Promise<void>;
     deletePublisher(id: PublisherId): Promise<void>;
+    getAllGlobalNotes(): Promise<Array<GlobalNote>>;
     getAllPublishers(): Promise<Array<Publisher>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getGlobalNote(id: bigint): Promise<GlobalNote | null>;
     getPublisher(id: PublisherId): Promise<Publisher | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     togglePublisherActiveState(id: PublisherId): Promise<void>;
+    updateGlobalNote(id: bigint, title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<void>;
     updatePublisher(id: PublisherId, fullName: string, fieldServiceGroup: bigint, privileges: {
         servant: boolean;
         publisher: boolean;

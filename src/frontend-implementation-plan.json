@@ -1,92 +1,97 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Publisher Profile page routed by publisher ID",
+  "title": "Global Notes: Notes page Add Note modal and create flow (frontend)",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Add an authenticated Publisher Profile route addressed by publisher ID and rendered within the existing authenticated AppLayout.",
+      "id": "REQ-10",
+      "summary": "Implement an Add Note modal on /notes with required fields and exact conditional Attach To behavior by category.",
       "acceptanceCriteria": [
-        "Navigating to `/publishers/<publisherId>` renders the Publisher Profile page inside the existing AppLayout (sidebar/header remain visible).",
-        "The route parameter is treated as a publisher ID and used to load the correct publisher record."
+        "Clicking \"Add Note\" opens a modal containing Title, Content, Category, and Submit/Cancel controls.",
+        "\"Attach To\" behavior matches exactly: shown for Publishers (enabled), shown for Territory (disabled with placeholder \"Territories (coming soon)\"), shown for Shepherding (disabled with placeholder \"Shepherding Visits (coming soon)\"), hidden for Elder/General/None.",
+        "All user-facing text in the modal is in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Register a new TanStack Router route for the Publisher Profile page at `/publishers/<id>` (parameterized segment) under the existing authenticated root route so it renders inside AppLayout."
+          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "operation": "create",
+          "description": "Create an Add Global Note modal using shadcn-ui primitives (Dialog, Input, Select, Button, etc.) with fields Title (required), Content (required), Category dropdown (required; options exactly: None, Publishers, Territory, Shepherding, Elder, General), and conditional \"Attach To\" UI: (1) Publishers shows enabled dropdown, (2) Territory shows disabled dropdown with placeholder text \"Territories (coming soon)\", (3) Shepherding shows disabled dropdown with placeholder text \"Shepherding Visits (coming soon)\", (4) hidden for Elder/General/None. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/PublisherProfile.tsx",
-          "operation": "create",
-          "description": "Create the Publisher Profile page component that reads the route publisher ID parameter and renders within the existing authenticated app layout via the router Outlet."
+          "path": "frontend/src/pages/Notes.tsx",
+          "operation": "modify",
+          "description": "Wire the existing \"Add Note\" button to open/close the new AddGlobalNoteModal component and pass required state/handlers so the modal renders on /notes without introducing new routes."
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Make publisher names in the Publishers table navigate to the selected publisher’s profile route using that publisher’s ID.",
+      "id": "REQ-11",
+      "summary": "For Category = \"Publishers\", populate Attach To with only active publishers and reflect updates without reload.",
       "acceptanceCriteria": [
-        "Clicking a publisher’s name in the table navigates to `/publishers/<id>` for that row.",
-        "The existing Edit/Delete actions continue to work unchanged."
+        "The \"Attach To\" dropdown lists only publishers whose active flag is true.",
+        "Inactive publishers are not visible/selectable in the dropdown without requiring a page reload after the publishers query refetches/updates."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Publishers.tsx",
+          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
           "operation": "modify",
-          "description": "Replace the current non-functional name button handler with TanStack Router navigation (e.g., Link or navigate) to the Publisher Profile route using the row’s publisher.id, without changing existing filters, inactive styling, or Edit/Delete behaviors."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Implement Publisher Profile UI showing the selected publisher’s details including heading, group, overseer/assistant statuses, and privileges.",
-      "acceptanceCriteria": [
-        "The publisher full name is shown as the primary heading at the top of the page.",
-        "Group number, overseer status, assistant status, and privileges are visible and reflect the backend values for the selected publisher.",
-        "Overseer and Assistant are rendered as \"Yes\" or \"No\" (in English)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/PublisherProfile.tsx",
-          "operation": "modify",
-          "description": "Render the publisher’s fullName as the page heading and display fieldServiceGroup, isGroupOverseer (Yes/No), isGroupAssistant (Yes/No), and privileges (publisher/servant/elder) using existing UI primitives (e.g., shadcn-ui components). Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Add a Back to Publishers button on the Publisher Profile page that navigates back to the Publishers list.",
-      "acceptanceCriteria": [
-        "The Publisher Profile page includes a visible \"Back to Publishers\" button at the top.",
-        "Clicking the button navigates to `/publishers`."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/PublisherProfile.tsx",
-          "operation": "modify",
-          "description": "Add a \"Back to Publishers\" control at the top of the page using TanStack Router navigation (Link or navigate) to `/publishers`, using existing button styling/components (e.g., shadcn-ui Button). Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Fetch a single publisher by ID via the existing backend API and handle loading and not-found states on the Publisher Profile page.",
-      "acceptanceCriteria": [
-        "The frontend calls the backend to fetch a publisher by ID (using the existing backend method) when the Publisher Profile page loads.",
-        "While the publisher is loading, the page shows a loading state (in English).",
-        "If the publisher ID does not exist (backend returns null/empty), the page shows a clear \"not found\" message (in English) and still provides a way to return to `/publishers`."
-      ],
-      "file_operations": [
+          "description": "Populate the Publishers \"Attach To\" dropdown from the existing publishers query data and filter to only `isActive === true`; ensure the dropdown options are derived from query state so changes in the cached/refetched publishers list immediately update what can be selected for new Global Notes. Verify the component's usage instructions before implementing."
+        },
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a React Query hook to fetch a single publisher by ID using the existing backend capability (actor.getPublisher), with query enabling tied to actor availability."
+          "description": "Confirm the existing publishers query hook behavior is suitable for reactive updates (React Query cached data + refetch/invalidation) and, if needed, adjust query options (without changing semantics) to support timely UI updates for the active-publishers Attach To dropdown."
+        }
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "summary": "Implement Add Note modal Submit/Cancel flows: create Global Note via backend call, reset/close, and show exact success toast.",
+      "acceptanceCriteria": [
+        "Submit triggers a backend call and creates a persisted Global Note with an integer creation timestamp.",
+        "After a successful submit, the modal closes, form state resets, and a success toast appears with the exact text and auto-dismiss timing.",
+        "Cancel closes the modal and does not create any note in the backend."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useCreateGlobalNote.ts",
+          "operation": "create",
+          "description": "Add a React Query mutation hook that calls the backend capability to create a Global Note (title/content/category plus attachedPublisher as PublisherId|null) and returns the created ID; include basic client-side validation alignment (required fields; attachedPublisher only when category is exactly \"Publishers\") and expose pending/error state for UI control."
+        },
+        {
+          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "operation": "modify",
+          "description": "Wire Submit to call useCreateGlobalNote; on success close the modal, clear form fields, and show a green success toast with exact text \"Note created successfully!\" that auto-dismisses after 3 seconds; on Cancel, close the modal without saving. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/Notes.tsx",
+          "operation": "modify",
+          "description": "Ensure the Notes page passes modal open/close and completion handlers so a successful submit closes the modal and resets UI state while preserving all existing Notes page behavior aside from the requested create flow."
+        }
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "summary": "Ensure Global Notes UI and Publisher Profile Notes UI remain independent and do not cross-populate.",
+      "acceptanceCriteria": [
+        "Creating a Global Note attached to a publisher does not change or populate the Publisher Profile Notes section for that publisher.",
+        "Publisher Profile Notes CRUD continues to operate only on the publisher-keyed notes system and does not read/write Global Notes storage."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useGlobalNotes.ts",
+          "operation": "create",
+          "description": "Create dedicated React Query hook(s) for Global Notes reads (e.g., fetch all Global Notes) using distinct query keys (e.g., ['globalNotes', ...]) so Global Notes are cached/invalidated separately from any publisher-related notes concerns."
+        },
+        {
+          "path": "frontend/src/hooks/useCreateGlobalNote.ts",
+          "operation": "modify",
+          "description": "On successful creation, invalidate/refetch only Global Notes query keys (e.g., ['globalNotes']) and avoid invalidating any publisher profile notes keys, ensuring Global Notes creation on /notes does not implicitly drive Publisher Profile Notes UI updates."
         },
         {
           "path": "frontend/src/pages/PublisherProfile.tsx",
           "operation": "modify",
-          "description": "Use the route publisher ID parameter to call the single-publisher query hook; show an English loading state while fetching and an English \"not found\" state when the backend returns null, including a visible way to return to `/publishers`."
+          "description": "Audit and enforce that PublisherProfile does not import or query Global Notes hooks/components; keep Publisher Profile behavior unchanged and ensure no Global Notes rendering is introduced when a Global Note references a publisher."
         }
       ]
     }

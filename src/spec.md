@@ -1,13 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Add an authenticated Publisher Profile page that can be opened by publisher ID and reached from the Publishers list.
+**Goal:** Add a Global Notes “Add Note” modal on /notes that creates and persists Global Notes in a new, separate backend store, with an optional publisher attachment only for the “Publishers” category.
 
 **Planned changes:**
-- Add a new authenticated route `/publishers/:id` that renders inside the existing authenticated app layout.
-- Update the Publishers table so each publisher name is clickable and navigates to `/publishers/<id>` without changing existing Edit/Delete actions.
-- Build the Publisher Profile page UI to show the selected publisher’s details: full name (as heading), group number, overseer status (Yes/No), assistant status (Yes/No), and privileges.
-- Add a “Back to Publishers” button on the profile page that navigates to `/publishers`.
-- Fetch publisher data by ID on page load using the existing backend API, and display loading and “not found” states with a way back to `/publishers`.
+- Create a new backend Global Notes data model and stable storage that is fully separate from Publisher Profile Notes (separate IDs, storage, and APIs).
+- Add backend APIs to create Global Notes with: generated unique ID, title, content, category, optional publisher reference (only when category is “Publishers”), and integer creation timestamp; validate payloads and persist across canister upgrades.
+- Update /notes UI: implement “Add Note” modal with required Title, Content, Category dropdown (None, Publishers, Territory, Shepherding, Elder, General), and conditional “Attach To” dropdown behavior (Publishers enabled; Territory/Shepherding shown but disabled with specified placeholders; hidden otherwise).
+- Populate “Attach To” for Publishers category using only active publishers (exclude inactive; update as publisher list refetches).
+- Wire Submit/Cancel flows: Submit calls create API, closes modal, clears form, and shows a green toast “Note created successfully!” that auto-dismisses after 3 seconds; Cancel closes without saving.
+- Enforce separation in UI and backend: Global Notes do not appear in Publisher Profile Notes, and Publisher Profile Notes do not appear on /notes.
 
-**User-visible outcome:** Users can click a publisher’s name in the Publishers list to open a profile page at `/publishers/<id>`, view that publisher’s details, see clear loading/not-found messaging, and return to the Publishers list via a back button.
+**User-visible outcome:** On the Notes page, users can open an Add Note modal, optionally attach a note to an active publisher (Publishers category only), submit to save a new Global Note that persists over upgrades, and see a success toast—without affecting Publisher Profile Notes.

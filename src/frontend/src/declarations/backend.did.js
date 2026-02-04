@@ -14,6 +14,14 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const GlobalNote = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'content' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'category' : IDL.Text,
+  'attachedPublisher' : IDL.Opt(PublisherId),
+});
 export const Publisher = IDL.Record({
   'id' : PublisherId,
   'privileges' : IDL.Record({
@@ -25,7 +33,6 @@ export const Publisher = IDL.Record({
   'fullName' : IDL.Text,
   'isGroupOverseer' : IDL.Bool,
   'isActive' : IDL.Bool,
-  'notes' : IDL.Text,
   'isGroupAssistant' : IDL.Bool,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
@@ -44,16 +51,23 @@ export const idlService = IDL.Service({
         IDL.Bool,
         IDL.Bool,
         IDL.Opt(IDL.Bool),
-        IDL.Opt(IDL.Text),
       ],
       [PublisherId],
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'createGlobalNote' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
+      [IDL.Nat],
+      [],
+    ),
+  'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
   'deletePublisher' : IDL.Func([PublisherId], [], []),
+  'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
   'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
   'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -63,6 +77,11 @@ export const idlService = IDL.Service({
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
+  'updateGlobalNote' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
+      [],
+      [],
+    ),
   'updatePublisher' : IDL.Func(
       [
         PublisherId,
@@ -91,6 +110,14 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const GlobalNote = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'content' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'category' : IDL.Text,
+    'attachedPublisher' : IDL.Opt(PublisherId),
+  });
   const Publisher = IDL.Record({
     'id' : PublisherId,
     'privileges' : IDL.Record({
@@ -102,7 +129,6 @@ export const idlFactory = ({ IDL }) => {
     'fullName' : IDL.Text,
     'isGroupOverseer' : IDL.Bool,
     'isActive' : IDL.Bool,
-    'notes' : IDL.Text,
     'isGroupAssistant' : IDL.Bool,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
@@ -121,16 +147,23 @@ export const idlFactory = ({ IDL }) => {
           IDL.Bool,
           IDL.Bool,
           IDL.Opt(IDL.Bool),
-          IDL.Opt(IDL.Text),
         ],
         [PublisherId],
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createGlobalNote' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
+        [IDL.Nat],
+        [],
+      ),
+    'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
     'deletePublisher' : IDL.Func([PublisherId], [], []),
+    'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
     'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
     'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -140,6 +173,11 @@ export const idlFactory = ({ IDL }) => {
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
+    'updateGlobalNote' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
+        [],
+        [],
+      ),
     'updatePublisher' : IDL.Func(
         [
           PublisherId,
