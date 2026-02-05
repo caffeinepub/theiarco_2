@@ -18,28 +18,45 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useCreateGlobalNote } from '../../hooks/useCreateGlobalNote';
+import { useUpdateGlobalNote } from '../../hooks/useUpdateGlobalNote';
 import { useGetAllPublishers } from '../../hooks/useQueries';
 import { toast } from 'sonner';
-import type { PublisherId } from '../../backend';
+import type { PublisherId, GlobalNote } from '../../backend';
 
 interface AddGlobalNoteModalProps {
   isOpen: boolean;
   onClose: () => void;
+  noteToEdit?: GlobalNote | null;
 }
 
 type CategoryOption = 'None' | 'Publishers' | 'Territory' | 'Shepherding' | 'Elder' | 'General';
 
-export default function AddGlobalNoteModal({ isOpen, onClose }: AddGlobalNoteModalProps) {
+export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddGlobalNoteModalProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<CategoryOption | ''>('');
   const [attachedPublisher, setAttachedPublisher] = useState<string>('');
 
   const createNoteMutation = useCreateGlobalNote();
+  const updateNoteMutation = useUpdateGlobalNote();
   const { data: publishers = [] } = useGetAllPublishers();
+
+  const isEditMode = !!noteToEdit;
 
   // Filter to only active publishers
   const activePublishers = publishers.filter((p) => p.isActive);
+
+  // Initialize form with note data when editing
+  useEffect(() => {
+    if (noteToEdit) {
+      setTitle(noteToEdit.title);
+      setContent(noteToEdit.content);
+      setCategory(noteToEdit.category as CategoryOption);
+      setAttachedPublisher(noteToEdit.attachedPublisher?.toString() || '');
+    } else {
+      resetForm();
+    }
+  }, [noteToEdit]);
 
   // Reset attached publisher when category changes
   useEffect(() => {
@@ -58,29 +75,48 @@ export default function AddGlobalNoteModal({ isOpen, onClose }: AddGlobalNoteMod
     }
 
     try {
-      await createNoteMutation.mutateAsync({
-        title: title.trim(),
-        content: content.trim(),
-        category,
-        attachedPublisher: attachedPublisher ? BigInt(attachedPublisher) : undefined,
-      });
+      if (isEditMode && noteToEdit) {
+        // Update existing note
+        await updateNoteMutation.mutateAsync({
+          id: noteToEdit.id,
+          title: title.trim(),
+          content: content.trim(),
+          category,
+          attachedPublisher: attachedPublisher ? BigInt(attachedPublisher) : undefined,
+        });
 
-      // Success - show toast and close modal
-      toast.success('Note created successfully!', {
-        duration: 3000,
-        style: {
-          background: 'oklch(0.7 0.15 145)',
-          color: 'white',
-        },
-      });
+        toast.success('Note updated successfully!', {
+          duration: 3000,
+          style: {
+            background: 'oklch(0.7 0.15 145)',
+            color: 'white',
+          },
+        });
+      } else {
+        // Create new note
+        await createNoteMutation.mutateAsync({
+          title: title.trim(),
+          content: content.trim(),
+          category,
+          attachedPublisher: attachedPublisher ? BigInt(attachedPublisher) : undefined,
+        });
+
+        toast.success('Note created successfully!', {
+          duration: 3000,
+          style: {
+            background: 'oklch(0.7 0.15 145)',
+            color: 'white',
+          },
+        });
+      }
 
       // Reset form and close
       resetForm();
       onClose();
     } catch (error) {
       // Error - keep modal open, show error toast
-      console.error('Failed to create note:', error);
-      toast.error('Failed to create note. Please try again.');
+      console.error(`Failed to ${isEditMode ? 'update' : 'create'} note:`, error);
+      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} note. Please try again.`);
     }
   };
 
@@ -110,11 +146,13 @@ export default function AddGlobalNoteModal({ isOpen, onClose }: AddGlobalNoteMod
     return '';
   };
 
+  const isPending = createNoteMutation.isPending || updateNoteMutation.isPending;
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Add Note</DialogTitle>
+          <DialogTitle>{isEditMode ? 'Edit Note' : 'Add Note'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -196,17 +234,17 @@ export default function AddGlobalNoteModal({ isOpen, onClose }: AddGlobalNoteMod
               type="button"
               variant="outline"
               onClick={handleClose}
-              disabled={createNoteMutation.isPending}
+              disabled={isPending}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={createNoteMutation.isPending}
+              disabled={isPending}
               style={{ backgroundColor: '#43587A' }}
               className="text-white hover:opacity-90"
             >
-              {createNoteMutation.isPending ? 'Creating...' : 'Submit'}
+              {isPending ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save' : 'Submit')}
             </Button>
           </DialogFooter>
         </form>

@@ -14,6 +14,17 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const CreateTaskInput = IDL.Record({
+  'title' : IDL.Text,
+  'dueDate' : IDL.Int,
+  'parentTaskId' : IDL.Opt(IDL.Nat),
+  'notes' : IDL.Opt(IDL.Text),
+  'category' : IDL.Text,
+});
+export const CreateTerritoryNoteInput = IDL.Record({
+  'title' : IDL.Text,
+  'content' : IDL.Text,
+});
 export const GlobalNote = IDL.Record({
   'id' : IDL.Nat,
   'title' : IDL.Text,
@@ -35,7 +46,46 @@ export const Publisher = IDL.Record({
   'isActive' : IDL.Bool,
   'isGroupAssistant' : IDL.Bool,
 });
+export const CheckoutRecord = IDL.Record({
+  'publisherId' : PublisherId,
+  'publisherName' : IDL.Text,
+  'dateReturned' : IDL.Opt(IDL.Int),
+  'isCampaign' : IDL.Bool,
+  'dateCheckedOut' : IDL.Int,
+});
+export const Territory = IDL.Record({
+  'id' : IDL.Text,
+  'status' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'checkOutHistory' : IDL.Vec(CheckoutRecord),
+  'territoryType' : IDL.Text,
+  'notes' : IDL.Text,
+  'number' : IDL.Text,
+});
+export const TerritoryNote = IDL.Record({
+  'id' : IDL.Nat,
+  'title' : IDL.Text,
+  'content' : IDL.Text,
+  'createdAt' : IDL.Int,
+});
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const Task = IDL.Record({
+  'id' : IDL.Nat,
+  'completedAt' : IDL.Opt(IDL.Int),
+  'title' : IDL.Text,
+  'isCompleted' : IDL.Bool,
+  'createdAt' : IDL.Int,
+  'dueDate' : IDL.Int,
+  'updatedAt' : IDL.Opt(IDL.Int),
+  'parentTaskId' : IDL.Opt(IDL.Nat),
+  'notes' : IDL.Opt(IDL.Text),
+  'category' : IDL.Text,
+});
+export const TaskStatus = IDL.Variant({
+  'all' : IDL.Null,
+  'completed' : IDL.Null,
+  'uncompleted' : IDL.Null,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -56,25 +106,57 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'checkOutTerritory' : IDL.Func([IDL.Text, PublisherId, IDL.Bool], [], []),
   'createGlobalNote' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
       [IDL.Nat],
       [],
     ),
+  'createTask' : IDL.Func([CreateTaskInput], [IDL.Nat], []),
+  'createTerritory' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+      [IDL.Text],
+      [],
+    ),
+  'createTerritoryNote' : IDL.Func(
+      [IDL.Text, CreateTerritoryNoteInput],
+      [IDL.Nat],
+      [],
+    ),
   'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
   'deletePublisher' : IDL.Func([PublisherId], [], []),
+  'deleteTask' : IDL.Func([IDL.Nat], [], []),
+  'deleteTerritory' : IDL.Func([IDL.Text], [], []),
+  'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
   'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
   'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
+  'getAllTerritories' : IDL.Func([], [IDL.Vec(Territory)], ['query']),
+  'getAllTerritoryNotes' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(TerritoryNote)],
+      ['query'],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
   'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
+  'getTask' : IDL.Func([IDL.Nat], [IDL.Opt(Task)], ['query']),
+  'getTasks' : IDL.Func([TaskStatus], [IDL.Vec(Task)], ['query']),
+  'getTasksByParent' : IDL.Func([IDL.Opt(IDL.Nat)], [IDL.Vec(Task)], ['query']),
+  'getTerritory' : IDL.Func([IDL.Text], [IDL.Opt(Territory)], ['query']),
+  'getTerritoryNote' : IDL.Func(
+      [IDL.Text, IDL.Nat],
+      [IDL.Opt(TerritoryNote)],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'makeTerritoryAvailable' : IDL.Func([IDL.Text], [], []),
+  'markTerritoryReturned' : IDL.Func([IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
   'updateGlobalNote' : IDL.Func(
@@ -99,6 +181,14 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'updateTask' : IDL.Func([IDL.Nat, CreateTaskInput], [], []),
+  'updateTaskCompletion' : IDL.Func([IDL.Nat, IDL.Bool], [], []),
+  'updateTerritory' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+  'updateTerritoryNote' : IDL.Func(
+      [IDL.Text, IDL.Nat, CreateTerritoryNoteInput],
+      [],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -109,6 +199,17 @@ export const idlFactory = ({ IDL }) => {
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const CreateTaskInput = IDL.Record({
+    'title' : IDL.Text,
+    'dueDate' : IDL.Int,
+    'parentTaskId' : IDL.Opt(IDL.Nat),
+    'notes' : IDL.Opt(IDL.Text),
+    'category' : IDL.Text,
+  });
+  const CreateTerritoryNoteInput = IDL.Record({
+    'title' : IDL.Text,
+    'content' : IDL.Text,
   });
   const GlobalNote = IDL.Record({
     'id' : IDL.Nat,
@@ -131,7 +232,46 @@ export const idlFactory = ({ IDL }) => {
     'isActive' : IDL.Bool,
     'isGroupAssistant' : IDL.Bool,
   });
+  const CheckoutRecord = IDL.Record({
+    'publisherId' : PublisherId,
+    'publisherName' : IDL.Text,
+    'dateReturned' : IDL.Opt(IDL.Int),
+    'isCampaign' : IDL.Bool,
+    'dateCheckedOut' : IDL.Int,
+  });
+  const Territory = IDL.Record({
+    'id' : IDL.Text,
+    'status' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'checkOutHistory' : IDL.Vec(CheckoutRecord),
+    'territoryType' : IDL.Text,
+    'notes' : IDL.Text,
+    'number' : IDL.Text,
+  });
+  const TerritoryNote = IDL.Record({
+    'id' : IDL.Nat,
+    'title' : IDL.Text,
+    'content' : IDL.Text,
+    'createdAt' : IDL.Int,
+  });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const Task = IDL.Record({
+    'id' : IDL.Nat,
+    'completedAt' : IDL.Opt(IDL.Int),
+    'title' : IDL.Text,
+    'isCompleted' : IDL.Bool,
+    'createdAt' : IDL.Int,
+    'dueDate' : IDL.Int,
+    'updatedAt' : IDL.Opt(IDL.Int),
+    'parentTaskId' : IDL.Opt(IDL.Nat),
+    'notes' : IDL.Opt(IDL.Text),
+    'category' : IDL.Text,
+  });
+  const TaskStatus = IDL.Variant({
+    'all' : IDL.Null,
+    'completed' : IDL.Null,
+    'uncompleted' : IDL.Null,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -152,25 +292,61 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'checkOutTerritory' : IDL.Func([IDL.Text, PublisherId, IDL.Bool], [], []),
     'createGlobalNote' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
         [IDL.Nat],
         [],
       ),
+    'createTask' : IDL.Func([CreateTaskInput], [IDL.Nat], []),
+    'createTerritory' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+        [IDL.Text],
+        [],
+      ),
+    'createTerritoryNote' : IDL.Func(
+        [IDL.Text, CreateTerritoryNoteInput],
+        [IDL.Nat],
+        [],
+      ),
     'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
     'deletePublisher' : IDL.Func([PublisherId], [], []),
+    'deleteTask' : IDL.Func([IDL.Nat], [], []),
+    'deleteTerritory' : IDL.Func([IDL.Text], [], []),
+    'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
     'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
     'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
+    'getAllTerritories' : IDL.Func([], [IDL.Vec(Territory)], ['query']),
+    'getAllTerritoryNotes' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(TerritoryNote)],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
     'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
+    'getTask' : IDL.Func([IDL.Nat], [IDL.Opt(Task)], ['query']),
+    'getTasks' : IDL.Func([TaskStatus], [IDL.Vec(Task)], ['query']),
+    'getTasksByParent' : IDL.Func(
+        [IDL.Opt(IDL.Nat)],
+        [IDL.Vec(Task)],
+        ['query'],
+      ),
+    'getTerritory' : IDL.Func([IDL.Text], [IDL.Opt(Territory)], ['query']),
+    'getTerritoryNote' : IDL.Func(
+        [IDL.Text, IDL.Nat],
+        [IDL.Opt(TerritoryNote)],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'makeTerritoryAvailable' : IDL.Func([IDL.Text], [], []),
+    'markTerritoryReturned' : IDL.Func([IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
     'updateGlobalNote' : IDL.Func(
@@ -192,6 +368,14 @@ export const idlFactory = ({ IDL }) => {
           IDL.Bool,
           IDL.Bool,
         ],
+        [],
+        [],
+      ),
+    'updateTask' : IDL.Func([IDL.Nat, CreateTaskInput], [], []),
+    'updateTaskCompletion' : IDL.Func([IDL.Nat, IDL.Bool], [], []),
+    'updateTerritory' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+    'updateTerritoryNote' : IDL.Func(
+        [IDL.Text, IDL.Nat, CreateTerritoryNoteInput],
         [],
         [],
       ),

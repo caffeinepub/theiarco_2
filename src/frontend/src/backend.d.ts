@@ -7,6 +7,12 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export interface TerritoryNote {
+    id: bigint;
+    title: string;
+    content: string;
+    createdAt: bigint;
+}
 export interface Publisher {
     id: PublisherId;
     privileges: {
@@ -20,6 +26,26 @@ export interface Publisher {
     isActive: boolean;
     isGroupAssistant: boolean;
 }
+export type PublisherId = bigint;
+export interface CreateTaskInput {
+    title: string;
+    dueDate: bigint;
+    parentTaskId?: bigint;
+    notes?: string;
+    category: string;
+}
+export interface Task {
+    id: bigint;
+    completedAt?: bigint;
+    title: string;
+    isCompleted: boolean;
+    createdAt: bigint;
+    dueDate: bigint;
+    updatedAt?: bigint;
+    parentTaskId?: bigint;
+    notes?: string;
+    category: string;
+}
 export interface GlobalNote {
     id: bigint;
     title: string;
@@ -28,9 +54,33 @@ export interface GlobalNote {
     category: string;
     attachedPublisher?: PublisherId;
 }
-export type PublisherId = bigint;
+export interface CreateTerritoryNoteInput {
+    title: string;
+    content: string;
+}
+export interface CheckoutRecord {
+    publisherId: PublisherId;
+    publisherName: string;
+    dateReturned?: bigint;
+    isCampaign: boolean;
+    dateCheckedOut: bigint;
+}
 export interface UserProfile {
     name: string;
+}
+export interface Territory {
+    id: string;
+    status: string;
+    createdAt: bigint;
+    checkOutHistory: Array<CheckoutRecord>;
+    territoryType: string;
+    notes: string;
+    number: string;
+}
+export enum TaskStatus {
+    all = "all",
+    completed = "completed",
+    uncompleted = "uncompleted"
 }
 export enum UserRole {
     admin = "admin",
@@ -44,17 +94,33 @@ export interface backendInterface {
         elder: boolean;
     }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null): Promise<PublisherId>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    checkOutTerritory(territoryId: string, publisherId: PublisherId, isCampaign: boolean): Promise<void>;
     createGlobalNote(title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<bigint>;
+    createTask(input: CreateTaskInput): Promise<bigint>;
+    createTerritory(id: string, number: string, territoryType: string, status: string | null, notes: string | null): Promise<string>;
+    createTerritoryNote(territoryId: string, input: CreateTerritoryNoteInput): Promise<bigint>;
     deleteGlobalNote(id: bigint): Promise<void>;
     deletePublisher(id: PublisherId): Promise<void>;
+    deleteTask(id: bigint): Promise<void>;
+    deleteTerritory(id: string): Promise<void>;
+    deleteTerritoryNote(territoryId: string, noteId: bigint): Promise<void>;
     getAllGlobalNotes(): Promise<Array<GlobalNote>>;
     getAllPublishers(): Promise<Array<Publisher>>;
+    getAllTerritories(): Promise<Array<Territory>>;
+    getAllTerritoryNotes(territoryId: string): Promise<Array<TerritoryNote>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getGlobalNote(id: bigint): Promise<GlobalNote | null>;
     getPublisher(id: PublisherId): Promise<Publisher | null>;
+    getTask(id: bigint): Promise<Task | null>;
+    getTasks(status: TaskStatus): Promise<Array<Task>>;
+    getTasksByParent(parentTaskId: bigint | null): Promise<Array<Task>>;
+    getTerritory(id: string): Promise<Territory | null>;
+    getTerritoryNote(territoryId: string, noteId: bigint): Promise<TerritoryNote | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    makeTerritoryAvailable(territoryId: string): Promise<void>;
+    markTerritoryReturned(territoryId: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     togglePublisherActiveState(id: PublisherId): Promise<void>;
     updateGlobalNote(id: bigint, title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<void>;
@@ -63,4 +129,8 @@ export interface backendInterface {
         publisher: boolean;
         elder: boolean;
     }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean): Promise<void>;
+    updateTask(id: bigint, input: CreateTaskInput): Promise<void>;
+    updateTaskCompletion(id: bigint, isCompleted: boolean): Promise<void>;
+    updateTerritory(id: string, number: string, territoryType: string): Promise<void>;
+    updateTerritoryNote(territoryId: string, noteId: bigint, input: CreateTerritoryNoteInput): Promise<void>;
 }

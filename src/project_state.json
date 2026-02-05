@@ -1,546 +1,60 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 28,
-  "summary": "Theiarco is an Internet Computer (ICP) dapp with a Motoko backend canister and a React (Vite) frontend. Users authenticate with DFINITY Internet Identity, after which they interact with an authenticated dashboard layout (header + sidebar + routed pages). The main implemented domain feature is Publisher management (list/filter/create/edit/delete + Publisher Profile). The app is intended as a single-user (or any-authenticated-user) system: once logged in, users should have full access to all backend operations (no admin/RBAC permission blocks).",
+  "projectStateVersion": 3,
+  "summary": "Territories management app with an existing Territories list/table and backend checkout history; next work is adding a Checked Out Duration column that calculates months since latest active checkout and highlights long checkouts.",
+  "architectural_notes": [
+    "Territory records include checkOutHistory array of checkout records.",
+    "Checkout record fields: publisherId (Text), publisherName (Text), dateCheckedOut (Int timestamp seconds), dateReturned (?Int; null when active), isCampaign (Bool).",
+    "Statuses: Available, Checked Out, Under Review.",
+    "Duration display: for Checked Out only, use most recent checkout record where dateReturned is null; months = floor((now - dateCheckedOut)/(30*24*60*60)); render as 'X months'.",
+    "UI styling: apply subtle light red background (e.g., Tailwind bg-red-50 or bg-red-100) to entire row when checked out duration >= 4 months; otherwise no red background; show '—' for non-Checked Out statuses."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "IF-1",
-      "title": "Motoko role-based access control (RBAC) state and role mapping",
-      "synonyms": [
-        "AccessControl",
-        "userRoles map",
-        "admin/user/guest roles"
-      ],
-      "description": "Implements an RBAC state holding a principal-to-role map and an adminAssigned flag. Supports initialization of roles, role lookup for callers, and basic permission evaluation.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-2",
-      "title": "RBAC bootstrap initialization with admin token and first-admin assignment",
-      "synonyms": [
-        "initialize",
-        "admin token bootstrap",
-        "first caller becomes admin"
-      ],
-      "description": "On first-time registration, assigns #admin to the first principal providing the correct admin token (and marks adminAssigned), otherwise assigns #user; anonymous callers are ignored.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-3",
-      "title": "Role queries and role assignment API (admin-only)",
-      "synonyms": [
-        "getUserRole",
-        "isAdmin",
-        "assignRole"
-      ],
-      "description": "Provides role lookup (traps if user is not registered), an is-admin predicate, and an admin-guarded role assignment function to set any principal’s role.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-4",
-      "title": "Authorization mixin exposing RBAC endpoints on the canister",
-      "synonyms": [
-        "MixinAuthorization",
-        "_initializeAccessControlWithSecret",
-        "getCallerUserRole",
-        "assignCallerUserRole",
-        "isCallerAdmin"
-      ],
-      "description": "Motoko mixin included in the main canister that exposes shared/query methods to initialize access control using CAFFEINE_ADMIN_TOKEN plus a user-provided token, query the caller’s role, assign roles, and check admin status.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-5",
-      "title": "Access-controlled user profile storage",
-      "synonyms": [
-        "UserProfile",
-        "getCallerUserProfile",
-        "getUserProfile",
-        "saveCallerUserProfile"
-      ],
-      "description": "Stores simple user profiles keyed by Principal in a Map. Users can read/write their own profile; admins can read other users’ profiles; unauthorized access traps.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-6",
-      "title": "Publisher domain model and in-canister storage",
-      "synonyms": [
-        "Publisher type",
-        "publishers map",
-        "nextPublisherId"
-      ],
-      "description": "Defines a Publisher record with id, fullName, fieldServiceGroup, privileges (publisher/servant/elder flags), overseer/assistant flags, isActive, and notes. Stores publishers in an in-memory Map with an auto-incrementing id counter.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-7",
-      "title": "Publisher creation API (addPublisher)",
-      "synonyms": [
-        "create publisher",
-        "addPublisher"
-      ],
-      "description": "RBAC-protected canister method to add a publisher and return its id. Supports optional isActive (defaults true) and optional notes (defaults empty string).",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-8",
-      "title": "Publisher update API (updatePublisher)",
-      "synonyms": [
-        "edit publisher",
-        "updatePublisher"
-      ],
-      "description": "RBAC-protected canister method to update a publisher by id. Traps with a clear error if the publisher does not exist.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-9",
-      "title": "Publisher deletion API (deletePublisher)",
-      "synonyms": [
-        "remove publisher",
-        "deletePublisher"
-      ],
-      "description": "RBAC-protected canister method that deletes a publisher by id; traps if the id does not exist.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-10",
-      "title": "Publisher read/list APIs and active-state toggle",
-      "synonyms": [
-        "getPublisher",
-        "getAllPublishers",
-        "togglePublisherActiveState"
-      ],
-      "description": "RBAC-protected methods to fetch a single publisher (nullable), list all publishers, and toggle the isActive flag for a publisher (traps if missing).",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-11",
-      "title": "Internet Identity authentication provider and hook",
-      "synonyms": [
-        "InternetIdentityProvider",
-        "useInternetIdentity",
-        "AuthClient integration"
-      ],
-      "description": "React context/provider that creates an AuthClient, loads persisted authentication state, exposes identity, login, and clear/logout methods, and provides status flags for UI (initializing/logging-in/success/error).",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-12",
-      "title": "Login page for Internet Identity",
-      "synonyms": [
-        "Login UI",
-        "Login with Internet Identity"
-      ],
-      "description": "Standalone login screen with Theiarco branding that triggers Internet Identity login and shows a loading state while connecting.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-13",
-      "title": "URL/hash secret parameter utilities with session persistence",
-      "synonyms": [
-        "getSecretParameter",
-        "getSecretFromHash",
-        "sessionStorage persistence",
-        "clearParamFromHash"
-      ],
-      "description": "Utilities to read parameters from query or hash, persist them to sessionStorage, and specifically extract secrets from the URL hash and remove them from the address bar to reduce leakage (used for caffeineAdminToken).",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-14",
-      "title": "Backend actor creation hook with RBAC initialization",
-      "synonyms": [
-        "useActor",
-        "createActorWithConfig",
-        "_initializeAccessControlWithSecret"
-      ],
-      "description": "Creates an anonymous actor when unauthenticated, and an identity-bound actor when authenticated. On authenticated creation it reads caffeineAdminToken from the URL hash/session and calls the canister initialization method, then invalidates/refetches non-actor React Query queries when the actor changes.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-15",
-      "title": "React Query publishers data hooks (list + detail)",
-      "synonyms": [
-        "useGetAllPublishers",
-        "useGetPublisher"
-      ],
-      "description": "Provides React Query hooks for fetching all publishers and fetching a single publisher by id from the backend actor; queries are enabled only once the actor is available and not currently fetching.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-16",
-      "title": "Add Publisher mutation hook",
-      "synonyms": [
-        "useAddPublisher",
-        "publisher create mutation"
-      ],
-      "description": "Calls actor.addPublisher, maps the UI privilege selection into backend privilege flags, converts the group number to BigInt, and invalidates the publishers list query on success.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-17",
-      "title": "Update Publisher mutation hook",
-      "synonyms": [
-        "useUpdatePublisher",
-        "publisher update mutation"
-      ],
-      "description": "Calls actor.updatePublisher, maps the UI privilege selection into backend privilege flags, converts the group number to BigInt, and invalidates the publishers list query on success.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-18",
-      "title": "Delete Publisher mutation hook with optimistic UI and rollback",
-      "synonyms": [
-        "useDeletePublisher",
-        "optimistic delete",
-        "rollback on error"
-      ],
-      "description": "Deletes a publisher via actor.deletePublisher, optimistically removes it from the cached publishers list, rolls back on error, shows an error toast, and invalidates the list query on settle to resync.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-19",
-      "title": "Add Publisher modal form workflow",
-      "synonyms": [
-        "AddPublisherModal",
-        "create publisher dialog"
-      ],
-      "description": "Dialog form to create a publisher with required fields (full name, group, privileges) and optional flags (overseer, assistant, inactive). Performs basic validation, submits via useAddPublisher, shows success/error toasts, and resets form state on close.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-20",
-      "title": "Edit Publisher modal form workflow",
-      "synonyms": [
-        "EditPublisherModal",
-        "edit publisher dialog"
-      ],
-      "description": "Dialog form to edit an existing publisher. Pre-fills fields from the provided Publisher object, validates required inputs, submits via useUpdatePublisher, and shows toast feedback while disabling actions during pending submission.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-21",
-      "title": "Publishers list page with table, CRUD actions, and confirmation dialog",
-      "synonyms": [
-        "Publishers page",
-        "publishers table UI",
-        "AlertDialog delete confirmation"
-      ],
-      "description": "Displays publishers in a table with loading and empty states, privilege label rendering, badges for overseer/assistant, inactive row styling, and actions for Add (modal), Edit (modal), and Delete (confirmation dialog) with toast notifications.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-22",
-      "title": "Client-side publisher filtering UI and logic",
-      "synonyms": [
-        "search by name",
-        "group filter",
-        "show inactive toggle",
-        "useMemo filtering"
-      ],
-      "description": "Implements a filter bar and memoized filtering logic combining (AND) a case-insensitive name substring search, a group dropdown filter (All/1–4), and a toggle to include inactive publishers.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-23",
-      "title": "Authenticated app shell with header, sidebar navigation, routed outlet, and toasts",
-      "synonyms": [
-        "AppLayout",
-        "Header",
-        "Sidebar",
-        "Sonner Toaster"
-      ],
-      "description": "Provides an authenticated dashboard layout with a responsive/collapsible sidebar, a header with logout that clears auth and React Query cache, a routed outlet for pages, and a global toast notification system.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-24",
-      "title": "Client-side routing with auth gating and placeholder pages",
-      "synonyms": [
-        "TanStack Router",
-        "ComingSoon routes",
-        "auth-gated root route"
-      ],
-      "description": "Defines routes for multiple app sections; the root route conditionally renders Login or the authenticated layout based on identity. Non-implemented sections render a reusable ComingSoon component.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-25",
-      "title": "Publisher Profile route at /publishers/:id within authenticated routing",
-      "synonyms": [
-        "PublisherProfile route",
-        "publisher detail page route"
-      ],
-      "description": "Adds a routed Publisher Profile page under the authenticated app at /publishers/:id.",
+      "id": "feature-update-the-existing-territories-list-page-table-frontend-src-pages-territories-tsx-to-add-a-new-column-titled-checked-out-duration-immediately-after-the-existing-status-column-without-changing-any-other-table-behavior",
+      "title": "Update the existing Territories list page table (frontend/src/pages/Territories.tsx) to add a new column titled \"Checked Out Duration\" immediately after the existing \"Status\" column, without changing any other table behavior.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "IF-26",
-      "title": "Clickable publisher names navigate to Publisher Profile",
-      "synonyms": [
-        "publishers table name link",
-        "navigate to /publishers/:id"
-      ],
-      "description": "In the publishers list table, the publisher name is a clickable control that navigates to that publisher’s profile page by id.",
+      "id": "feature-for-each-territory-row-in-the-territories-list-table-compute-and-display-the-checked-out-duration-in-months-only-when-territory-status-is-exactly-checked-out-use-the-most-recent-checkout-record-in-territory-checkouthistory-where-datereturned-is-null-i-e-the-active-checkout-calculate-months-as-floor-currenttimestampseconds-datecheckedout-30-24-60-60-and-render-the-cell-text-as-x-months-e-g-0-months-2-months-if-no-active-checkout-record-exists-display",
+      "title": "For each territory row in the Territories list table, compute and display the checked-out duration in months only when territory.status is exactly \"Checked Out\". Use the most recent checkout record in territory.checkOutHistory where dateReturned is null (i.e., the active checkout). Calculate months as floor((currentTimestampSeconds - dateCheckedOut) / (30 * 24 * 60 * 60)) and render the cell text as \"[X] months\" (e.g., \"0 months\", \"2 months\"). If no active checkout record exists, display \"—\".",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "IF-27",
-      "title": "Publisher Profile read-only details display",
-      "synonyms": [
-        "publisher details view",
-        "read-only profile fields"
-      ],
-      "description": "Displays a publisher’s details in read-only format on the profile page: full name heading, field service group, overseer status (Yes/No), assistant status (Yes/No), and privilege as a simple text label.",
+      "id": "feature-for-territories-with-status-exactly-available-or-exactly-under-review-render-em-dash-in-the-checked-out-duration-column-and-do-not-apply-any-red-background-styling",
+      "title": "For territories with status exactly \"Available\" or exactly \"Under Review\", render \"—\" (em dash) in the \"Checked Out Duration\" column and do not apply any red background styling.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "IF-28",
-      "title": "Back to Publishers navigation on Publisher Profile",
-      "synonyms": [
-        "Back button",
-        "navigate back to /publishers"
-      ],
-      "description": "Provides a \"Back to Publishers\" button on the profile page that navigates back to the publishers list route.",
+      "id": "feature-conditionally-apply-a-subtle-light-red-background-to-the-entire-territories-table-row-when-a-territory-status-is-exactly-checked-out-and-b-the-computed-months-checked-out-is-4-or-more-use-a-tailwind-class-such-as-bg-red-50-or-bg-red-100-subtle-but-noticeable-applied-to-the-full-tablerow",
+      "title": "Conditionally apply a subtle light red background to the entire Territories table row when (a) territory.status is exactly \"Checked Out\" and (b) the computed months checked out is 4 or more. Use a Tailwind class such as bg-red-50 or bg-red-100 (subtle but noticeable) applied to the full <TableRow>.",
       "reqIds": [
         "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-29",
-      "title": "Edit and Delete actions on Publisher Profile reusing existing workflows",
-      "synonyms": [
-        "profile edit modal reuse",
-        "profile delete confirmation"
-      ],
-      "description": "On the publisher profile page, includes Edit (reuses EditPublisherModal) and Delete (reuses the AlertDialog confirmation pattern) actions consistent with the publishers list behaviors.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-30",
-      "title": "Post-delete navigation from Publisher Profile back to Publishers list",
-      "synonyms": [
-        "navigate after delete",
-        "redirect after deletion"
-      ],
-      "description": "After successfully deleting a publisher from the profile page, automatically navigates back to the publishers list page.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-31",
-      "title": "Consistent layout and styling across Publishers and Publisher Profile pages",
-      "synonyms": [
-        "shared styling",
-        "consistent AppLayout usage"
-      ],
-      "description": "Ensures the publisher profile page follows the established app layout/styling patterns (padding, card borders, shadcn components) without impacting unrelated routes.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-32",
-      "title": "Tailwind + shadcn/ui theming with custom Theiarco primary color token",
-      "synonyms": [
-        "OKLCH CSS variables",
-        "theiarco-primary token",
-        "light/dark theme"
-      ],
-      "description": "Configures a CSS-variable-based OKLCH theme (light/dark) and a custom Theiarco primary color token exposed through Tailwind and utility classes for consistent branding across UI components.",
-      "reqIds": [],
-      "version": 1
-    },
-    {
-      "id": "IF-35",
-      "title": "Backend authorization neutralized for authenticated users (single-user/any-authenticated-user mode)",
-      "synonyms": [
-        "remove RBAC gates",
-        "bypass authorization checks",
-        "no admin/RBAC blocks"
-      ],
-      "description": "Backend permission gates were removed or bypassed so any authenticated Internet Identity principal can call all publisher CRUD APIs and notes-related operations without admin/RBAC restrictions.",
-      "reqIds": [
-        "AR-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-36",
-      "title": "Multi-note Publisher Profile Notes (create/list/sort/date/edit/delete) UI",
-      "synonyms": [
-        "PublisherNotesSection",
-        "PublisherNoteCard",
-        "EditPublisherNoteModal",
-        "DeletePublisherNoteDialog"
-      ],
-      "description": "Replaces the legacy single-textarea notes editor with a multi-note notes section on Publisher Profile. Supports creating notes (clears input after save), listing notes sorted by createdAt descending with a formatted created date, editing a note via modal, and deleting a note via confirmation dialog, with success/error toasts and pending-state UX patterns.",
-      "reqIds": [
-        "AR-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-37",
-      "title": "Backend multi-note notes storage and CRUD APIs keyed by publisher ID",
-      "synonyms": [
-        "publisherNotes stable storage",
-        "createPublisherNote",
-        "updatePublisherNote",
-        "deletePublisherNote",
-        "listPublisherNotes"
-      ],
-      "description": "Backend now persists multiple notes per publisher in stable storage keyed by publisher ID. Each note has a unique noteId, text content, and backend-generated integer createdAt timestamp. Exposes APIs to create, list, update, and delete notes; notes are shared per publisher across all authenticated users.",
-      "reqIds": [
-        "AR-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "IF-38",
-      "title": "Global Notes page (/notes) UI with category filters and placeholder content",
-      "synonyms": [
-        "Notes page",
-        "/notes route",
-        "global notes UI",
-        "category filter buttons"
-      ],
-      "description": "Implements the standalone Global Notes page at /notes (separate from Publisher Profile Notes). Page includes a heading, an \"Add Note\" button styled with the primary color (#43587A), interactive category filter buttons that highlight the active category in #43587A, and placeholder text/content that remains visible regardless of current notes state.",
-      "reqIds": [
-        "AR-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-on-the-notes-page-notes-implement-the-add-note-button-to-open-a-modal-form-with-the-required-fields-and-conditional-attach-to-behavior-title-required-content-required-category-dropdown-required-options-none-publishers-territory-shepherding-elder-general-and-an-attach-to-dropdown-that-only-appears-for-publishers-territory-shepherding-with-territory-and-shepherding-disabled-placeholders-as-specified",
-      "title": "On the Notes page (/notes), implement the \"Add Note\" button to open a modal form with the required fields and conditional \"Attach To\" behavior: Title (required), Content (required), Category dropdown (required; options: None, Publishers, Territory, Shepherding, Elder, General), and an \"Attach To\" dropdown that only appears for Publishers/Territory/Shepherding with Territory and Shepherding disabled placeholders as specified.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-for-category-publishers-in-the-global-notes-add-note-modal-populate-the-attach-to-dropdown-with-only-active-publishers-exclude-inactive-publishers-if-a-publisher-becomes-inactive-it-must-no-longer-appear-in-the-dropdown-for-new-global-notes",
-      "title": "For Category = \"Publishers\" in the Global Notes Add Note modal, populate the \"Attach To\" dropdown with ONLY active publishers (exclude inactive publishers). If a publisher becomes inactive, it must no longer appear in the dropdown for new Global Notes.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-wire-the-global-notes-add-note-modal-submit-cancel-flows-on-submit-call-the-backend-create-global-note-api-then-close-the-modal-clear-the-form-fields-and-show-a-green-success-toast-with-exact-text-note-created-successfully-that-auto-dismisses-after-3-seconds-on-cancel-close-the-modal-without-saving",
-      "title": "Wire the Global Notes Add Note modal Submit/Cancel flows: on Submit, call the backend create Global Note API, then close the modal, clear the form fields, and show a green success toast with exact text \"Note created successfully!\" that auto-dismisses after 3 seconds; on Cancel, close the modal without saving.",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enforce-the-separation-between-global-notes-and-publisher-profile-notes-global-notes-created-on-notes-must-not-appear-in-any-publisher-profile-notes-ui-publisher-profile-notes-must-not-appear-on-the-global-notes-page-keep-them-as-independent-systems-even-when-a-global-note-references-a-publisher",
-      "title": "Enforce the separation between Global Notes and Publisher Profile Notes: Global Notes created on /notes must not appear in any Publisher Profile Notes UI; Publisher Profile Notes must not appear on the Global Notes page. Keep them as independent systems even when a Global Note references a publisher.",
-      "reqIds": [
-        "REQ-13"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-6",
-      "summary": "Global Notes page: Add Note modal and backend persistence for creating categorized notes with optional attachments (publishers now; other entities disabled placeholders)",
+      "id": "AR-1",
+      "summary": "Add 'Checked Out Duration' column to Territories list, computed from latest active checkout (dateReturned=null), and highlight rows red when duration >= 4 months",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Implement a new Global Notes backend data model and stable storage that is completely separate from Publisher Profile Notes storage. Global Notes must have their own unique IDs and must only reference a publisher when the note category is exactly \"Publishers\".",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Add backend APIs for creating Global Notes from the Notes page with fields: unique ID (generated), title, content, category, optional attached publisher reference (only for category \"Publishers\"), and an integer timestamp for creation time. Persist Global Notes using stable storage so notes survive canister upgrades.",
-      "reqIds": [
-        "REQ-9"
-      ],
       "status": "pending"
     }
   ],
-  "architectural_notes": [
-    "Monorepo structure with a Motoko canister backend (backend/) and a React frontend (frontend/) communicating through generated Candid/actor TypeScript bindings (frontend/src/backend) via an actor factory (createActorWithConfig).",
-    "Backend authorization uses a reusable RBAC module (authorization/access-control.mo) and a Motoko mixin (authorization/MixinAuthorization.mo) included into the main canister to expose auth/role APIs.",
-    "Frontend authentication is encapsulated in a React context/provider (InternetIdentityProvider) backed by @dfinity/auth-client; identity is loaded on mount and login/logout APIs are exposed to the app.",
-    "Frontend routing uses TanStack Router with an auth-gated root route: unauthenticated users see Login; authenticated users see AppLayout and protected routes.",
-    "Data fetching/mutations use @tanstack/react-query. A dedicated useActor() hook creates/caches the backend actor keyed by principal, performs access-control initialization on authenticated actor creation, and invalidates/refetches dependent queries when the actor changes.",
-    "UI is built with Tailwind CSS + shadcn/ui primitives (table, dialog, select, checkbox, alert-dialog, button) and lucide-react icons; toast notifications via Sonner.",
-    "Sensitive bootstrap input (caffeineAdminToken) is read from the URL hash and persisted in sessionStorage via frontend/src/utils/urlParams.ts, then passed to the canister initialization method.",
-    "Publisher notes must be persisted in stable storage on the backend (keyed by publisher ID) so they survive page refreshes and logout/login (and canister upgrades if required).",
-    "For this single-user (or any-authenticated-user) mode, backend authorization checks/RBAC gates should be removed or bypassed so all authenticated callers can perform all operations; notes editing should be allowed for any authenticated user who can view the profile.",
-    "Publisher Profile notes editing is implemented via a dedicated frontend hook (usePublisherNotes) that loads notes for a publisher and saves updates back to the backend.",
-    "Backend authorization/RBAC checks are neutralized/bypassed in alignment with the app’s single-user (any-authenticated-user) mode so authenticated callers can access all operations (publisher CRUD + notes) without role-based blocking.",
-    "Publisher Profile notes should support multiple notes per publisher, stored in backend stable storage keyed by publisher ID. Each note should have a unique note ID, text content, and integer createdAt timestamp; UI displays formatted date like \"Feb 3, 2026\" and sorts notes by createdAt descending. Support create (clears input after save), edit (modal), and delete (confirmation) with success toasts.",
-    "Multi-note Publisher Profile Notes: no migration required from legacy single-note field; notes can start empty in the new system.",
-    "Multi-note Publisher Profile Notes visibility: notes are shared per publisher across all authenticated users (no per-user scoping).",
-    "Multi-note Publisher Profile Notes timestamps: createdAt should be generated/stored authoritatively on the backend in Motoko as an integer timestamp; frontend formats for display (e.g., \"Feb 3, 2026\").",
-    "Global Notes page (/notes) is a separate notes system from Publisher Profile Notes; it will have its own storage/domain model and is not an aggregation of per-publisher notes.",
-    "Global Notes (/notes) system: implement note creation via modal with fields title, content, category, optional attachedTo. Backend should persist notes with unique ID and backend-authoritative integer createdAt timestamp; attachedTo is only applicable for category=Publishers initially (select from all publishers). For Territory/Shepherding categories show disabled placeholder dropdowns; for Elder/General/None hide Attach To.",
-    "Global Notes (/notes) system must use a separate backend stable-storage store/domain model from Publisher Profile Notes; they are independent systems with separate IDs and persistence.",
-    "Global Notes Attach To dropdown for category=Publishers must list only active publishers (exclude inactive).",
-    "Global Notes attached-to-publisher notes must NOT appear in Publisher Profile Notes (no cross-visibility/integration for this phase); they may reference a publisher but remain visible/managed only on the Global Notes page."
-  ],
-  "known_issues": [
-    "Backend state (RBAC role map, userProfiles, publishers map, nextPublisherId) is in-memory and not stored in stable variables; data will reset on canister upgrade unless migrated to stable storage.",
-    "Publishers list and profile pages have limited explicit error UI for query failures (beyond generic empty/not-found states and mutation error toasts).",
-    "Delete confirmation dialogs do not disable the confirm action or show a pending state during deletion, enabling possible double-submission clicks.",
-    "PublisherProfile uses useParams({ strict: false }) and coerces a missing/invalid id to BigInt(0), which can cause an unintended lookup for publisher id 0 rather than treating the route as invalid.",
-    "Two global CSS files exist (frontend/src/index.css and frontend/index.css), which may be confusing if build tooling changes cause both to be included.",
-    "Users may encounter an \"Actor not available\" state/error in the frontend (likely during actor initialization or authentication/identity loading), preventing backend calls until the actor is created."
-  ],
-  "isFixRequest": false,
   "gameProjectType": "none",
-  "projectName": "Theiarco",
-  "clarification_mode": "thinking",
+  "projectName": "Add Checked Out Duration column and highlight long checkouts in Territories table",
+  "clarification_mode": "instant",
   "clarification_rounds": 0
 }

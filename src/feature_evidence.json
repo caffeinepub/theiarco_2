@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-on-the-notes-page-notes-implement-the-add-note-button-to-open-a-modal-form-with-the-required-fields-and-conditional-attach-to-behavior-title-required-content-required-category-dropdown-required-options-none-publishers-territory-shepherding-elder-general-and-an-attach-to-dropdown-that-only-appears-for-publishers-territory-shepherding-with-territory-and-shepherding-disabled-placeholders-as-specified",
-      "featureTitle": "On the Notes page (/notes), implement the \"Add Note\" button to open a modal form with the required fields and conditional \"Attach To\" behavior: Title (required), Content (required), Category dropdown (required; options: None, Publishers, Territory, Shepherding, Elder, General), and an \"Attach To\" dropdown that only appears for Publishers/Territory/Shepherding with Territory and Shepherding disabled placeholders as specified.",
+      "featureId": "feature-update-the-existing-territories-list-page-table-frontend-src-pages-territories-tsx-to-add-a-new-column-titled-checked-out-duration-immediately-after-the-existing-status-column-without-changing-any-other-table-behavior",
+      "featureTitle": "Update the existing Territories list page table (frontend/src/pages/Territories.tsx) to add a new column titled \"Checked Out Duration\" immediately after the existing \"Status\" column, without changing any other table behavior.",
       "files": [
-        "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-        "frontend/src/pages/Notes.tsx"
+        "frontend/src/pages/Territories.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,15 +16,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-10"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-for-category-publishers-in-the-global-notes-add-note-modal-populate-the-attach-to-dropdown-with-only-active-publishers-exclude-inactive-publishers-if-a-publisher-becomes-inactive-it-must-no-longer-appear-in-the-dropdown-for-new-global-notes",
-      "featureTitle": "For Category = \"Publishers\" in the Global Notes Add Note modal, populate the \"Attach To\" dropdown with ONLY active publishers (exclude inactive publishers). If a publisher becomes inactive, it must no longer appear in the dropdown for new Global Notes.",
+      "featureId": "feature-for-each-territory-row-in-the-territories-list-table-compute-and-display-the-checked-out-duration-in-months-only-when-territory-status-is-exactly-checked-out-use-the-most-recent-checkout-record-in-territory-checkouthistory-where-datereturned-is-null-i-e-the-active-checkout-calculate-months-as-floor-currenttimestampseconds-datecheckedout-30-24-60-60-and-render-the-cell-text-as-x-months-e-g-0-months-2-months-if-no-active-checkout-record-exists-display",
+      "featureTitle": "For each territory row in the Territories list table, compute and display the checked-out duration in months only when territory.status is exactly \"Checked Out\". Use the most recent checkout record in territory.checkOutHistory where dateReturned is null (i.e., the active checkout). Calculate months as floor((currentTimestampSeconds - dateCheckedOut) / (30 * 24 * 60 * 60)) and render the cell text as \"[X] months\" (e.g., \"0 months\", \"2 months\"). If no active checkout record exists, display \"—\".",
       "files": [
-        "frontend/src/components/notes/AddGlobalNoteModal.tsx"
+        "frontend/src/pages/Territories.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -36,17 +35,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-11"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-wire-the-global-notes-add-note-modal-submit-cancel-flows-on-submit-call-the-backend-create-global-note-api-then-close-the-modal-clear-the-form-fields-and-show-a-green-success-toast-with-exact-text-note-created-successfully-that-auto-dismisses-after-3-seconds-on-cancel-close-the-modal-without-saving",
-      "featureTitle": "Wire the Global Notes Add Note modal Submit/Cancel flows: on Submit, call the backend create Global Note API, then close the modal, clear the form fields, and show a green success toast with exact text \"Note created successfully!\" that auto-dismisses after 3 seconds; on Cancel, close the modal without saving.",
+      "featureId": "feature-for-territories-with-status-exactly-available-or-exactly-under-review-render-em-dash-in-the-checked-out-duration-column-and-do-not-apply-any-red-background-styling",
+      "featureTitle": "For territories with status exactly \"Available\" or exactly \"Under Review\", render \"—\" (em dash) in the \"Checked Out Duration\" column and do not apply any red background styling.",
       "files": [
-        "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-        "frontend/src/hooks/useCreateGlobalNote.ts",
-        "frontend/src/pages/Notes.tsx"
+        "frontend/src/pages/Territories.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -57,16 +54,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-12"
+        "REQ-3"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-enforce-the-separation-between-global-notes-and-publisher-profile-notes-global-notes-created-on-notes-must-not-appear-in-any-publisher-profile-notes-ui-publisher-profile-notes-must-not-appear-on-the-global-notes-page-keep-them-as-independent-systems-even-when-a-global-note-references-a-publisher",
-      "featureTitle": "Enforce the separation between Global Notes and Publisher Profile Notes: Global Notes created on /notes must not appear in any Publisher Profile Notes UI; Publisher Profile Notes must not appear on the Global Notes page. Keep them as independent systems even when a Global Note references a publisher.",
+      "featureId": "feature-conditionally-apply-a-subtle-light-red-background-to-the-entire-territories-table-row-when-a-territory-status-is-exactly-checked-out-and-b-the-computed-months-checked-out-is-4-or-more-use-a-tailwind-class-such-as-bg-red-50-or-bg-red-100-subtle-but-noticeable-applied-to-the-full-tablerow",
+      "featureTitle": "Conditionally apply a subtle light red background to the entire Territories table row when (a) territory.status is exactly \"Checked Out\" and (b) the computed months checked out is 4 or more. Use a Tailwind class such as bg-red-50 or bg-red-100 (subtle but noticeable) applied to the full <TableRow>.",
       "files": [
-        "frontend/src/hooks/useCreateGlobalNote.ts",
-        "frontend/src/hooks/useGlobalNotes.ts"
+        "frontend/src/pages/Territories.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -77,7 +73,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-13"
+        "REQ-4"
       ],
       "confidence": "high"
     }

@@ -1,97 +1,67 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Global Notes: Notes page Add Note modal and create flow (frontend)",
+  "title": "Territories table: checked-out duration column + long-checkout row highlight",
   "requirements": [
     {
-      "id": "REQ-10",
-      "summary": "Implement an Add Note modal on /notes with required fields and exact conditional Attach To behavior by category.",
+      "id": "REQ-1",
+      "summary": "Insert a new \"Checked Out Duration\" column in the Territories table immediately after the existing \"Status\" column, without changing other table behavior.",
       "acceptanceCriteria": [
-        "Clicking \"Add Note\" opens a modal containing Title, Content, Category, and Submit/Cancel controls.",
-        "\"Attach To\" behavior matches exactly: shown for Publishers (enabled), shown for Territory (disabled with placeholder \"Territories (coming soon)\"), shown for Shepherding (disabled with placeholder \"Shepherding Visits (coming soon)\"), hidden for Elder/General/None.",
-        "All user-facing text in the modal is in English."
+        "The Territories table header includes a new \"Checked Out Duration\" column placed after \"Status\".",
+        "Each Territories table row renders a corresponding cell under \"Checked Out Duration\"."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-          "operation": "create",
-          "description": "Create an Add Global Note modal using shadcn-ui primitives (Dialog, Input, Select, Button, etc.) with fields Title (required), Content (required), Category dropdown (required; options exactly: None, Publishers, Territory, Shepherding, Elder, General), and conditional \"Attach To\" UI: (1) Publishers shows enabled dropdown, (2) Territory shows disabled dropdown with placeholder text \"Territories (coming soon)\", (3) Shepherding shows disabled dropdown with placeholder text \"Shepherding Visits (coming soon)\", (4) hidden for Elder/General/None. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/Notes.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Wire the existing \"Add Note\" button to open/close the new AddGlobalNoteModal component and pass required state/handlers so the modal renders on /notes without introducing new routes."
+          "description": "Add a new <TableHead> labeled \"Checked Out Duration\" immediately after the existing \"Status\" header, and add a matching <TableCell> in each mapped row in the same position (after the Status cell), preserving existing table structure and interactions."
         }
       ]
     },
     {
-      "id": "REQ-11",
-      "summary": "For Category = \"Publishers\", populate Attach To with only active publishers and reflect updates without reload.",
+      "id": "REQ-2",
+      "summary": "Compute and display checked-out duration in whole months for \"Checked Out\" territories using the most recent active checkout record; otherwise show an em dash.",
       "acceptanceCriteria": [
-        "The \"Attach To\" dropdown lists only publishers whose active flag is true.",
-        "Inactive publishers are not visible/selectable in the dropdown without requiring a page reload after the publishers query refetches/updates."
+        "For territories with status exactly \"Checked Out\" and an active checkout record, the \"Checked Out Duration\" cell shows \"[X] months\" where X matches the specified formula using current time in seconds and the active record's dateCheckedOut.",
+        "The active checkout record is selected as the most recent record (largest dateCheckedOut) among those with dateReturned = null.",
+        "If territory.status is \"Checked Out\" but there is no active checkout record, the duration cell displays \"—\" (em dash)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Populate the Publishers \"Attach To\" dropdown from the existing publishers query data and filter to only `isActive === true`; ensure the dropdown options are derived from query state so changes in the cached/refetched publishers list immediately update what can be selected for new Global Notes. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Confirm the existing publishers query hook behavior is suitable for reactive updates (React Query cached data + refetch/invalidation) and, if needed, adjust query options (without changing semantics) to support timely UI updates for the active-publishers Attach To dropdown."
+          "description": "Implement a local helper (in this file) to derive the active checkout record from territory.checkOutHistory by filtering records with dateReturned == null and selecting the one with the largest dateCheckedOut; compute months as floor((currentTimestampSeconds - dateCheckedOutSeconds) / (30*24*60*60)) using currentTimestampSeconds = Math.floor(Date.now()/1000); render the duration cell as \"[X] months\" only when territory.status is exactly \"Checked Out\" and an active record exists, otherwise render an em dash (—)."
         }
       ]
     },
     {
-      "id": "REQ-12",
-      "summary": "Implement Add Note modal Submit/Cancel flows: create Global Note via backend call, reset/close, and show exact success toast.",
+      "id": "REQ-3",
+      "summary": "Show an em dash for \"Available\" and \"Under Review\" territories in the duration column and ensure no red background styling is applied.",
       "acceptanceCriteria": [
-        "Submit triggers a backend call and creates a persisted Global Note with an integer creation timestamp.",
-        "After a successful submit, the modal closes, form state resets, and a success toast appears with the exact text and auto-dismiss timing.",
-        "Cancel closes the modal and does not create any note in the backend."
+        "If territory.status is exactly \"Available\", the duration cell displays \"—\" and the row has no red background class applied.",
+        "If territory.status is exactly \"Under Review\", the duration cell displays \"—\" and the row has no red background class applied."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useCreateGlobalNote.ts",
-          "operation": "create",
-          "description": "Add a React Query mutation hook that calls the backend capability to create a Global Note (title/content/category plus attachedPublisher as PublisherId|null) and returns the created ID; include basic client-side validation alignment (required fields; attachedPublisher only when category is exactly \"Publishers\") and expose pending/error state for UI control."
-        },
-        {
-          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Wire Submit to call useCreateGlobalNote; on success close the modal, clear form fields, and show a green success toast with exact text \"Note created successfully!\" that auto-dismisses after 3 seconds; on Cancel, close the modal without saving. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/Notes.tsx",
-          "operation": "modify",
-          "description": "Ensure the Notes page passes modal open/close and completion handlers so a successful submit closes the modal and resets UI state while preserving all existing Notes page behavior aside from the requested create flow."
+          "description": "Ensure the duration-rendering logic explicitly returns an em dash (—) for territories whose status is exactly \"Available\" or exactly \"Under Review\", and ensure the row highlight class is not applied for these statuses regardless of checkout history content."
         }
       ]
     },
     {
-      "id": "REQ-13",
-      "summary": "Ensure Global Notes UI and Publisher Profile Notes UI remain independent and do not cross-populate.",
+      "id": "REQ-4",
+      "summary": "Apply a subtle light red background to the full table row when a territory is \"Checked Out\" for 4+ months, without changing readability or existing click/navigation behavior.",
       "acceptanceCriteria": [
-        "Creating a Global Note attached to a publisher does not change or populate the Publisher Profile Notes section for that publisher.",
-        "Publisher Profile Notes CRUD continues to operate only on the publisher-keyed notes system and does not read/write Global Notes storage."
+        "When a territory is \"Checked Out\" and computed months >= 4, the corresponding <TableRow> has a light red background class (e.g., bg-red-50 or bg-red-100) and the background spans the entire row width.",
+        "When computed months < 4, no red background class is applied to the row.",
+        "The row remains readable (text contrast preserved) and existing click/navigation behavior for the Territory Number remains unchanged."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useGlobalNotes.ts",
-          "operation": "create",
-          "description": "Create dedicated React Query hook(s) for Global Notes reads (e.g., fetch all Global Notes) using distinct query keys (e.g., ['globalNotes', ...]) so Global Notes are cached/invalidated separately from any publisher-related notes concerns."
-        },
-        {
-          "path": "frontend/src/hooks/useCreateGlobalNote.ts",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "On successful creation, invalidate/refetch only Global Notes query keys (e.g., ['globalNotes']) and avoid invalidating any publisher profile notes keys, ensuring Global Notes creation on /notes does not implicitly drive Publisher Profile Notes UI updates."
-        },
-        {
-          "path": "frontend/src/pages/PublisherProfile.tsx",
-          "operation": "modify",
-          "description": "Audit and enforce that PublisherProfile does not import or query Global Notes hooks/components; keep Publisher Profile behavior unchanged and ensure no Global Notes rendering is introduced when a Global Note references a publisher."
+          "description": "Use the computed months value (from REQ-2) to conditionally add a Tailwind class such as bg-red-50 (or bg-red-100) to the entire <TableRow> only when territory.status is exactly \"Checked Out\" and months >= 4; otherwise leave the row unstyled. Keep existing Territory Number button and navigation logic unchanged to preserve current behavior and readability."
         }
       ]
     }

@@ -1,99 +1,67 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T04:00:49.045Z",
+  "generatedAt": "2026-02-05T16:57:12.213Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
+    "total": 4,
     "implemented": 4,
     "items": [
       {
-        "id": "REQ-10",
-        "summary": "On the Notes page (/notes), implement the \"Add Note\" button to open a modal form with the required fields and conditional \"Attach To\" behavior: Title (required), Content (required), Category dropdown (required; options: None, Publishers, Territory, Shepherding, Elder, General), and an \"Attach To\" dropdown that only appears for Publishers/Territory/Shepherding with Territory and Shepherding disabled placeholders as specified.",
+        "id": "REQ-1",
+        "summary": "Update the existing Territories list page table (frontend/src/pages/Territories.tsx) to add a new column titled \"Checked Out Duration\" immediately after the existing \"Status\" column, without changing any other table behavior.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-          "frontend/src/pages/Notes.tsx"
+          "frontend/src/pages/Territories.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-          "frontend/src/pages/Notes.tsx"
+          "frontend/src/pages/Territories.tsx"
         ]
       },
       {
-        "id": "REQ-11",
-        "summary": "For Category = \"Publishers\" in the Global Notes Add Note modal, populate the \"Attach To\" dropdown with ONLY active publishers (exclude inactive publishers). If a publisher becomes inactive, it must no longer appear in the dropdown for new Global Notes.",
+        "id": "REQ-2",
+        "summary": "For each territory row in the Territories list table, compute and display the checked-out duration in months only when territory.status is exactly \"Checked Out\". Use the most recent checkout record in territory.checkOutHistory where dateReturned is null (i.e., the active checkout). Calculate months as floor((currentTimestampSeconds - dateCheckedOut) / (30 * 24 * 60 * 60)) and render the cell text as \"[X] months\" (e.g., \"0 months\", \"2 months\"). If no active checkout record exists, display \"—\".",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/pages/Territories.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/notes/AddGlobalNoteModal.tsx"
+          "frontend/src/pages/Territories.tsx"
         ]
       },
       {
-        "id": "REQ-12",
-        "summary": "Wire the Global Notes Add Note modal Submit/Cancel flows: on Submit, call the backend create Global Note API, then close the modal, clear the form fields, and show a green success toast with exact text \"Note created successfully!\" that auto-dismisses after 3 seconds; on Cancel, close the modal without saving.",
+        "id": "REQ-3",
+        "summary": "For territories with status exactly \"Available\" or exactly \"Under Review\", render \"—\" (em dash) in the \"Checked Out Duration\" column and do not apply any red background styling.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useCreateGlobalNote.ts",
-          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-          "frontend/src/pages/Notes.tsx"
+          "frontend/src/pages/Territories.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useCreateGlobalNote.ts",
-          "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-          "frontend/src/pages/Notes.tsx"
+          "frontend/src/pages/Territories.tsx"
         ]
       },
       {
-        "id": "REQ-13",
-        "summary": "Enforce the separation between Global Notes and Publisher Profile Notes: Global Notes created on /notes must not appear in any Publisher Profile Notes UI; Publisher Profile Notes must not appear on the Global Notes page. Keep them as independent systems even when a Global Note references a publisher.",
+        "id": "REQ-4",
+        "summary": "Conditionally apply a subtle light red background to the entire Territories table row when (a) territory.status is exactly \"Checked Out\" and (b) the computed months checked out is 4 or more. Use a Tailwind class such as bg-red-50 or bg-red-100 (subtle but noticeable) applied to the full <TableRow>.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useGlobalNotes.ts",
-          "frontend/src/hooks/useCreateGlobalNote.ts",
-          "frontend/src/pages/PublisherProfile.tsx"
+          "frontend/src/pages/Territories.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useGlobalNotes.ts",
-          "frontend/src/hooks/useCreateGlobalNote.ts"
+          "frontend/src/pages/Territories.tsx"
         ]
-      },
-      {
-        "id": "REQ-8",
-        "summary": "Implement a new Global Notes backend data model and stable storage that is completely separate from Publisher Profile Notes storage. Global Notes must have their own unique IDs and must only reference a publisher when the note category is exactly \"Publishers\".",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-9",
-        "summary": "Add backend APIs for creating Global Notes from the Notes page with fields: unique ID (generated), title, content, category, optional attached publisher reference (only for category \"Publishers\"), and an integer timestamp for creation time. Persist Global Notes using stable storage so notes survive canister upgrades.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useCreateGlobalNote.ts",
-    "frontend/src/hooks/useGlobalNotes.ts",
-    "frontend/src/pages/Notes.tsx",
+    "frontend/src/pages/Territories.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

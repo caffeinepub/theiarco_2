@@ -6,6 +6,9 @@ import ComingSoon from './pages/ComingSoon';
 import Publishers from './pages/Publishers';
 import PublisherProfile from './pages/PublisherProfile';
 import Notes from './pages/Notes';
+import Tasks from './pages/Tasks';
+import Territories from './pages/Territories';
+import TerritoryProfile from './pages/TerritoryProfile';
 
 // Root component that handles auth state
 function RootComponent() {
@@ -66,7 +69,13 @@ const pioneersRoute = createRoute({
 const territoriesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/territories',
-  component: () => <ComingSoon title="Territories" />
+  component: Territories
+});
+
+const territoryProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/territories/$id',
+  component: TerritoryProfile
 });
 
 const shepherdingRoute = createRoute({
@@ -102,7 +111,7 @@ const notesRoute = createRoute({
 const tasksRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/tasks',
-  component: () => <ComingSoon title="Tasks" />
+  component: Tasks
 });
 
 const userProfileRoute = createRoute({
@@ -118,6 +127,7 @@ const routeTree = rootRoute.addChildren([
   publisherProfileRoute,
   pioneersRoute,
   territoriesRoute,
+  territoryProfileRoute,
   shepherdingRoute,
   conductorsRoute,
   publicWitnessingRoute,

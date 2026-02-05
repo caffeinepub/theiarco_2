@@ -10,6 +10,24 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface CheckoutRecord {
+  'publisherId' : PublisherId,
+  'publisherName' : string,
+  'dateReturned' : [] | [bigint],
+  'isCampaign' : boolean,
+  'dateCheckedOut' : bigint,
+}
+export interface CreateTaskInput {
+  'title' : string,
+  'dueDate' : bigint,
+  'parentTaskId' : [] | [bigint],
+  'notes' : [] | [string],
+  'category' : string,
+}
+export interface CreateTerritoryNoteInput {
+  'title' : string,
+  'content' : string,
+}
 export interface GlobalNote {
   'id' : bigint,
   'title' : string,
@@ -32,6 +50,36 @@ export interface Publisher {
   'isGroupAssistant' : boolean,
 }
 export type PublisherId = bigint;
+export interface Task {
+  'id' : bigint,
+  'completedAt' : [] | [bigint],
+  'title' : string,
+  'isCompleted' : boolean,
+  'createdAt' : bigint,
+  'dueDate' : bigint,
+  'updatedAt' : [] | [bigint],
+  'parentTaskId' : [] | [bigint],
+  'notes' : [] | [string],
+  'category' : string,
+}
+export type TaskStatus = { 'all' : null } |
+  { 'completed' : null } |
+  { 'uncompleted' : null };
+export interface Territory {
+  'id' : string,
+  'status' : string,
+  'createdAt' : bigint,
+  'checkOutHistory' : Array<CheckoutRecord>,
+  'territoryType' : string,
+  'notes' : string,
+  'number' : string,
+}
+export interface TerritoryNote {
+  'id' : bigint,
+  'title' : string,
+  'content' : string,
+  'createdAt' : bigint,
+}
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -50,20 +98,42 @@ export interface _SERVICE {
     PublisherId
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'checkOutTerritory' : ActorMethod<[string, PublisherId, boolean], undefined>,
   'createGlobalNote' : ActorMethod<
     [string, string, string, [] | [PublisherId]],
     bigint
   >,
+  'createTask' : ActorMethod<[CreateTaskInput], bigint>,
+  'createTerritory' : ActorMethod<
+    [string, string, string, [] | [string], [] | [string]],
+    string
+  >,
+  'createTerritoryNote' : ActorMethod<
+    [string, CreateTerritoryNoteInput],
+    bigint
+  >,
   'deleteGlobalNote' : ActorMethod<[bigint], undefined>,
   'deletePublisher' : ActorMethod<[PublisherId], undefined>,
+  'deleteTask' : ActorMethod<[bigint], undefined>,
+  'deleteTerritory' : ActorMethod<[string], undefined>,
+  'deleteTerritoryNote' : ActorMethod<[string, bigint], undefined>,
   'getAllGlobalNotes' : ActorMethod<[], Array<GlobalNote>>,
   'getAllPublishers' : ActorMethod<[], Array<Publisher>>,
+  'getAllTerritories' : ActorMethod<[], Array<Territory>>,
+  'getAllTerritoryNotes' : ActorMethod<[string], Array<TerritoryNote>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getGlobalNote' : ActorMethod<[bigint], [] | [GlobalNote]>,
   'getPublisher' : ActorMethod<[PublisherId], [] | [Publisher]>,
+  'getTask' : ActorMethod<[bigint], [] | [Task]>,
+  'getTasks' : ActorMethod<[TaskStatus], Array<Task>>,
+  'getTasksByParent' : ActorMethod<[[] | [bigint]], Array<Task>>,
+  'getTerritory' : ActorMethod<[string], [] | [Territory]>,
+  'getTerritoryNote' : ActorMethod<[string, bigint], [] | [TerritoryNote]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'makeTerritoryAvailable' : ActorMethod<[string], undefined>,
+  'markTerritoryReturned' : ActorMethod<[string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'togglePublisherActiveState' : ActorMethod<[PublisherId], undefined>,
   'updateGlobalNote' : ActorMethod<
@@ -80,6 +150,13 @@ export interface _SERVICE {
       boolean,
       boolean,
     ],
+    undefined
+  >,
+  'updateTask' : ActorMethod<[bigint, CreateTaskInput], undefined>,
+  'updateTaskCompletion' : ActorMethod<[bigint, boolean], undefined>,
+  'updateTerritory' : ActorMethod<[string, string, string], undefined>,
+  'updateTerritoryNote' : ActorMethod<
+    [string, bigint, CreateTerritoryNoteInput],
     undefined
   >,
 }

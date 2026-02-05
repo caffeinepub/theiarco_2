@@ -1,53 +1,62 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T04:00:48.996Z",
-  "summary": "Frontend adds an Add Global Note modal on /notes with category + conditional Attach To behavior and a create mutation wired to a new backend actor method name (createGlobalNote). However, the diff summary does not provide evidence that the backend Global Notes data model/stable storage and required API semantics (return created note incl. timestamp, validation rules, persistence) are implemented. Additionally, the frontend create hook expects createGlobalNote to return only an ID, which conflicts with the requirement to return the created note object.",
+  "generatedAt": "2026-02-05T16:57:12.210Z",
+  "summary": "The diff adds helper functions in Territories.tsx to find the active checkout record and compute months checked out, but the provided truncated diff does not show the required table column insertion, cell rendering rules (including em dash), or application of row background highlighting. Additionally, two non-requested metadata files were modified.",
   "missing_requirements": [
     {
-      "id": "REQ-8",
-      "requirement": "Implement a new Global Notes backend data model and stable storage that is completely separate from Publisher Profile Notes storage, with backend-generated unique IDs and optional publisher reference only when category == \"Publishers\".",
-      "reason": "The provided backend/main.mo diff excerpt does not show any Global Notes types, separate storage, stable variables, or logic enforcing publisher reference only for \"Publishers\"; no other backend file evidence is included.",
+      "id": "REQ-1",
+      "requirement": "Add a new Territories table column titled \"Checked Out Duration\" immediately after the \"Status\" column, and render a corresponding cell for each row.",
+      "reason": "The diff for Territories.tsx is truncated before the TableHeader/TableRow rendering, so there is no visible evidence that a new header column and per-row cells were actually added or placed after \"Status\".",
       "evidence": [
-        "backend/main.mo (truncated; no Global Notes model/storage shown)"
+        "frontend/src/pages/Territories.tsx (truncated; TableHeader/TableBody not shown)"
       ]
     },
     {
-      "id": "REQ-9",
-      "requirement": "Add backend APIs for creating Global Notes (returning the created note including generated ID and integer creation timestamp), persisting via stable storage across upgrades, and rejecting invalid payloads (missing title/content/category; attached publisher set when category is not \"Publishers\").",
-      "reason": "No backend API implementation is visible in the diff summary. Frontend code calls actor.createGlobalNote(...) and treats the return value as a noteId, not the created note with timestamp, suggesting the required API contract is not implemented (or not used). Also no evidence of stable persistence or backend-side validation is shown.",
+      "id": "REQ-2",
+      "requirement": "When territory.status is exactly \"Checked Out\", display \"[X] months\" computed from the most recent active checkout record (dateReturned = null) using floor((nowSeconds - dateCheckedOut)/(30*24*60*60)); if no active record exists, display \"—\".",
+      "reason": "While helper functions to select an active record and compute months are added, the diff does not show the actual cell rendering logic that outputs \"[X] months\" or \"—\" in the table. Also, the helper returns null when there is no active record rather than explicitly returning/displaying an em dash; the mapping from null to \"—\" is not evidenced in the truncated render section.",
       "evidence": [
-        "frontend/src/hooks/useCreateGlobalNote.ts (expects createGlobalNote to return noteId)",
-        "backend/main.mo (truncated; no createGlobalNote/getAllGlobalNotes/getGlobalNote implementation shown)"
+        "frontend/src/pages/Territories.tsx (helpers added, but table cell render not shown)"
       ]
     },
     {
-      "id": "REQ-13",
-      "requirement": "Ensure separation between Global Notes and Publisher Profile Notes so they do not appear in each other’s UIs and do not share storage/endpoints.",
-      "reason": "Notes page remains a placeholder and does not render Global Notes at all, but the diff summary also doesn’t show any backend separation (independent collections/endpoints) or any explicit UI logic preventing cross-display besides the absence of a Publisher Profile notes section (not enough evidence to confirm the separation requirement is implemented correctly).",
+      "id": "REQ-3",
+      "requirement": "For status exactly \"Available\" or exactly \"Under Review\", render \"—\" in the \"Checked Out Duration\" column and do not apply any red background styling.",
+      "reason": "The helpers return null for non-\"Checked Out\" statuses, but the diff does not show the table cell rendering that outputs an em dash for these statuses, nor does it show any row class application logic to confirm no red background is applied.",
       "evidence": [
-        "frontend/src/pages/Notes.tsx (placeholder content; no notes list)",
-        "backend/main.mo (truncated; no Global Notes vs Publisher Notes separation shown)"
+        "frontend/src/pages/Territories.tsx (truncated; no cell/row class rendering shown)"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Apply a subtle light red background (e.g., bg-red-50 or bg-red-100) to the entire <TableRow> when status is exactly \"Checked Out\" and computed months >= 4; otherwise no red background; keep existing click/navigation behavior unchanged.",
+      "reason": "A shouldHighlightRow helper is added, but the diff does not show it being applied to the <TableRow> className with bg-red-50/bg-red-100 (or similar). The truncation also prevents verifying that click/navigation behavior remains unchanged.",
+      "evidence": [
+        "frontend/src/pages/Territories.tsx (shouldHighlightRow helper present; no <TableRow> usage shown due to truncation)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added frontend query hook for fetching all global notes and a single global note by ID (useGetAllGlobalNotes, useGetGlobalNote) calling actor.getAllGlobalNotes() and actor.getGlobalNote(id).",
-      "reason": "The BuildRequest focuses on the create flow modal + create API wiring and separation; list/get-by-id APIs/hooks were not requested.",
+      "description": "Modification of repository metadata/summary files unrelated to the requested UI change (frontend-file-summaries.txt).",
+      "reason": "The BuildRequest only asks for UI behavior changes in Territories.tsx and explicitly lists constraints; it does not request updating documentation/summary files.",
       "evidence": [
-        "frontend/src/hooks/useGlobalNotes.ts"
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "Modification of project_state.json to track feature request state.",
+      "reason": "Not requested by the BuildRequest; appears to be project tracking metadata rather than implementing the specified UI behavior.",
+      "evidence": [
+        "project_state.json"
       ]
     }
   ],
-  "confidence": 0.66,
+  "confidence": 0.63,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/notes/AddGlobalNoteModal.tsx",
-    "frontend/src/hooks/useCreateGlobalNote.ts",
-    "frontend/src/hooks/useGlobalNotes.ts",
-    "frontend/src/pages/Notes.tsx",
+    "frontend/src/pages/Territories.tsx",
     "project_state.json"
   ]
 }

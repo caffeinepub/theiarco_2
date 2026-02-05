@@ -16,3 +16,41 @@ export function formatNoteDate(timestamp: bigint): string {
     year: 'numeric',
   });
 }
+
+/**
+ * Converts a backend timestamp (bigint) to a formatted date string for tasks.
+ * Backend task timestamps are in seconds; this function converts to milliseconds.
+ * @param timestamp - Backend timestamp as bigint (seconds)
+ * @returns Formatted date string like "Feb 3, 2026"
+ */
+export function formatTaskDate(timestamp: bigint): string {
+  // Convert seconds to milliseconds
+  const milliseconds = Number(timestamp) * 1000;
+  const date = new Date(milliseconds);
+  
+  // Format as "MMM d, yyyy"
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+/**
+ * Converts a backend checkout timestamp (bigint) to a formatted date string.
+ * Backend checkout timestamps are in nanoseconds; this function converts to milliseconds.
+ * @param timestamp - Backend timestamp as bigint (nanoseconds)
+ * @returns Formatted date string like "Feb 5, 2026"
+ */
+export function formatCheckoutDate(timestamp: bigint): string {
+  // Convert nanoseconds to milliseconds
+  const milliseconds = Number(timestamp / BigInt(1_000_000));
+  const date = new Date(milliseconds);
+  
+  // Format as "MMM d, yyyy"
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
