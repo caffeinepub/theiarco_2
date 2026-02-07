@@ -17,6 +17,18 @@ export interface CheckoutRecord {
   'isCampaign' : boolean,
   'dateCheckedOut' : bigint,
 }
+export interface CreatePioneerInput {
+  'serviceYear' : string,
+  'publisherId' : string,
+  'publisherName' : string,
+}
+export interface CreateShepherdingVisitInput {
+  'eldersPresent' : string,
+  'visitDate' : bigint,
+  'publisherId' : string,
+  'publisherName' : string,
+  'notes' : string,
+}
 export interface CreateTaskInput {
   'title' : string,
   'dueDate' : bigint,
@@ -28,6 +40,11 @@ export interface CreateTerritoryNoteInput {
   'title' : string,
   'content' : string,
 }
+export interface EditPioneerInput {
+  'serviceYear' : string,
+  'publisherId' : string,
+  'publisherName' : string,
+}
 export interface GlobalNote {
   'id' : bigint,
   'title' : string,
@@ -35,6 +52,14 @@ export interface GlobalNote {
   'createdAt' : bigint,
   'category' : string,
   'attachedPublisher' : [] | [PublisherId],
+}
+export interface Pioneer {
+  'id' : string,
+  'serviceYear' : string,
+  'createdAt' : bigint,
+  'publisherId' : string,
+  'publisherName' : string,
+  'isActive' : boolean,
 }
 export interface Publisher {
   'id' : PublisherId,
@@ -50,6 +75,15 @@ export interface Publisher {
   'isGroupAssistant' : boolean,
 }
 export type PublisherId = bigint;
+export interface ShepherdingVisit {
+  'id' : string,
+  'eldersPresent' : string,
+  'createdAt' : bigint,
+  'visitDate' : bigint,
+  'publisherId' : string,
+  'publisherName' : string,
+  'notes' : string,
+}
 export interface Task {
   'id' : bigint,
   'completedAt' : [] | [bigint],
@@ -103,6 +137,8 @@ export interface _SERVICE {
     [string, string, string, [] | [PublisherId]],
     bigint
   >,
+  'createPioneer' : ActorMethod<[CreatePioneerInput], string>,
+  'createShepherdingVisit' : ActorMethod<[CreateShepherdingVisitInput], string>,
   'createTask' : ActorMethod<[CreateTaskInput], bigint>,
   'createTerritory' : ActorMethod<
     [string, string, string, [] | [string], [] | [string]],
@@ -113,18 +149,28 @@ export interface _SERVICE {
     bigint
   >,
   'deleteGlobalNote' : ActorMethod<[bigint], undefined>,
+  'deletePioneer' : ActorMethod<[string], undefined>,
   'deletePublisher' : ActorMethod<[PublisherId], undefined>,
+  'deleteShepherdingVisit' : ActorMethod<[string], undefined>,
   'deleteTask' : ActorMethod<[bigint], undefined>,
   'deleteTerritory' : ActorMethod<[string], undefined>,
   'deleteTerritoryNote' : ActorMethod<[string, bigint], undefined>,
+  'editPioneer' : ActorMethod<[string, EditPioneerInput], undefined>,
   'getAllGlobalNotes' : ActorMethod<[], Array<GlobalNote>>,
+  'getAllPioneers' : ActorMethod<[], Array<Pioneer>>,
   'getAllPublishers' : ActorMethod<[], Array<Publisher>>,
+  'getAllShepherdingVisits' : ActorMethod<[], Array<ShepherdingVisit>>,
   'getAllTerritories' : ActorMethod<[], Array<Territory>>,
   'getAllTerritoryNotes' : ActorMethod<[string], Array<TerritoryNote>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getGlobalNote' : ActorMethod<[bigint], [] | [GlobalNote]>,
   'getPublisher' : ActorMethod<[PublisherId], [] | [Publisher]>,
+  'getShepherdingVisit' : ActorMethod<[string], [] | [ShepherdingVisit]>,
+  'getShepherdingVisitsByPublisher' : ActorMethod<
+    [string],
+    Array<ShepherdingVisit>
+  >,
   'getTask' : ActorMethod<[bigint], [] | [Task]>,
   'getTasks' : ActorMethod<[TaskStatus], Array<Task>>,
   'getTasksByParent' : ActorMethod<[[] | [bigint]], Array<Task>>,
@@ -136,6 +182,10 @@ export interface _SERVICE {
   'markTerritoryReturned' : ActorMethod<[string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'togglePublisherActiveState' : ActorMethod<[PublisherId], undefined>,
+  'updateCheckoutRecord' : ActorMethod<
+    [string, PublisherId, bigint, PublisherId, bigint, [] | [bigint], boolean],
+    undefined
+  >,
   'updateGlobalNote' : ActorMethod<
     [bigint, string, string, string, [] | [PublisherId]],
     undefined
@@ -150,6 +200,10 @@ export interface _SERVICE {
       boolean,
       boolean,
     ],
+    undefined
+  >,
+  'updateShepherdingVisit' : ActorMethod<
+    [string, string, string, bigint, string, string],
     undefined
   >,
   'updateTask' : ActorMethod<[bigint, CreateTaskInput], undefined>,

@@ -1,62 +1,61 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T16:57:12.210Z",
-  "summary": "The diff adds helper functions in Territories.tsx to find the active checkout record and compute months checked out, but the provided truncated diff does not show the required table column insertion, cell rendering rules (including em dash), or application of row background highlighting. Additionally, two non-requested metadata files were modified.",
+  "generatedAt": "2026-02-07T22:12:29.309Z",
+  "summary": "Diff adds a new /shepherding/$id routed Visit Profile page, React Query hooks for single-visit fetch + update/delete/notes update, and an Edit Shepherding Visit modal. Some requirements (notably specific UI wiring/text and button styling) are not verifiable from the truncated diffs, and backend actor method additions are not evidenced.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Add a new Territories table column titled \"Checked Out Duration\" immediately after the \"Status\" column, and render a corresponding cell for each row.",
-      "reason": "The diff for Territories.tsx is truncated before the TableHeader/TableRow rendering, so there is no visible evidence that a new header column and per-row cells were actually added or placed after \"Status\".",
+      "requirement": "In frontend/src/pages/Shepherding.tsx, clicking a row’s Publisher Name cell navigates to /shepherding/<visit.id> (using visit.id, not publisher name).",
+      "reason": "Shepherding.tsx defines handleVisitClick(visitId) which navigates to `/shepherding/${visitId}`, but the diff is truncated before showing the table cell rendering and does not provide evidence that the Publisher Name cell is wired to call handleVisitClick with visit.id.",
       "evidence": [
-        "frontend/src/pages/Territories.tsx (truncated; TableHeader/TableBody not shown)"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "When territory.status is exactly \"Checked Out\", display \"[X] months\" computed from the most recent active checkout record (dateReturned = null) using floor((nowSeconds - dateCheckedOut)/(30*24*60*60)); if no active record exists, display \"—\".",
-      "reason": "While helper functions to select an active record and compute months are added, the diff does not show the actual cell rendering logic that outputs \"[X] months\" or \"—\" in the table. Also, the helper returns null when there is no active record rather than explicitly returning/displaying an em dash; the mapping from null to \"—\" is not evidenced in the truncated render section.",
-      "evidence": [
-        "frontend/src/pages/Territories.tsx (helpers added, but table cell render not shown)"
+        "frontend/src/pages/Shepherding.tsx"
       ]
     },
     {
       "id": "REQ-3",
-      "requirement": "For status exactly \"Available\" or exactly \"Under Review\", render \"—\" in the \"Checked Out Duration\" column and do not apply any red background styling.",
-      "reason": "The helpers return null for non-\"Checked Out\" statuses, but the diff does not show the table cell rendering that outputs an em dash for these statuses, nor does it show any row class application logic to confirm no red background is applied.",
+      "requirement": "Visit Profile page UI: show Publisher Name as heading; show Visit Date formatted like `Feb 7, 2026` using existing formatter; show Elders Present as a single free-text string; include a top-left `Back to Shepherding Visits` button to /shepherding; include `Edit` and `Delete` buttons top-right.",
+      "reason": "The Visit Profile page file is truncated before the main rendered UI; only loading/not-found states and handler functions are visible, so the required heading/date/elders display and presence/placement of Edit/Delete buttons cannot be confirmed.",
       "evidence": [
-        "frontend/src/pages/Territories.tsx (truncated; no cell/row class rendering shown)"
+        "frontend/src/pages/ShepherdingVisitProfile.tsx"
       ]
     },
     {
       "id": "REQ-4",
-      "requirement": "Apply a subtle light red background (e.g., bg-red-50 or bg-red-100) to the entire <TableRow> when status is exactly \"Checked Out\" and computed months >= 4; otherwise no red background; keep existing click/navigation behavior unchanged.",
-      "reason": "A shouldHighlightRow helper is added, but the diff does not show it being applied to the <TableRow> className with bg-red-50/bg-red-100 (or similar). The truncation also prevents verifying that click/navigation behavior remains unchanged.",
+      "requirement": "Notes section: textarea bound to notes; `Save Notes` button with background color #43587A; on save persist to backend and show green toast text exactly `Notes saved successfully!`.",
+      "reason": "Success toast text is evidenced, and hooks exist to persist notes, but the diff is truncated before showing the Notes section UI, so the textarea binding and the `Save Notes` button styling (#43587A) are not evidenced.",
       "evidence": [
-        "frontend/src/pages/Territories.tsx (shouldHighlightRow helper present; no <TableRow> usage shown due to truncation)"
-      ]
-    }
-  ],
-  "hallucinated_features": [
-    {
-      "description": "Modification of repository metadata/summary files unrelated to the requested UI change (frontend-file-summaries.txt).",
-      "reason": "The BuildRequest only asks for UI behavior changes in Territories.tsx and explicitly lists constraints; it does not request updating documentation/summary files.",
-      "evidence": [
-        "frontend-file-summaries.txt"
+        "frontend/src/pages/ShepherdingVisitProfile.tsx"
       ]
     },
     {
-      "description": "Modification of project_state.json to track feature request state.",
-      "reason": "Not requested by the BuildRequest; appears to be project tracking metadata rather than implementing the specified UI behavior.",
+      "id": "REQ-6",
+      "requirement": "Delete flow: clicking `Delete` opens confirmation dialog with exact title `Delete this visit?` and `Yes`/`Cancel` buttons; Yes deletes, navigates to /shepherding, shows green toast `Visit deleted successfully!`.",
+      "reason": "The delete mutation + success toast + navigation are shown, and AlertDialog components are imported, but the diff is truncated before the confirmation dialog JSX, so the exact title text and `Yes`/`Cancel` button labels cannot be confirmed.",
       "evidence": [
-        "project_state.json"
+        "frontend/src/pages/ShepherdingVisitProfile.tsx"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "If required backend actor methods are missing, add them in backend/main.mo (get single shepherding visit by ID, update, delete) without changing the visit data model fields.",
+      "reason": "Frontend hooks call actor.getShepherdingVisit, actor.updateShepherdingVisit, and actor.deleteShepherdingVisit, but the backend diff is truncated and does not show any shepherding-visit-related method additions/definitions, so backend support cannot be verified.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/hooks/useShepherdingVisit.ts"
       ]
     }
   ],
-  "confidence": 0.63,
+  "hallucinated_features": [],
+  "confidence": 0.62,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/pages/Territories.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
+    "frontend/src/hooks/useShepherdingVisit.ts",
+    "frontend/src/pages/Shepherding.tsx",
+    "frontend/src/pages/ShepherdingVisitProfile.tsx",
     "project_state.json"
   ]
 }

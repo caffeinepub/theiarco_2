@@ -14,6 +14,18 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const CreatePioneerInput = IDL.Record({
+  'serviceYear' : IDL.Text,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+});
+export const CreateShepherdingVisitInput = IDL.Record({
+  'eldersPresent' : IDL.Text,
+  'visitDate' : IDL.Int,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'notes' : IDL.Text,
+});
 export const CreateTaskInput = IDL.Record({
   'title' : IDL.Text,
   'dueDate' : IDL.Int,
@@ -25,6 +37,11 @@ export const CreateTerritoryNoteInput = IDL.Record({
   'title' : IDL.Text,
   'content' : IDL.Text,
 });
+export const EditPioneerInput = IDL.Record({
+  'serviceYear' : IDL.Text,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+});
 export const GlobalNote = IDL.Record({
   'id' : IDL.Nat,
   'title' : IDL.Text,
@@ -32,6 +49,14 @@ export const GlobalNote = IDL.Record({
   'createdAt' : IDL.Int,
   'category' : IDL.Text,
   'attachedPublisher' : IDL.Opt(PublisherId),
+});
+export const Pioneer = IDL.Record({
+  'id' : IDL.Text,
+  'serviceYear' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'isActive' : IDL.Bool,
 });
 export const Publisher = IDL.Record({
   'id' : PublisherId,
@@ -45,6 +70,15 @@ export const Publisher = IDL.Record({
   'isGroupOverseer' : IDL.Bool,
   'isActive' : IDL.Bool,
   'isGroupAssistant' : IDL.Bool,
+});
+export const ShepherdingVisit = IDL.Record({
+  'id' : IDL.Text,
+  'eldersPresent' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'visitDate' : IDL.Int,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'notes' : IDL.Text,
 });
 export const CheckoutRecord = IDL.Record({
   'publisherId' : PublisherId,
@@ -112,6 +146,12 @@ export const idlService = IDL.Service({
       [IDL.Nat],
       [],
     ),
+  'createPioneer' : IDL.Func([CreatePioneerInput], [IDL.Text], []),
+  'createShepherdingVisit' : IDL.Func(
+      [CreateShepherdingVisitInput],
+      [IDL.Text],
+      [],
+    ),
   'createTask' : IDL.Func([CreateTaskInput], [IDL.Nat], []),
   'createTerritory' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
@@ -124,12 +164,21 @@ export const idlService = IDL.Service({
       [],
     ),
   'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
+  'deletePioneer' : IDL.Func([IDL.Text], [], []),
   'deletePublisher' : IDL.Func([PublisherId], [], []),
+  'deleteShepherdingVisit' : IDL.Func([IDL.Text], [], []),
   'deleteTask' : IDL.Func([IDL.Nat], [], []),
   'deleteTerritory' : IDL.Func([IDL.Text], [], []),
   'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+  'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
   'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
+  'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
   'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
+  'getAllShepherdingVisits' : IDL.Func(
+      [],
+      [IDL.Vec(ShepherdingVisit)],
+      ['query'],
+    ),
   'getAllTerritories' : IDL.Func([], [IDL.Vec(Territory)], ['query']),
   'getAllTerritoryNotes' : IDL.Func(
       [IDL.Text],
@@ -140,6 +189,16 @@ export const idlService = IDL.Service({
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
   'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
+  'getShepherdingVisit' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(ShepherdingVisit)],
+      ['query'],
+    ),
+  'getShepherdingVisitsByPublisher' : IDL.Func(
+      [IDL.Text],
+      [IDL.Vec(ShepherdingVisit)],
+      ['query'],
+    ),
   'getTask' : IDL.Func([IDL.Nat], [IDL.Opt(Task)], ['query']),
   'getTasks' : IDL.Func([TaskStatus], [IDL.Vec(Task)], ['query']),
   'getTasksByParent' : IDL.Func([IDL.Opt(IDL.Nat)], [IDL.Vec(Task)], ['query']),
@@ -159,6 +218,19 @@ export const idlService = IDL.Service({
   'markTerritoryReturned' : IDL.Func([IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
+  'updateCheckoutRecord' : IDL.Func(
+      [
+        IDL.Text,
+        PublisherId,
+        IDL.Int,
+        PublisherId,
+        IDL.Int,
+        IDL.Opt(IDL.Int),
+        IDL.Bool,
+      ],
+      [],
+      [],
+    ),
   'updateGlobalNote' : IDL.Func(
       [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
       [],
@@ -181,6 +253,11 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'updateShepherdingVisit' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Int, IDL.Text, IDL.Text],
+      [],
+      [],
+    ),
   'updateTask' : IDL.Func([IDL.Nat, CreateTaskInput], [], []),
   'updateTaskCompletion' : IDL.Func([IDL.Nat, IDL.Bool], [], []),
   'updateTerritory' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
@@ -200,6 +277,18 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const CreatePioneerInput = IDL.Record({
+    'serviceYear' : IDL.Text,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+  });
+  const CreateShepherdingVisitInput = IDL.Record({
+    'eldersPresent' : IDL.Text,
+    'visitDate' : IDL.Int,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'notes' : IDL.Text,
+  });
   const CreateTaskInput = IDL.Record({
     'title' : IDL.Text,
     'dueDate' : IDL.Int,
@@ -211,6 +300,11 @@ export const idlFactory = ({ IDL }) => {
     'title' : IDL.Text,
     'content' : IDL.Text,
   });
+  const EditPioneerInput = IDL.Record({
+    'serviceYear' : IDL.Text,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+  });
   const GlobalNote = IDL.Record({
     'id' : IDL.Nat,
     'title' : IDL.Text,
@@ -218,6 +312,14 @@ export const idlFactory = ({ IDL }) => {
     'createdAt' : IDL.Int,
     'category' : IDL.Text,
     'attachedPublisher' : IDL.Opt(PublisherId),
+  });
+  const Pioneer = IDL.Record({
+    'id' : IDL.Text,
+    'serviceYear' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'isActive' : IDL.Bool,
   });
   const Publisher = IDL.Record({
     'id' : PublisherId,
@@ -231,6 +333,15 @@ export const idlFactory = ({ IDL }) => {
     'isGroupOverseer' : IDL.Bool,
     'isActive' : IDL.Bool,
     'isGroupAssistant' : IDL.Bool,
+  });
+  const ShepherdingVisit = IDL.Record({
+    'id' : IDL.Text,
+    'eldersPresent' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'visitDate' : IDL.Int,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'notes' : IDL.Text,
   });
   const CheckoutRecord = IDL.Record({
     'publisherId' : PublisherId,
@@ -298,6 +409,12 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'createPioneer' : IDL.Func([CreatePioneerInput], [IDL.Text], []),
+    'createShepherdingVisit' : IDL.Func(
+        [CreateShepherdingVisitInput],
+        [IDL.Text],
+        [],
+      ),
     'createTask' : IDL.Func([CreateTaskInput], [IDL.Nat], []),
     'createTerritory' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
@@ -310,12 +427,21 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
+    'deletePioneer' : IDL.Func([IDL.Text], [], []),
     'deletePublisher' : IDL.Func([PublisherId], [], []),
+    'deleteShepherdingVisit' : IDL.Func([IDL.Text], [], []),
     'deleteTask' : IDL.Func([IDL.Nat], [], []),
     'deleteTerritory' : IDL.Func([IDL.Text], [], []),
     'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+    'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
     'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
+    'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
     'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
+    'getAllShepherdingVisits' : IDL.Func(
+        [],
+        [IDL.Vec(ShepherdingVisit)],
+        ['query'],
+      ),
     'getAllTerritories' : IDL.Func([], [IDL.Vec(Territory)], ['query']),
     'getAllTerritoryNotes' : IDL.Func(
         [IDL.Text],
@@ -326,6 +452,16 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
     'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
+    'getShepherdingVisit' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(ShepherdingVisit)],
+        ['query'],
+      ),
+    'getShepherdingVisitsByPublisher' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(ShepherdingVisit)],
+        ['query'],
+      ),
     'getTask' : IDL.Func([IDL.Nat], [IDL.Opt(Task)], ['query']),
     'getTasks' : IDL.Func([TaskStatus], [IDL.Vec(Task)], ['query']),
     'getTasksByParent' : IDL.Func(
@@ -349,6 +485,19 @@ export const idlFactory = ({ IDL }) => {
     'markTerritoryReturned' : IDL.Func([IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
+    'updateCheckoutRecord' : IDL.Func(
+        [
+          IDL.Text,
+          PublisherId,
+          IDL.Int,
+          PublisherId,
+          IDL.Int,
+          IDL.Opt(IDL.Int),
+          IDL.Bool,
+        ],
+        [],
+        [],
+      ),
     'updateGlobalNote' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
         [],
@@ -368,6 +517,11 @@ export const idlFactory = ({ IDL }) => {
           IDL.Bool,
           IDL.Bool,
         ],
+        [],
+        [],
+      ),
+    'updateShepherdingVisit' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Int, IDL.Text, IDL.Text],
         [],
         [],
       ),

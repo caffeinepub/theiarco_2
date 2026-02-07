@@ -1,5 +1,7 @@
 import type { CheckoutRecord } from '../../backend';
 import { formatCheckoutDate } from '../../utils/formatters';
+import { Button } from '@/components/ui/button';
+import { Pencil } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -11,9 +13,10 @@ import {
 
 interface CheckoutHistoryTableProps {
   checkOutHistory: CheckoutRecord[];
+  onEdit?: (record: CheckoutRecord) => void;
 }
 
-export function CheckoutHistoryTable({ checkOutHistory }: CheckoutHistoryTableProps) {
+export function CheckoutHistoryTable({ checkOutHistory, onEdit }: CheckoutHistoryTableProps) {
   // Sort by dateCheckedOut descending (most recent first)
   const sortedHistory = [...checkOutHistory].sort((a, b) => {
     return Number(b.dateCheckedOut - a.dateCheckedOut);
@@ -36,6 +39,7 @@ export function CheckoutHistoryTable({ checkOutHistory }: CheckoutHistoryTablePr
             <TableHead>Date Checked Out</TableHead>
             <TableHead>Date Returned</TableHead>
             <TableHead>Campaign</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -53,6 +57,19 @@ export function CheckoutHistoryTable({ checkOutHistory }: CheckoutHistoryTablePr
                   : 'Still Out'}
               </TableCell>
               <TableCell>{record.isCampaign ? 'Yes' : 'No'}</TableCell>
+              <TableCell className="text-right">
+                {onEdit && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(record)}
+                    className="gap-2"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Edit
+                  </Button>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

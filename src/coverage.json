@@ -1,67 +1,121 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T16:57:12.213Z",
+  "generatedAt": "2026-02-07T22:12:29.313Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 7,
+    "implemented": 7,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the existing Territories list page table (frontend/src/pages/Territories.tsx) to add a new column titled \"Checked Out Duration\" immediately after the existing \"Status\" column, without changing any other table behavior.",
+        "summary": "Update the Shepherding Visits list so the Publisher Name cell navigates to a visit-specific profile route using the visit’s unique ID (not publisher name). Clicking a row’s Publisher Name must navigate to `/shepherding/:id`, where `:id` is `visit.id`.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/Shepherding.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/Shepherding.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "For each territory row in the Territories list table, compute and display the checked-out duration in months only when territory.status is exactly \"Checked Out\". Use the most recent checkout record in territory.checkOutHistory where dateReturned is null (i.e., the active checkout). Calculate months as floor((currentTimestampSeconds - dateCheckedOut) / (30 * 24 * 60 * 60)) and render the cell text as \"[X] months\" (e.g., \"0 months\", \"2 months\"). If no active checkout record exists, display \"—\".",
+        "summary": "Add a new routed page for the Visit Profile at `/shepherding/$id` and register it in `frontend/src/App.tsx` using TanStack Router, similar to existing profile routes (e.g. `/territories/$id`, `/publishers/$id`).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/App.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "For territories with status exactly \"Available\" or exactly \"Under Review\", render \"—\" (em dash) in the \"Checked Out Duration\" column and do not apply any red background styling.",
+        "summary": "Implement the Visit Profile page UI to display the selected visit’s details and actions: show Publisher Name as the page heading; show Visit Date formatted like `Feb 7, 2026`; show Elders Present as a single free-text string; include a top-left button labeled `Back to Shepherding Visits` that navigates to `/shepherding`; include `Edit` and `Delete` buttons in the top-right.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/ShepherdingVisitProfile.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/ShepherdingVisitProfile.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Conditionally apply a subtle light red background to the entire Territories table row when (a) territory.status is exactly \"Checked Out\" and (b) the computed months checked out is 4 or more. Use a Tailwind class such as bg-red-50 or bg-red-100 (subtle but noticeable) applied to the full <TableRow>.",
+        "summary": "Add a Notes section on the Visit Profile page that allows viewing and editing the existing backend `notes : Text` field for the visit. The section must include a textarea bound to the visit’s notes and a `Save Notes` button with background color `#43587A`. When `Save Notes` is clicked, persist the updated notes to the backend for that visit and show a green success toast with the exact text `Notes saved successfully!`.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/hooks/useShepherdingVisit.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/hooks/useShepherdingVisit.ts"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Implement the Visit Edit flow on the Visit Profile page: clicking `Edit` opens a modal pre-filled with the visit’s current data and includes required fields: Publisher (dropdown, required, pre-selected), Visit Date (date picker, required, pre-filled), Elders Present (text input, required, pre-filled). The modal must have `Save` and `Cancel` buttons. Clicking `Save` must update the visit in the backend, refresh the Visit Profile page data, and show a green success toast with exact text `Visit updated successfully!`.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/hooks/useShepherdingVisit.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/hooks/useShepherdingVisit.ts"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Implement the Visit Delete flow on the Visit Profile page: clicking `Delete` opens a confirmation dialog with the exact title text `Delete this visit?` and `Yes` and `Cancel` buttons. Clicking `Yes` must delete the visit from the backend, navigate back to `/shepherding`, and show a green success toast with exact text `Visit deleted successfully!`.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/hooks/useShepherdingVisit.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "frontend/src/hooks/useShepherdingVisit.ts"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Add/ensure frontend React Query hooks needed by the Visit Profile page to load a single shepherding visit by ID and to perform update/delete/notes-save mutations, using the existing backend actor API created in PROMPT #29-30. Mutations must invalidate the appropriate React Query cache keys so the Shepherding Visits list (`['shepherdingVisits']`) and the single-visit query are refreshed correctly.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useShepherdingVisit.ts",
+          "frontend/src/pages/ShepherdingVisitProfile.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useShepherdingVisit.ts",
+          "frontend/src/pages/ShepherdingVisitProfile.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/Territories.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useShepherdingVisit.ts",
+    "frontend/src/pages/Shepherding.tsx",
+    "frontend/src/pages/ShepherdingVisitProfile.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

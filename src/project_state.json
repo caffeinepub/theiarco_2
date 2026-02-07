@@ -1,46 +1,68 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Territories management app with an existing Territories list/table and backend checkout history; next work is adding a Checked Out Duration column that calculates months since latest active checkout and highlights long checkouts.",
+  "summary": "Build Shepherding Visits app UI: add a Visit Profile page for individual shepherding visits with notes editing plus edit/delete visit actions, using existing backend data.",
   "architectural_notes": [
-    "Territory records include checkOutHistory array of checkout records.",
-    "Checkout record fields: publisherId (Text), publisherName (Text), dateCheckedOut (Int timestamp seconds), dateReturned (?Int; null when active), isCampaign (Bool).",
-    "Statuses: Available, Checked Out, Under Review.",
-    "Duration display: for Checked Out only, use most recent checkout record where dateReturned is null; months = floor((now - dateCheckedOut)/(30*24*60*60)); render as 'X months'.",
-    "UI styling: apply subtle light red background (e.g., Tailwind bg-red-50 or bg-red-100) to entire row when checked out duration >= 4 months; otherwise no red background; show '—' for non-Checked Out statuses."
+    "Use route /shepherding/:id where :id is the visit's unique ID (publisher name is not unique).",
+    "Backend already has visit.notes as a single Text field (default empty string); UI should edit this existing field.",
+    "visit.eldersPresent is stored as a single free-text string (comma-separated names), not a list."
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-existing-territories-list-page-table-frontend-src-pages-territories-tsx-to-add-a-new-column-titled-checked-out-duration-immediately-after-the-existing-status-column-without-changing-any-other-table-behavior",
-      "title": "Update the existing Territories list page table (frontend/src/pages/Territories.tsx) to add a new column titled \"Checked Out Duration\" immediately after the existing \"Status\" column, without changing any other table behavior.",
+      "id": "feature-update-the-shepherding-visits-list-so-the-publisher-name-cell-navigates-to-a-visit-specific-profile-route-using-the-visit-s-unique-id-not-publisher-name-clicking-a-row-s-publisher-name-must-navigate-to-shepherding-id-where-id-is-visit-id",
+      "title": "Update the Shepherding Visits list so the Publisher Name cell navigates to a visit-specific profile route using the visit’s unique ID (not publisher name). Clicking a row’s Publisher Name must navigate to `/shepherding/:id`, where `:id` is `visit.id`.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-for-each-territory-row-in-the-territories-list-table-compute-and-display-the-checked-out-duration-in-months-only-when-territory-status-is-exactly-checked-out-use-the-most-recent-checkout-record-in-territory-checkouthistory-where-datereturned-is-null-i-e-the-active-checkout-calculate-months-as-floor-currenttimestampseconds-datecheckedout-30-24-60-60-and-render-the-cell-text-as-x-months-e-g-0-months-2-months-if-no-active-checkout-record-exists-display",
-      "title": "For each territory row in the Territories list table, compute and display the checked-out duration in months only when territory.status is exactly \"Checked Out\". Use the most recent checkout record in territory.checkOutHistory where dateReturned is null (i.e., the active checkout). Calculate months as floor((currentTimestampSeconds - dateCheckedOut) / (30 * 24 * 60 * 60)) and render the cell text as \"[X] months\" (e.g., \"0 months\", \"2 months\"). If no active checkout record exists, display \"—\".",
+      "id": "feature-add-a-new-routed-page-for-the-visit-profile-at-shepherding-id-and-register-it-in-frontend-src-app-tsx-using-tanstack-router-similar-to-existing-profile-routes-e-g-territories-id-publishers-id",
+      "title": "Add a new routed page for the Visit Profile at `/shepherding/$id` and register it in `frontend/src/App.tsx` using TanStack Router, similar to existing profile routes (e.g. `/territories/$id`, `/publishers/$id`).",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-for-territories-with-status-exactly-available-or-exactly-under-review-render-em-dash-in-the-checked-out-duration-column-and-do-not-apply-any-red-background-styling",
-      "title": "For territories with status exactly \"Available\" or exactly \"Under Review\", render \"—\" (em dash) in the \"Checked Out Duration\" column and do not apply any red background styling.",
+      "id": "feature-implement-the-visit-profile-page-ui-to-display-the-selected-visit-s-details-and-actions-show-publisher-name-as-the-page-heading-show-visit-date-formatted-like-feb-7-2026-show-elders-present-as-a-single-free-text-string-include-a-top-left-button-labeled-back-to-shepherding-visits-that-navigates-to-shepherding-include-edit-and-delete-buttons-in-the-top-right",
+      "title": "Implement the Visit Profile page UI to display the selected visit’s details and actions: show Publisher Name as the page heading; show Visit Date formatted like `Feb 7, 2026`; show Elders Present as a single free-text string; include a top-left button labeled `Back to Shepherding Visits` that navigates to `/shepherding`; include `Edit` and `Delete` buttons in the top-right.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-conditionally-apply-a-subtle-light-red-background-to-the-entire-territories-table-row-when-a-territory-status-is-exactly-checked-out-and-b-the-computed-months-checked-out-is-4-or-more-use-a-tailwind-class-such-as-bg-red-50-or-bg-red-100-subtle-but-noticeable-applied-to-the-full-tablerow",
-      "title": "Conditionally apply a subtle light red background to the entire Territories table row when (a) territory.status is exactly \"Checked Out\" and (b) the computed months checked out is 4 or more. Use a Tailwind class such as bg-red-50 or bg-red-100 (subtle but noticeable) applied to the full <TableRow>.",
+      "id": "feature-add-a-notes-section-on-the-visit-profile-page-that-allows-viewing-and-editing-the-existing-backend-notes-text-field-for-the-visit-the-section-must-include-a-textarea-bound-to-the-visit-s-notes-and-a-save-notes-button-with-background-color-43587a-when-save-notes-is-clicked-persist-the-updated-notes-to-the-backend-for-that-visit-and-show-a-green-success-toast-with-the-exact-text-notes-saved-successfully",
+      "title": "Add a Notes section on the Visit Profile page that allows viewing and editing the existing backend `notes : Text` field for the visit. The section must include a textarea bound to the visit’s notes and a `Save Notes` button with background color `#43587A`. When `Save Notes` is clicked, persist the updated notes to the backend for that visit and show a green success toast with the exact text `Notes saved successfully!`.",
       "reqIds": [
         "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-visit-edit-flow-on-the-visit-profile-page-clicking-edit-opens-a-modal-pre-filled-with-the-visit-s-current-data-and-includes-required-fields-publisher-dropdown-required-pre-selected-visit-date-date-picker-required-pre-filled-elders-present-text-input-required-pre-filled-the-modal-must-have-save-and-cancel-buttons-clicking-save-must-update-the-visit-in-the-backend-refresh-the-visit-profile-page-data-and-show-a-green-success-toast-with-exact-text-visit-updated-successfully",
+      "title": "Implement the Visit Edit flow on the Visit Profile page: clicking `Edit` opens a modal pre-filled with the visit’s current data and includes required fields: Publisher (dropdown, required, pre-selected), Visit Date (date picker, required, pre-filled), Elders Present (text input, required, pre-filled). The modal must have `Save` and `Cancel` buttons. Clicking `Save` must update the visit in the backend, refresh the Visit Profile page data, and show a green success toast with exact text `Visit updated successfully!`.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-visit-delete-flow-on-the-visit-profile-page-clicking-delete-opens-a-confirmation-dialog-with-the-exact-title-text-delete-this-visit-and-yes-and-cancel-buttons-clicking-yes-must-delete-the-visit-from-the-backend-navigate-back-to-shepherding-and-show-a-green-success-toast-with-exact-text-visit-deleted-successfully",
+      "title": "Implement the Visit Delete flow on the Visit Profile page: clicking `Delete` opens a confirmation dialog with the exact title text `Delete this visit?` and `Yes` and `Cancel` buttons. Clicking `Yes` must delete the visit from the backend, navigate back to `/shepherding`, and show a green success toast with exact text `Visit deleted successfully!`.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-ensure-frontend-react-query-hooks-needed-by-the-visit-profile-page-to-load-a-single-shepherding-visit-by-id-and-to-perform-update-delete-notes-save-mutations-using-the-existing-backend-actor-api-created-in-prompt-29-30-mutations-must-invalidate-the-appropriate-react-query-cache-keys-so-the-shepherding-visits-list-shepherdingvisits-and-the-single-visit-query-are-refreshed-correctly",
+      "title": "Add/ensure frontend React Query hooks needed by the Visit Profile page to load a single shepherding visit by ID and to perform update/delete/notes-save mutations, using the existing backend actor API created in PROMPT #29-30. Mutations must invalidate the appropriate React Query cache keys so the Shepherding Visits list (`['shepherdingVisits']`) and the single-visit query are refreshed correctly.",
+      "reqIds": [
+        "REQ-7"
       ],
       "version": 1
     }
@@ -48,13 +70,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add 'Checked Out Duration' column to Territories list, computed from latest active checkout (dateReturned=null), and highlight rows red when duration >= 4 months",
+      "summary": "Add Visit Profile page (/shepherding/:id) with visit details, notes editing (save to backend + success toast), edit modal (update backend + toast), and delete confirmation (delete backend + navigate back + toast); make Publisher Name in list link to visit by unique ID.",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "Add Checked Out Duration column and highlight long checkouts in Territories table",
+  "projectName": "Add Shepherding Visit Profile page with notes editing and edit/delete actions",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -124,7 +124,7 @@ export default function Territories() {
                 const highlight = shouldHighlightRow(territory);
 
                 return (
-                  <TableRow key={territory.id} className={highlight ? 'bg-red-50' : ''}>
+                  <TableRow key={territory.id} className={highlight ? 'bg-red-100' : ''}>
                     <TableCell className="font-medium">
                       <button
                         onClick={() => handleTerritoryClick(territory.id)}

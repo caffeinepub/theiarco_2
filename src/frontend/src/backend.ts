@@ -89,26 +89,15 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface TerritoryNote {
-    id: bigint;
-    title: string;
-    content: string;
+export interface ShepherdingVisit {
+    id: string;
+    eldersPresent: string;
     createdAt: bigint;
+    visitDate: bigint;
+    publisherId: string;
+    publisherName: string;
+    notes: string;
 }
-export interface Publisher {
-    id: PublisherId;
-    privileges: {
-        servant: boolean;
-        publisher: boolean;
-        elder: boolean;
-    };
-    fieldServiceGroup: bigint;
-    fullName: string;
-    isGroupOverseer: boolean;
-    isActive: boolean;
-    isGroupAssistant: boolean;
-}
-export type PublisherId = bigint;
 export interface CreateTaskInput {
     title: string;
     dueDate: bigint;
@@ -116,6 +105,7 @@ export interface CreateTaskInput {
     notes?: string;
     category: string;
 }
+export type PublisherId = bigint;
 export interface Task {
     id: bigint;
     completedAt?: bigint;
@@ -136,9 +126,57 @@ export interface GlobalNote {
     category: string;
     attachedPublisher?: PublisherId;
 }
+export interface EditPioneerInput {
+    serviceYear: string;
+    publisherId: string;
+    publisherName: string;
+}
 export interface CreateTerritoryNoteInput {
     title: string;
     content: string;
+}
+export interface Pioneer {
+    id: string;
+    serviceYear: string;
+    createdAt: bigint;
+    publisherId: string;
+    publisherName: string;
+    isActive: boolean;
+}
+export interface Territory {
+    id: string;
+    status: string;
+    createdAt: bigint;
+    checkOutHistory: Array<CheckoutRecord>;
+    territoryType: string;
+    notes: string;
+    number: string;
+}
+export interface TerritoryNote {
+    id: bigint;
+    title: string;
+    content: string;
+    createdAt: bigint;
+}
+export interface Publisher {
+    id: PublisherId;
+    privileges: {
+        servant: boolean;
+        publisher: boolean;
+        elder: boolean;
+    };
+    fieldServiceGroup: bigint;
+    fullName: string;
+    isGroupOverseer: boolean;
+    isActive: boolean;
+    isGroupAssistant: boolean;
+}
+export interface CreateShepherdingVisitInput {
+    eldersPresent: string;
+    visitDate: bigint;
+    publisherId: string;
+    publisherName: string;
+    notes: string;
 }
 export interface CheckoutRecord {
     publisherId: PublisherId;
@@ -150,14 +188,10 @@ export interface CheckoutRecord {
 export interface UserProfile {
     name: string;
 }
-export interface Territory {
-    id: string;
-    status: string;
-    createdAt: bigint;
-    checkOutHistory: Array<CheckoutRecord>;
-    territoryType: string;
-    notes: string;
-    number: string;
+export interface CreatePioneerInput {
+    serviceYear: string;
+    publisherId: string;
+    publisherName: string;
 }
 export enum TaskStatus {
     all = "all",
@@ -179,22 +213,31 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkOutTerritory(territoryId: string, publisherId: PublisherId, isCampaign: boolean): Promise<void>;
     createGlobalNote(title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<bigint>;
+    createPioneer(input: CreatePioneerInput): Promise<string>;
+    createShepherdingVisit(input: CreateShepherdingVisitInput): Promise<string>;
     createTask(input: CreateTaskInput): Promise<bigint>;
     createTerritory(id: string, number: string, territoryType: string, status: string | null, notes: string | null): Promise<string>;
     createTerritoryNote(territoryId: string, input: CreateTerritoryNoteInput): Promise<bigint>;
     deleteGlobalNote(id: bigint): Promise<void>;
+    deletePioneer(id: string): Promise<void>;
     deletePublisher(id: PublisherId): Promise<void>;
+    deleteShepherdingVisit(id: string): Promise<void>;
     deleteTask(id: bigint): Promise<void>;
     deleteTerritory(id: string): Promise<void>;
     deleteTerritoryNote(territoryId: string, noteId: bigint): Promise<void>;
+    editPioneer(id: string, input: EditPioneerInput): Promise<void>;
     getAllGlobalNotes(): Promise<Array<GlobalNote>>;
+    getAllPioneers(): Promise<Array<Pioneer>>;
     getAllPublishers(): Promise<Array<Publisher>>;
+    getAllShepherdingVisits(): Promise<Array<ShepherdingVisit>>;
     getAllTerritories(): Promise<Array<Territory>>;
     getAllTerritoryNotes(territoryId: string): Promise<Array<TerritoryNote>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getGlobalNote(id: bigint): Promise<GlobalNote | null>;
     getPublisher(id: PublisherId): Promise<Publisher | null>;
+    getShepherdingVisit(id: string): Promise<ShepherdingVisit | null>;
+    getShepherdingVisitsByPublisher(publisherId: string): Promise<Array<ShepherdingVisit>>;
     getTask(id: bigint): Promise<Task | null>;
     getTasks(status: TaskStatus): Promise<Array<Task>>;
     getTasksByParent(parentTaskId: bigint | null): Promise<Array<Task>>;
@@ -206,18 +249,20 @@ export interface backendInterface {
     markTerritoryReturned(territoryId: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     togglePublisherActiveState(id: PublisherId): Promise<void>;
+    updateCheckoutRecord(territoryId: string, originalPublisherId: PublisherId, originalDateCheckedOut: bigint, newPublisherId: PublisherId, newDateCheckedOut: bigint, newDateReturned: bigint | null, newIsCampaign: boolean): Promise<void>;
     updateGlobalNote(id: bigint, title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<void>;
     updatePublisher(id: PublisherId, fullName: string, fieldServiceGroup: bigint, privileges: {
         servant: boolean;
         publisher: boolean;
         elder: boolean;
     }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean): Promise<void>;
+    updateShepherdingVisit(id: string, publisherId: string, publisherName: string, visitDate: bigint, eldersPresent: string, notes: string): Promise<void>;
     updateTask(id: bigint, input: CreateTaskInput): Promise<void>;
     updateTaskCompletion(id: bigint, isCompleted: boolean): Promise<void>;
     updateTerritory(id: string, number: string, territoryType: string): Promise<void>;
     updateTerritoryNote(territoryId: string, noteId: bigint, input: CreateTerritoryNoteInput): Promise<void>;
 }
-import type { CheckoutRecord as _CheckoutRecord, CreateTaskInput as _CreateTaskInput, GlobalNote as _GlobalNote, Publisher as _Publisher, PublisherId as _PublisherId, Task as _Task, TaskStatus as _TaskStatus, Territory as _Territory, TerritoryNote as _TerritoryNote, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { CheckoutRecord as _CheckoutRecord, CreateTaskInput as _CreateTaskInput, GlobalNote as _GlobalNote, Publisher as _Publisher, PublisherId as _PublisherId, ShepherdingVisit as _ShepherdingVisit, Task as _Task, TaskStatus as _TaskStatus, Territory as _Territory, TerritoryNote as _TerritoryNote, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -294,6 +339,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async createPioneer(arg0: CreatePioneerInput): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createPioneer(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createPioneer(arg0);
+            return result;
+        }
+    }
+    async createShepherdingVisit(arg0: CreateShepherdingVisitInput): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createShepherdingVisit(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createShepherdingVisit(arg0);
+            return result;
+        }
+    }
     async createTask(arg0: CreateTaskInput): Promise<bigint> {
         if (this.processError) {
             try {
@@ -350,6 +423,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deletePioneer(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deletePioneer(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deletePioneer(arg0);
+            return result;
+        }
+    }
     async deletePublisher(arg0: PublisherId): Promise<void> {
         if (this.processError) {
             try {
@@ -361,6 +448,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deletePublisher(arg0);
+            return result;
+        }
+    }
+    async deleteShepherdingVisit(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteShepherdingVisit(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteShepherdingVisit(arg0);
             return result;
         }
     }
@@ -406,6 +507,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async editPioneer(arg0: string, arg1: EditPioneerInput): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.editPioneer(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.editPioneer(arg0, arg1);
+            return result;
+        }
+    }
     async getAllGlobalNotes(): Promise<Array<GlobalNote>> {
         if (this.processError) {
             try {
@@ -420,6 +535,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getAllPioneers(): Promise<Array<Pioneer>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllPioneers();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllPioneers();
+            return result;
+        }
+    }
     async getAllPublishers(): Promise<Array<Publisher>> {
         if (this.processError) {
             try {
@@ -431,6 +560,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getAllPublishers();
+            return result;
+        }
+    }
+    async getAllShepherdingVisits(): Promise<Array<ShepherdingVisit>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllShepherdingVisits();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllShepherdingVisits();
             return result;
         }
     }
@@ -518,74 +661,102 @@ export class Backend implements backendInterface {
             return from_candid_opt_n23(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getTask(arg0: bigint): Promise<Task | null> {
+    async getShepherdingVisit(arg0: string): Promise<ShepherdingVisit | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.getTask(arg0);
+                const result = await this.actor.getShepherdingVisit(arg0);
                 return from_candid_opt_n24(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getTask(arg0);
+            const result = await this.actor.getShepherdingVisit(arg0);
             return from_candid_opt_n24(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getShepherdingVisitsByPublisher(arg0: string): Promise<Array<ShepherdingVisit>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getShepherdingVisitsByPublisher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getShepherdingVisitsByPublisher(arg0);
+            return result;
+        }
+    }
+    async getTask(arg0: bigint): Promise<Task | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTask(arg0);
+                return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTask(arg0);
+            return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
         }
     }
     async getTasks(arg0: TaskStatus): Promise<Array<Task>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getTasks(to_candid_TaskStatus_n29(this._uploadFile, this._downloadFile, arg0));
-                return from_candid_vec_n31(this._uploadFile, this._downloadFile, result);
+                const result = await this.actor.getTasks(to_candid_TaskStatus_n30(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getTasks(to_candid_TaskStatus_n29(this._uploadFile, this._downloadFile, arg0));
-            return from_candid_vec_n31(this._uploadFile, this._downloadFile, result);
+            const result = await this.actor.getTasks(to_candid_TaskStatus_n30(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
         }
     }
     async getTasksByParent(arg0: bigint | null): Promise<Array<Task>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getTasksByParent(to_candid_opt_n32(this._uploadFile, this._downloadFile, arg0));
-                return from_candid_vec_n31(this._uploadFile, this._downloadFile, result);
+                const result = await this.actor.getTasksByParent(to_candid_opt_n33(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getTasksByParent(to_candid_opt_n32(this._uploadFile, this._downloadFile, arg0));
-            return from_candid_vec_n31(this._uploadFile, this._downloadFile, result);
+            const result = await this.actor.getTasksByParent(to_candid_opt_n33(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
         }
     }
     async getTerritory(arg0: string): Promise<Territory | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getTerritory(arg0);
-                return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getTerritory(arg0);
-            return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getTerritoryNote(arg0: string, arg1: bigint): Promise<TerritoryNote | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getTerritoryNote(arg0, arg1);
                 return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getTerritoryNote(arg0, arg1);
+            const result = await this.actor.getTerritory(arg0);
             return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getTerritoryNote(arg0: string, arg1: bigint): Promise<TerritoryNote | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTerritoryNote(arg0, arg1);
+                return from_candid_opt_n35(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTerritoryNote(arg0, arg1);
+            return from_candid_opt_n35(this._uploadFile, this._downloadFile, result);
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
@@ -672,6 +843,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateCheckoutRecord(arg0: string, arg1: PublisherId, arg2: bigint, arg3: PublisherId, arg4: bigint, arg5: bigint | null, arg6: boolean): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n36(this._uploadFile, this._downloadFile, arg5), arg6);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n36(this._uploadFile, this._downloadFile, arg5), arg6);
+            return result;
+        }
+    }
     async updateGlobalNote(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: PublisherId | null): Promise<void> {
         if (this.processError) {
             try {
@@ -701,6 +886,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.updatePublisher(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+            return result;
+        }
+    }
+    async updateShepherdingVisit(arg0: string, arg1: string, arg2: string, arg3: bigint, arg4: string, arg5: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateShepherdingVisit(arg0, arg1, arg2, arg3, arg4, arg5);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateShepherdingVisit(arg0, arg1, arg2, arg3, arg4, arg5);
             return result;
         }
     }
@@ -767,8 +966,8 @@ function from_candid_CheckoutRecord_n16(_uploadFile: (file: ExternalBlob) => Pro
 function from_candid_GlobalNote_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _GlobalNote): GlobalNote {
     return from_candid_record_n10(_uploadFile, _downloadFile, value);
 }
-function from_candid_Task_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Task): Task {
-    return from_candid_record_n26(_uploadFile, _downloadFile, value);
+function from_candid_Task_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Task): Task {
+    return from_candid_record_n27(_uploadFile, _downloadFile, value);
 }
 function from_candid_Territory_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Territory): Territory {
     return from_candid_record_n14(_uploadFile, _downloadFile, value);
@@ -791,19 +990,22 @@ function from_candid_opt_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 function from_candid_opt_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Publisher]): Publisher | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Task]): Task | null {
-    return value.length === 0 ? null : from_candid_Task_n25(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ShepherdingVisit]): ShepherdingVisit | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+function from_candid_opt_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Task]): Task | null {
+    return value.length === 0 ? null : from_candid_Task_n26(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Territory]): Territory | null {
+function from_candid_opt_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Territory]): Territory | null {
     return value.length === 0 ? null : from_candid_Territory_n13(_uploadFile, _downloadFile, value[0]);
 }
-function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TerritoryNote]): TerritoryNote | null {
+function from_candid_opt_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TerritoryNote]): TerritoryNote | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_record_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -878,7 +1080,7 @@ function from_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uin
         dateCheckedOut: value.dateCheckedOut
     };
 }
-function from_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: bigint;
     completedAt: [] | [bigint];
     title: string;
@@ -909,8 +1111,8 @@ function from_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uin
         createdAt: value.createdAt,
         dueDate: value.dueDate,
         updatedAt: record_opt_to_undefined(from_candid_opt_n18(_uploadFile, _downloadFile, value.updatedAt)),
-        parentTaskId: record_opt_to_undefined(from_candid_opt_n27(_uploadFile, _downloadFile, value.parentTaskId)),
-        notes: record_opt_to_undefined(from_candid_opt_n28(_uploadFile, _downloadFile, value.notes)),
+        parentTaskId: record_opt_to_undefined(from_candid_opt_n28(_uploadFile, _downloadFile, value.parentTaskId)),
+        notes: record_opt_to_undefined(from_candid_opt_n29(_uploadFile, _downloadFile, value.notes)),
         category: value.category
     };
 }
@@ -929,8 +1131,8 @@ function from_candid_vec_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 function from_candid_vec_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_CheckoutRecord>): Array<CheckoutRecord> {
     return value.map((x)=>from_candid_CheckoutRecord_n16(_uploadFile, _downloadFile, x));
 }
-function from_candid_vec_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Task>): Array<Task> {
-    return value.map((x)=>from_candid_Task_n25(_uploadFile, _downloadFile, x));
+function from_candid_vec_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Task>): Array<Task> {
+    return value.map((x)=>from_candid_Task_n26(_uploadFile, _downloadFile, x));
 }
 function from_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_GlobalNote>): Array<GlobalNote> {
     return value.map((x)=>from_candid_GlobalNote_n9(_uploadFile, _downloadFile, x));
@@ -938,8 +1140,8 @@ function from_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function to_candid_CreateTaskInput_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: CreateTaskInput): _CreateTaskInput {
     return to_candid_record_n6(_uploadFile, _downloadFile, value);
 }
-function to_candid_TaskStatus_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): _TaskStatus {
-    return to_candid_variant_n30(_uploadFile, _downloadFile, value);
+function to_candid_TaskStatus_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): _TaskStatus {
+    return to_candid_variant_n31(_uploadFile, _downloadFile, value);
 }
 function to_candid_UserRole_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n3(_uploadFile, _downloadFile, value);
@@ -947,7 +1149,10 @@ function to_candid_UserRole_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: boolean | null): [] | [boolean] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
+function to_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
+    return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_opt_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
     return value === null ? candid_none() : candid_some(value);
 }
 function to_candid_opt_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PublisherId | null): [] | [_PublisherId] {
@@ -992,7 +1197,7 @@ function to_candid_variant_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         guest: null
     } : value;
 }
-function to_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): {
+function to_candid_variant_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): {
     all: null;
 } | {
     completed: null;

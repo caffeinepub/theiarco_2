@@ -5,7 +5,9 @@ import { useGetTerritory, useDeleteTerritory, useMarkTerritoryReturned, useMakeT
 import { EditTerritoryModal } from '../components/territories/EditTerritoryModal';
 import { TerritoryNotesSection } from '../components/territories/TerritoryNotesSection';
 import { CheckOutTerritoryModal } from '../components/territories/CheckOutTerritoryModal';
+import { EditCheckoutRecordModal } from '../components/territories/EditCheckoutRecordModal';
 import { CheckoutHistoryTable } from '../components/territories/CheckoutHistoryTable';
+import type { CheckoutRecord } from '../backend';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -26,6 +28,8 @@ export default function TerritoryProfile() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isCheckOutModalOpen, setIsCheckOutModalOpen] = useState(false);
+  const [isEditCheckoutModalOpen, setIsEditCheckoutModalOpen] = useState(false);
+  const [selectedCheckoutRecord, setSelectedCheckoutRecord] = useState<CheckoutRecord | null>(null);
 
   const territoryId = id || '';
   const { data: territory, isLoading } = useGetTerritory(territoryId);
@@ -86,6 +90,15 @@ export default function TerritoryProfile() {
 
   const handleCheckOutClick = () => {
     setIsCheckOutModalOpen(true);
+  };
+
+  const handleEditCheckoutRecord = (record: CheckoutRecord) => {
+    setSelectedCheckoutRecord(record);
+    setIsEditCheckoutModalOpen(true);
+  };
+
+  const handleEditCheckoutSuccess = () => {
+    setSelectedCheckoutRecord(null);
   };
 
   const handleMarkReturnedClick = async () => {
@@ -261,7 +274,10 @@ export default function TerritoryProfile() {
           )}
         </div>
 
-        <CheckoutHistoryTable checkOutHistory={territory.checkOutHistory} />
+        <CheckoutHistoryTable 
+          checkOutHistory={territory.checkOutHistory}
+          onEdit={handleEditCheckoutRecord}
+        />
       </div>
 
       {/* Edit Modal */}
@@ -278,6 +294,15 @@ export default function TerritoryProfile() {
         open={isCheckOutModalOpen}
         onOpenChange={setIsCheckOutModalOpen}
         territoryId={territoryId}
+      />
+
+      {/* Edit Checkout Record Modal */}
+      <EditCheckoutRecordModal
+        open={isEditCheckoutModalOpen}
+        onOpenChange={setIsEditCheckoutModalOpen}
+        territoryId={territoryId}
+        record={selectedCheckoutRecord}
+        onSuccess={handleEditCheckoutSuccess}
       />
 
       {/* Delete Confirmation Dialog */}

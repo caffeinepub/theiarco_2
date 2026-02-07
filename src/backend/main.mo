@@ -6,13 +6,12 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import Nat "mo:core/Nat";
 import Time "mo:core/Time";
-import Iter "mo:core/Iter";
 import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Text "mo:core/Text";
 
 actor {
-  // Initialize the access control state
+  // Initialize the user system state
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -154,7 +153,84 @@ actor {
     publishers.values().toArray();
   };
 
-  // Global Notes functionality
+  // Pioneers domain
+  public type Pioneer = {
+    id : Text;
+    publisherId : Text;
+    publisherName : Text;
+    serviceYear : Text;
+    isActive : Bool;
+    createdAt : Int;
+  };
+
+  let pioneers = Map.empty<Text, Pioneer>();
+  var nextPioneerId = 0;
+
+  // CreatePioneerInput type
+  public type CreatePioneerInput = {
+    publisherId : Text;
+    publisherName : Text;
+    serviceYear : Text;
+  };
+
+  // EditPioneerInput type - now with explicit type
+  public type EditPioneerInput = {
+    publisherId : Text;
+    publisherName : Text;
+    serviceYear : Text;
+  };
+
+  public shared ({ caller }) func createPioneer(input : CreatePioneerInput) : async Text {
+    checkUserPermission(caller, #user);
+
+    let pioneerId = nextPioneerId.toText();
+    nextPioneerId += 1;
+
+    let newPioneer : Pioneer = {
+      id = pioneerId;
+      publisherId = input.publisherId;
+      publisherName = input.publisherName;
+      serviceYear = input.serviceYear;
+      isActive = true;
+      createdAt = Time.now();
+    };
+
+    pioneers.add(pioneerId, newPioneer);
+    pioneerId;
+  };
+
+  public shared ({ caller }) func editPioneer(id : Text, input : EditPioneerInput) : async () {
+    checkUserPermission(caller, #user);
+
+    switch (pioneers.get(id)) {
+      case (null) { Runtime.trap("Pioneer not found: " # id) };
+      case (?existing) {
+        let updatedPioneer : Pioneer = {
+          existing with
+          publisherId = input.publisherId;
+          publisherName = input.publisherName;
+          serviceYear = input.serviceYear;
+        };
+        pioneers.add(id, updatedPioneer);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deletePioneer(id : Text) : async () {
+    checkUserPermission(caller, #user);
+
+    if (not pioneers.containsKey(id)) {
+      Runtime.trap("Pioneer not found");
+    };
+
+    pioneers.remove(id);
+  };
+
+  public query ({ caller }) func getAllPioneers() : async [Pioneer] {
+    checkUserPermission(caller, #user);
+    pioneers.values().toArray();
+  };
+
   public type GlobalNote = {
     id : Nat;
     title : Text;
@@ -666,5 +742,151 @@ actor {
       case (null) { null };
       case (?notesMap) { notesMap.get(noteId) };
     };
+  };
+
+  public shared ({ caller }) func updateCheckoutRecord(
+    territoryId : Text,
+    originalPublisherId : PublisherId,
+    originalDateCheckedOut : Int,
+    newPublisherId : PublisherId,
+    newDateCheckedOut : Int,
+    newDateReturned : ?Int,
+    newIsCampaign : Bool,
+  ) : async () {
+    checkUserPermission(caller, #user);
+
+    let territory = switch (territories.get(territoryId)) {
+      case (null) { Runtime.trap("Territory not found. Update failed."); };
+      case (?t) { t };
+    };
+
+    let publisher = switch (publishers.get(newPublisherId)) {
+      case (null) { Runtime.trap("Publisher not found. Update failed."); };
+      case (?p) { p };
+    };
+
+    let updatedHistory = territory.checkOutHistory.map(
+      func(record) {
+        if (
+          record.publisherId == originalPublisherId and
+          record.dateCheckedOut == originalDateCheckedOut
+        ) {
+          {
+            publisherId = newPublisherId;
+            publisherName = publisher.fullName;
+            dateCheckedOut = newDateCheckedOut;
+            dateReturned = newDateReturned;
+            isCampaign = newIsCampaign;
+          };
+        } else {
+          record;
+        };
+      }
+    );
+
+    let updatedTerritory : Territory = {
+      territory with
+      checkOutHistory = updatedHistory;
+    };
+
+    territories.add(territoryId, updatedTerritory);
+  };
+
+  // ShepherdingVisits persistent module
+  public type ShepherdingVisit = {
+    id : Text;
+    publisherId : Text;
+    publisherName : Text;
+    visitDate : Int;
+    eldersPresent : Text;
+    notes : Text;
+    createdAt : Int;
+  };
+
+  let shepherdingVisits = Map.empty<Text, ShepherdingVisit>();
+  var nextShepherdingVisitId = 0;
+
+  public type CreateShepherdingVisitInput = {
+    publisherId : Text;
+    publisherName : Text;
+    visitDate : Int;
+    eldersPresent : Text;
+    notes : Text;
+  };
+
+  public shared ({ caller }) func createShepherdingVisit(input : CreateShepherdingVisitInput) : async Text {
+    checkUserPermission(caller, #user);
+
+    let visitId = nextShepherdingVisitId.toText();
+    nextShepherdingVisitId += 1;
+
+    let newVisit : ShepherdingVisit = {
+      id = visitId;
+      publisherId = input.publisherId;
+      publisherName = input.publisherName;
+      visitDate = input.visitDate;
+      eldersPresent = input.eldersPresent;
+      notes = input.notes;
+      createdAt = Time.now();
+    };
+
+    shepherdingVisits.add(visitId, newVisit);
+    visitId;
+  };
+
+  public query ({ caller }) func getAllShepherdingVisits() : async [ShepherdingVisit] {
+    checkUserPermission(caller, #user);
+    shepherdingVisits.values().toArray();
+  };
+
+  public query ({ caller }) func getShepherdingVisit(id : Text) : async ?ShepherdingVisit {
+    checkUserPermission(caller, #user);
+    shepherdingVisits.get(id);
+  };
+
+  public query ({ caller }) func getShepherdingVisitsByPublisher(publisherId : Text) : async [ShepherdingVisit] {
+    checkUserPermission(caller, #user);
+    shepherdingVisits.values().toArray().filter(func(visit) { visit.publisherId == publisherId });
+  };
+
+  public shared ({ caller }) func updateShepherdingVisit(
+    id : Text,
+    publisherId : Text,
+    publisherName : Text,
+    visitDate : Int,
+    eldersPresent : Text,
+    notes : Text,
+  ) : async () {
+    checkUserPermission(caller, #user);
+
+    // Pull the existing visit (if present -> use, if not -> trap)
+    let existing = switch (shepherdingVisits.get(id)) {
+      case (null) { Runtime.trap("ShepherdingVisit not found: " # id) };
+      case (?existing) { existing };
+    };
+
+    // Create modified visit on top of the (unmodified) existing one
+    let modified : ShepherdingVisit = {
+      existing with
+      publisherId;
+      publisherName;
+      visitDate;
+      eldersPresent;
+      notes = notes # "\n";
+    };
+
+    shepherdingVisits.add(id, modified);
+  };
+  // Editing single fields from the frontend must not be implemented here!
+  // Update functions work with the full record.
+
+  public shared ({ caller }) func deleteShepherdingVisit(id : Text) : async () {
+    checkUserPermission(caller, #user);
+
+    if (not shepherdingVisits.containsKey(id)) {
+      Runtime.trap("Delete failed. ShepherdingVisit with that id does not exist: " # id);
+    };
+
+    shepherdingVisits.remove(id);
   };
 };

@@ -38,13 +38,43 @@ export function formatTaskDate(timestamp: bigint): string {
 
 /**
  * Converts a backend checkout timestamp (bigint) to a formatted date string.
- * Backend checkout timestamps are in nanoseconds; this function converts to milliseconds.
- * @param timestamp - Backend timestamp as bigint (nanoseconds)
+ * Defensively handles both nanoseconds and seconds timestamps.
+ * @param timestamp - Backend timestamp as bigint (nanoseconds or seconds)
  * @returns Formatted date string like "Feb 5, 2026"
  */
 export function formatCheckoutDate(timestamp: bigint): string {
-  // Convert nanoseconds to milliseconds
-  const milliseconds = Number(timestamp / BigInt(1_000_000));
+  const timestampNum = Number(timestamp);
+  let milliseconds: number;
+  
+  // If timestamp is very large, it's likely in nanoseconds
+  // Nanoseconds since epoch would be > 1 trillion for dates after 2001
+  if (timestampNum > 1_000_000_000_000) {
+    // Convert nanoseconds to milliseconds
+    milliseconds = Number(timestamp / BigInt(1_000_000));
+  } else {
+    // Otherwise it's in seconds, convert to milliseconds
+    milliseconds = timestampNum * 1000;
+  }
+  
+  const date = new Date(milliseconds);
+  
+  // Format as "MMM d, yyyy"
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+/**
+ * Converts a backend visit timestamp (bigint) to a formatted date string.
+ * Backend visit timestamps are in seconds; this function converts to milliseconds.
+ * @param timestamp - Backend timestamp as bigint (seconds)
+ * @returns Formatted date string like "Feb 7, 2026"
+ */
+export function formatVisitDate(timestamp: bigint): string {
+  // Convert seconds to milliseconds
+  const milliseconds = Number(timestamp) * 1000;
   const date = new Date(milliseconds);
   
   // Format as "MMM d, yyyy"
