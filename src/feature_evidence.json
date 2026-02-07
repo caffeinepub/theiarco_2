@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-shepherding-visits-list-so-the-publisher-name-cell-navigates-to-a-visit-specific-profile-route-using-the-visit-s-unique-id-not-publisher-name-clicking-a-row-s-publisher-name-must-navigate-to-shepherding-id-where-id-is-visit-id",
-      "featureTitle": "Update the Shepherding Visits list so the Publisher Name cell navigates to a visit-specific profile route using the visit’s unique ID (not publisher name). Clicking a row’s Publisher Name must navigate to `/shepherding/:id`, where `:id` is `visit.id`.",
+      "featureId": "feature-replace-the-existing-conductors-route-placeholder-with-a-real-service-meeting-conductors-page-that-uses-the-standard-app-layout-styling-and-includes-1-heading-text-service-meeting-conductors-2-a-top-assign-conductor-button-styled-with-background-color-43587a-and-white-text-that-is-clickable-but-currently-performs-no-action-3-a-table-with-columns-week-of-conductor-name-and-actions-actions-are-placeholder-only-4-an-empty-state-message-exactly-no-conductors-assigned-click-assign-conductor-to-create-one-when-no-assignments-exist",
+      "featureTitle": "Replace the existing \"/conductors\" route placeholder with a real \"Service Meeting Conductors\" page that uses the standard app layout/styling and includes: (1) heading text \"Service Meeting Conductors\"; (2) a top \"Assign Conductor\" button styled with background color #43587A and white text that is clickable but currently performs no action; (3) a table with columns \"Week Of\", \"Conductor Name\", and \"Actions\" (actions are placeholder only); (4) an empty-state message exactly: \"No conductors assigned. Click 'Assign Conductor' to create one.\" when no assignments exist.",
       "files": [
-        "frontend/src/pages/Shepherding.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/pages/ServiceMeetingConductors.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,11 +22,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-new-routed-page-for-the-visit-profile-at-shepherding-id-and-register-it-in-frontend-src-app-tsx-using-tanstack-router-similar-to-existing-profile-routes-e-g-territories-id-publishers-id",
-      "featureTitle": "Add a new routed page for the Visit Profile at `/shepherding/$id` and register it in `frontend/src/App.tsx` using TanStack Router, similar to existing profile routes (e.g. `/territories/$id`, `/publishers/$id`).",
+      "featureId": "feature-wire-the-service-meeting-conductors-page-to-real-backend-queries-using-react-query-including-a-loading-state-that-shows-a-spinner-and-the-text-loading-while-fetching-assignments-the-initial-ui-should-correctly-display-an-empty-table-empty-state-when-the-backend-returns-no-assignments",
+      "featureTitle": "Wire the Service Meeting Conductors page to real backend queries using React Query, including a loading state that shows a spinner and the text \"Loading...\" while fetching assignments. The initial UI should correctly display an empty table/empty-state when the backend returns no assignments.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
+        "frontend/src/hooks/useServiceMeetingConductors.ts",
+        "frontend/src/pages/ServiceMeetingConductors.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -41,30 +42,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-the-visit-profile-page-ui-to-display-the-selected-visit-s-details-and-actions-show-publisher-name-as-the-page-heading-show-visit-date-formatted-like-feb-7-2026-show-elders-present-as-a-single-free-text-string-include-a-top-left-button-labeled-back-to-shepherding-visits-that-navigates-to-shepherding-include-edit-and-delete-buttons-in-the-top-right",
-      "featureTitle": "Implement the Visit Profile page UI to display the selected visit’s details and actions: show Publisher Name as the page heading; show Visit Date formatted like `Feb 7, 2026`; show Elders Present as a single free-text string; include a top-left button labeled `Back to Shepherding Visits` that navigates to `/shepherding`; include `Edit` and `Delete` buttons in the top-right.",
+      "featureId": "feature-expose-the-new-backend-query-in-the-generated-frontend-backend-bindings-and-consume-it-from-the-service-meeting-conductors-page-to-populate-the-table-rows-week-of-conductor-name-when-assignments-exist",
+      "featureTitle": "Expose the new backend query in the generated frontend backend bindings and consume it from the Service Meeting Conductors page to populate the table rows (Week Of, Conductor Name) when assignments exist.",
       "files": [
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-notes-section-on-the-visit-profile-page-that-allows-viewing-and-editing-the-existing-backend-notes-text-field-for-the-visit-the-section-must-include-a-textarea-bound-to-the-visit-s-notes-and-a-save-notes-button-with-background-color-43587a-when-save-notes-is-clicked-persist-the-updated-notes-to-the-backend-for-that-visit-and-show-a-green-success-toast-with-the-exact-text-notes-saved-successfully",
-      "featureTitle": "Add a Notes section on the Visit Profile page that allows viewing and editing the existing backend `notes : Text` field for the visit. The section must include a textarea bound to the visit’s notes and a `Save Notes` button with background color `#43587A`. When `Save Notes` is clicked, persist the updated notes to the backend for that visit and show a green success toast with the exact text `Notes saved successfully!`.",
-      "files": [
-        "frontend/src/hooks/useShepherdingVisit.ts",
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
+        "frontend/src/pages/ServiceMeetingConductors.tsx",
+        "frontend/src/utils/formatters.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -76,67 +58,6 @@
       ],
       "testIds": [
         "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-the-visit-edit-flow-on-the-visit-profile-page-clicking-edit-opens-a-modal-pre-filled-with-the-visit-s-current-data-and-includes-required-fields-publisher-dropdown-required-pre-selected-visit-date-date-picker-required-pre-filled-elders-present-text-input-required-pre-filled-the-modal-must-have-save-and-cancel-buttons-clicking-save-must-update-the-visit-in-the-backend-refresh-the-visit-profile-page-data-and-show-a-green-success-toast-with-exact-text-visit-updated-successfully",
-      "featureTitle": "Implement the Visit Edit flow on the Visit Profile page: clicking `Edit` opens a modal pre-filled with the visit’s current data and includes required fields: Publisher (dropdown, required, pre-selected), Visit Date (date picker, required, pre-filled), Elders Present (text input, required, pre-filled). The modal must have `Save` and `Cancel` buttons. Clicking `Save` must update the visit in the backend, refresh the Visit Profile page data, and show a green success toast with exact text `Visit updated successfully!`.",
-      "files": [
-        "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
-        "frontend/src/hooks/useShepherdingVisit.ts",
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-the-visit-delete-flow-on-the-visit-profile-page-clicking-delete-opens-a-confirmation-dialog-with-the-exact-title-text-delete-this-visit-and-yes-and-cancel-buttons-clicking-yes-must-delete-the-visit-from-the-backend-navigate-back-to-shepherding-and-show-a-green-success-toast-with-exact-text-visit-deleted-successfully",
-      "featureTitle": "Implement the Visit Delete flow on the Visit Profile page: clicking `Delete` opens a confirmation dialog with the exact title text `Delete this visit?` and `Yes` and `Cancel` buttons. Clicking `Yes` must delete the visit from the backend, navigate back to `/shepherding`, and show a green success toast with exact text `Visit deleted successfully!`.",
-      "files": [
-        "frontend/src/hooks/useShepherdingVisit.ts",
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-ensure-frontend-react-query-hooks-needed-by-the-visit-profile-page-to-load-a-single-shepherding-visit-by-id-and-to-perform-update-delete-notes-save-mutations-using-the-existing-backend-actor-api-created-in-prompt-29-30-mutations-must-invalidate-the-appropriate-react-query-cache-keys-so-the-shepherding-visits-list-shepherdingvisits-and-the-single-visit-query-are-refreshed-correctly",
-      "featureTitle": "Add/ensure frontend React Query hooks needed by the Visit Profile page to load a single shepherding visit by ID and to perform update/delete/notes-save mutations, using the existing backend actor API created in PROMPT #29-30. Mutations must invalidate the appropriate React Query cache keys so the Shepherding Visits list (`['shepherdingVisits']`) and the single-visit query are refreshed correctly.",
-      "files": [
-        "frontend/src/hooks/useShepherdingVisit.ts",
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
       ],
       "confidence": "high"
     }

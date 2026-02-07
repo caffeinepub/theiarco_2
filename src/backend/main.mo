@@ -9,7 +9,9 @@ import Time "mo:core/Time";
 import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Text "mo:core/Text";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   // Initialize the user system state
   let accessControlState = AccessControl.initState();
@@ -888,5 +890,22 @@ actor {
     };
 
     shepherdingVisits.remove(id);
+  };
+
+  // Service Meeting Conductor (SMC) Persistent Domain
+  public type ServiceMeetingConductor = {
+    id : Text;
+    weekOf : Int; // Timestamp for Monday of the week
+    conductorId : Text;
+    conductorName : Text;
+    createdAt : Int;
+  };
+
+  let serviceMeetingConductors = Map.empty<Text, ServiceMeetingConductor>();
+
+  // getAllServiceMeetingConductors - returns all SMC assignments
+  public query ({ caller }) func getAllServiceMeetingConductors() : async [ServiceMeetingConductor] {
+    checkUserPermission(caller, #user);
+    serviceMeetingConductors.values().toArray();
   };
 };

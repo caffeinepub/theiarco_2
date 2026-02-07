@@ -12,6 +12,7 @@ import TerritoryProfile from './pages/TerritoryProfile';
 import Pioneers from './pages/Pioneers';
 import Shepherding from './pages/Shepherding';
 import ShepherdingVisitProfile from './pages/ShepherdingVisitProfile';
+import ServiceMeetingConductors from './pages/ServiceMeetingConductors';
 
 // Root component that handles auth state
 function RootComponent() {
@@ -96,7 +97,7 @@ const shepherdingVisitProfileRoute = createRoute({
 const conductorsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/conductors',
-  component: () => <ComingSoon title="Service Meeting Conductors" />
+  component: ServiceMeetingConductors
 });
 
 const publicWitnessingRoute = createRoute({

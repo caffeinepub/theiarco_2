@@ -84,3 +84,22 @@ export function formatVisitDate(timestamp: bigint): string {
     year: 'numeric',
   });
 }
+
+/**
+ * Converts a backend weekOf timestamp (bigint) to a formatted date string.
+ * Backend weekOf timestamps are in seconds for the Monday of that week.
+ * @param timestamp - Backend timestamp as bigint (seconds)
+ * @returns Formatted date string like "Feb 10, 2026"
+ */
+export function formatWeekOfDate(timestamp: bigint): string {
+  // Convert seconds to milliseconds
+  const milliseconds = Number(timestamp) * 1000;
+  const date = new Date(milliseconds);
+  
+  // Format as "MMM d, yyyy"
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}

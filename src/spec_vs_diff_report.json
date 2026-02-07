@@ -1,48 +1,33 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-07T22:12:29.309Z",
-  "summary": "Diff adds a new /shepherding/$id routed Visit Profile page, React Query hooks for single-visit fetch + update/delete/notes update, and an Edit Shepherding Visit modal. Some requirements (notably specific UI wiring/text and button styling) are not verifiable from the truncated diffs, and backend actor method additions are not evidenced.",
+  "generatedAt": "2026-02-07T23:06:50.075Z",
+  "summary": "Frontend routing and a new Service Meeting Conductors page were added, including an Assign Conductor button, loading UI, empty-state message, and React Query hook. However, the diff summary does not provide evidence that the backend query API and stable storage are fully implemented in backend/main.mo, nor that generated frontend backend bindings were updated. Additionally, the page only renders the table when assignments exist, which may not satisfy the requirement to include a table with the specified columns on the page in the empty state.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "In frontend/src/pages/Shepherding.tsx, clicking a row’s Publisher Name cell navigates to /shepherding/<visit.id> (using visit.id, not publisher name).",
-      "reason": "Shepherding.tsx defines handleVisitClick(visitId) which navigates to `/shepherding/${visitId}`, but the diff is truncated before showing the table cell rendering and does not provide evidence that the Publisher Name cell is wired to call handleVisitClick with visit.id.",
+      "requirement": "Page includes a table with columns \"Week Of\", \"Conductor Name\", and \"Actions\".",
+      "reason": "In the new page implementation, the table is only rendered when conductors.length > 0. When the backend returns zero assignments, only the empty-state message is rendered, so the table (and its headers/columns) is not present in that state.",
       "evidence": [
-        "frontend/src/pages/Shepherding.tsx"
+        "frontend/src/pages/ServiceMeetingConductors.tsx"
       ]
     },
     {
       "id": "REQ-3",
-      "requirement": "Visit Profile page UI: show Publisher Name as heading; show Visit Date formatted like `Feb 7, 2026` using existing formatter; show Elders Present as a single free-text string; include a top-left `Back to Shepherding Visits` button to /shepherding; include `Edit` and `Delete` buttons top-right.",
-      "reason": "The Visit Profile page file is truncated before the main rendered UI; only loading/not-found states and handler functions are visible, so the required heading/date/elders display and presence/placement of Edit/Delete buttons cannot be confirmed.",
+      "requirement": "Backend adds a new stable-persisted collection for service meeting conductor assignments and provides a query method to list all assignments with fields: id, weekOf, conductorId, conductorName, createdAt.",
+      "reason": "Although a migration module adds a new serviceMeetingConductors field to the migrated state, the provided truncated backend/main.mo diff does not show the stable variable/field declaration and does not show any query method such as getAllServiceMeetingConductors that returns the specified record array.",
       "evidence": [
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
+        "backend/migration.mo",
+        "backend/main.mo"
       ]
     },
     {
       "id": "REQ-4",
-      "requirement": "Notes section: textarea bound to notes; `Save Notes` button with background color #43587A; on save persist to backend and show green toast text exactly `Notes saved successfully!`.",
-      "reason": "Success toast text is evidenced, and hooks exist to persist notes, but the diff is truncated before showing the Notes section UI, so the textarea binding and the `Save Notes` button styling (#43587A) are not evidenced.",
+      "requirement": "Expose the new backend query in generated frontend backend bindings and consume it from the Service Meeting Conductors page.",
+      "reason": "The frontend hook calls actor.getAllServiceMeetingConductors() and imports ServiceMeetingConductor from '../backend', but the diff summary does not show any changes to the generated bindings (e.g., a candid/actor binding file) that would add the method/type. The backend method itself is also not evidenced in the provided backend diff.",
       "evidence": [
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "Delete flow: clicking `Delete` opens confirmation dialog with exact title `Delete this visit?` and `Yes`/`Cancel` buttons; Yes deletes, navigates to /shepherding, shows green toast `Visit deleted successfully!`.",
-      "reason": "The delete mutation + success toast + navigation are shown, and AlertDialog components are imported, but the diff is truncated before the confirmation dialog JSX, so the exact title text and `Yes`/`Cancel` button labels cannot be confirmed.",
-      "evidence": [
-        "frontend/src/pages/ShepherdingVisitProfile.tsx"
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "If required backend actor methods are missing, add them in backend/main.mo (get single shepherding visit by ID, update, delete) without changing the visit data model fields.",
-      "reason": "Frontend hooks call actor.getShepherdingVisit, actor.updateShepherdingVisit, and actor.deleteShepherdingVisit, but the backend diff is truncated and does not show any shepherding-visit-related method additions/definitions, so backend support cannot be verified.",
-      "evidence": [
-        "backend/main.mo",
-        "frontend/src/hooks/useShepherdingVisit.ts"
+        "frontend/src/hooks/useServiceMeetingConductors.ts",
+        "backend/main.mo"
       ]
     }
   ],
@@ -50,12 +35,12 @@
   "confidence": 0.62,
   "changed_files": [
     "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
     "frontend/src/App.tsx",
-    "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
-    "frontend/src/hooks/useShepherdingVisit.ts",
-    "frontend/src/pages/Shepherding.tsx",
-    "frontend/src/pages/ShepherdingVisitProfile.tsx",
+    "frontend/src/hooks/useServiceMeetingConductors.ts",
+    "frontend/src/pages/ServiceMeetingConductors.tsx",
+    "frontend/src/utils/formatters.ts",
     "project_state.json"
   ]
 }

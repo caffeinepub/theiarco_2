@@ -1,150 +1,75 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Shepherding Visit Profile page with notes editing and edit/delete flows",
+  "title": "Service Meeting Conductors page (real route + React Query read-only wiring)",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Make Shepherding Visits table Publisher Name navigate to a visit-specific profile route using visit.id.",
+      "summary": "Replace the /conductors placeholder with a real Service Meeting Conductors page using the standard layout, header/button, table scaffold, and exact empty-state copy.",
       "acceptanceCriteria": [
-        "In `frontend/src/pages/Shepherding.tsx`, clicking a Publisher Name navigates to `/shepherding/<visit.id>`.",
-        "Multiple visits for the same publisher are distinguishable because navigation uses `visit.id`."
+        "Navigating to \"/conductors\" renders the new page (not the ComingSoon placeholder).",
+        "The page heading reads \"Service Meeting Conductors\".",
+        "The \"Assign Conductor\" button is clickable and has #43587A background with white text; clicking it does not navigate or open any modal yet.",
+        "The table renders with the three specified columns and no runtime errors.",
+        "When the backend returns zero assignments, the empty-state message matches exactly."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Shepherding.tsx",
+          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
+          "operation": "create",
+          "description": "Create the \"Service Meeting Conductors\" page UI using the standard page padding/styling, with heading text, a top \"Assign Conductor\" button styled with background #43587A and white text (clickable no-op), and a table scaffold with columns \"Week Of\", \"Conductor Name\", and \"Actions\" (placeholder). Use shadcn-ui Table/Button components where appropriate. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Replace the placeholder Publisher Name click handler with TanStack Router navigation to `/shepherding/${visit.id}` (use visit.id, not publisher name)."
+          "description": "Wire the existing \"/conductors\" route to render the new ServiceMeetingConductors page instead of the ComingSoon placeholder, keeping it under the authenticated AppLayout."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add and register a new TanStack Router page for `/shepherding/$id`.",
+      "summary": "Fetch conductor assignments via React Query and show a visible spinner with \"Loading...\" while fetching; show the exact empty-state when the list is empty.",
       "acceptanceCriteria": [
-        "Navigating directly to `/shepherding/<id>` renders the Visit Profile page when authenticated.",
-        "The existing `/shepherding` list page remains unchanged aside from the new navigation behavior."
+        "While the assignments query is in-flight, the page shows a visible spinner and the text \"Loading...\".",
+        "When the assignments query resolves to an empty list, the loading UI disappears and the empty-state message is shown.",
+        "No mock data is displayed; data shown (if any) comes from the backend query."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "path": "frontend/src/hooks/useServiceMeetingConductors.ts",
           "operation": "create",
-          "description": "Create the Visit Profile routed page component for a single shepherding visit, reading `$id` from TanStack Router params and rendering loading/not-found states."
+          "description": "Add a React Query hook (patterned after existing hooks like useGetAllPioneers) that uses useActor and queries the backend actor for all Service Meeting Conductor assignments, with enabled gating on actor availability and actor fetching state."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
           "operation": "modify",
-          "description": "Register the new `/shepherding/$id` route using TanStack Router, similar to existing profile routes like `/territories/$id` and `/publishers/$id`."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Build Visit Profile UI showing visit details plus Back/Edit/Delete actions.",
-      "acceptanceCriteria": [
-        "The Visit Profile page uses the existing visit date formatter behavior (same output format as `formatVisitDate`).",
-        "`Elders Present` is displayed exactly as stored (no parsing into a list).",
-        "The back button navigates to `/shepherding`."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "operation": "modify",
-          "description": "Implement the page header and details UI: Publisher Name heading, formatted Visit Date using `formatVisitDate`, Elders Present as a single string, a top-left `Back to Shepherding Visits` button navigating to `/shepherding`, and top-right `Edit`/`Delete` buttons."
+          "description": "Consume the new React Query hook to drive UI states: show a centered spinner plus the exact text \"Loading...\" while loading; when results are empty, show the exact empty-state copy: \"No conductors assigned. Click 'Assign Conductor' to create one.\" Ensure no mock data is rendered."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Add editable Notes section with Save Notes persistence and a green success toast.",
+      "summary": "Ensure frontend backend bindings expose the assignments list query/type and render assignment rows with formatted Week Of date and Conductor Name when data exists.",
       "acceptanceCriteria": [
-        "The notes textarea is pre-filled with the visit’s current `notes` value and can be edited.",
-        "Clicking `Save Notes` updates the backend value for `notes` for that visit.",
-        "After saving, a green toast appears with exact text `Notes saved successfully!`.",
-        "After saving, the Visit Profile shows the updated notes (either by local state update and/or refetch/invalidation)."
+        "Frontend type bindings include the conductor assignment type and the list query method.",
+        "When backend returns one or more assignments, the page renders a table row per assignment showing Week Of (formatted date) and Conductor Name.",
+        "No console errors related to missing actor methods/bindings when visiting the page authenticated."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "path": "frontend/src/backend.d.ts",
           "operation": "modify",
-          "description": "Add a Notes section: textarea bound to local notes state initialized from the loaded visit, and a `Save Notes` button styled with background `#43587A` that triggers a notes-save mutation and shows a green toast with exact text `Notes saved successfully!`."
+          "description": "Verify/align generated frontend bindings to include the ServiceMeetingConductor type and the getAllServiceMeetingConductors method signature used by the page (update declarations if they are missing or mismatched)."
         },
         {
-          "path": "frontend/src/hooks/useShepherdingVisit.ts",
-          "operation": "create",
-          "description": "Create React Query hooks to support saving notes for a visit (via the existing backend actor capabilities), and invalidate `['shepherdingVisits']` and the single-visit query cache for the current id on success."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Implement Edit modal flow for a visit (publisher/date/eldersPresent) with validation, backend update, refresh, and success toast.",
-      "acceptanceCriteria": [
-        "The Edit modal opens from the Visit Profile page and is pre-filled with the current visit values.",
-        "Publisher selection list uses the existing publishers source (active publishers) as used elsewhere in the app, and the current publisher is pre-selected.",
-        "Save validates required fields and blocks submission if missing, with an error toast consistent with existing patterns.",
-        "After successful save, a green toast appears with exact text `Visit updated successfully!` and the page reflects the updated visit details.",
-        "The visit’s unique ID remains unchanged after editing."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
-          "operation": "create",
-          "description": "Create an Edit modal (Dialog) pre-filled with the visit’s current data: Publisher dropdown (required), Visit Date date input (required), Elders Present text input (required), with Save/Cancel buttons and required-field validation with error toasts consistent with existing patterns."
+          "path": "frontend/src/utils/formatters.ts",
+          "operation": "modify",
+          "description": "Add a formatter utility for the conductor assignment weekOf value (bigint timestamp in seconds for the Monday of that week) to produce a user-friendly date string for the Week Of column."
         },
         {
-          "path": "frontend/src/pages/ShepherdingVisitProfile.tsx",
+          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
           "operation": "modify",
-          "description": "Wire the `Edit` button to open the edit modal, supply it with the loaded visit and active publishers list (from existing publishers query), and on successful save refresh the Visit Profile view and show a green toast with exact text `Visit updated successfully!`."
-        },
-        {
-          "path": "frontend/src/hooks/useShepherdingVisit.ts",
-          "operation": "modify",
-          "description": "Add/ensure a mutation hook for updating a shepherding visit and invalidate `['shepherdingVisits']` and the single-visit query cache for the updated id on success."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Implement Delete confirmation dialog flow with backend delete, navigation back to list, and success toast.",
-      "acceptanceCriteria": [
-        "The confirmation dialog title is exactly `Delete this visit?` and includes `Yes` and `Cancel` actions.",
-        "Cancel closes the dialog without changes.",
-        "Yes deletes the visit in the backend, then navigates to `/shepherding`, then shows a green toast `Visit deleted successfully!`.",
-        "After deletion, the deleted visit no longer appears in the Shepherding Visits list (after list refetch/invalidation)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "operation": "modify",
-          "description": "Implement the `Delete` button to open an AlertDialog titled exactly `Delete this visit?` with `Yes` and `Cancel`. On `Yes`, trigger delete mutation, navigate to `/shepherding`, and show a green toast with exact text `Visit deleted successfully!`."
-        },
-        {
-          "path": "frontend/src/hooks/useShepherdingVisit.ts",
-          "operation": "modify",
-          "description": "Add/ensure a delete mutation hook for shepherding visits that invalidates `['shepherdingVisits']` and removes/invalidates the single-visit cache for the deleted id."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Add React Query hooks to fetch a single visit by ID and perform update/delete/notes-save mutations with proper cache invalidation.",
-      "acceptanceCriteria": [
-        "There is a query hook to fetch a single visit by ID that the Visit Profile page uses for loading/not-found states.",
-        "There are mutation hooks for updating a visit, deleting a visit, and saving notes (either separate or combined, as supported by the backend API).",
-        "On success, the Shepherding Visits list query key `['shepherdingVisits']` is invalidated and any single-visit cache for that ID is invalidated/updated.",
-        "If the required backend actor methods are missing, add them in `backend/main.mo` without changing the visit data model fields (keep `notes : Text` and `eldersPresent : Text` as Text strings)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useShepherdingVisit.ts",
-          "operation": "modify",
-          "description": "Implement/complete: `useGetShepherdingVisit(id)` query (cache key like `['shepherdingVisit', id]`) plus mutation hooks for update, delete, and notes-save using the existing actor API, with invalidation of `['shepherdingVisits']` and the single-visit key."
-        },
-        {
-          "path": "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "operation": "modify",
-          "description": "Adopt the single-visit query hook for data loading/not-found handling, and use the mutation hooks for notes save, edit save, and delete flows."
+          "description": "Render one table row per assignment returned from the backend query, showing Week Of using the new formatter and Conductor Name, with an Actions column containing placeholder content only. Use shadcn-ui Table components for consistent styling. Verify the component's usage instructions before implementing."
         }
       ]
     }

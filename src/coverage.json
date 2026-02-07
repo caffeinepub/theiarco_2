@@ -1,108 +1,68 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-07T22:12:29.313Z",
+  "generatedAt": "2026-02-07T23:06:50.078Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 7,
-    "implemented": 7,
+    "total": 4,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the Shepherding Visits list so the Publisher Name cell navigates to a visit-specific profile route using the visit’s unique ID (not publisher name). Clicking a row’s Publisher Name must navigate to `/shepherding/:id`, where `:id` is `visit.id`.",
+        "summary": "Replace the existing \"/conductors\" route placeholder with a real \"Service Meeting Conductors\" page that uses the standard app layout/styling and includes: (1) heading text \"Service Meeting Conductors\"; (2) a top \"Assign Conductor\" button styled with background color #43587A and white text that is clickable but currently performs no action; (3) a table with columns \"Week Of\", \"Conductor Name\", and \"Actions\" (actions are placeholder only); (4) an empty-state message exactly: \"No conductors assigned. Click 'Assign Conductor' to create one.\" when no assignments exist.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Shepherding.tsx"
+          "frontend/src/pages/ServiceMeetingConductors.tsx",
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Shepherding.tsx"
+          "frontend/src/pages/ServiceMeetingConductors.tsx",
+          "frontend/src/App.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add a new routed page for the Visit Profile at `/shepherding/$id` and register it in `frontend/src/App.tsx` using TanStack Router, similar to existing profile routes (e.g. `/territories/$id`, `/publishers/$id`).",
+        "summary": "Wire the Service Meeting Conductors page to real backend queries using React Query, including a loading state that shows a spinner and the text \"Loading...\" while fetching assignments. The initial UI should correctly display an empty table/empty-state when the backend returns no assignments.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/hooks/useServiceMeetingConductors.ts",
+          "frontend/src/pages/ServiceMeetingConductors.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/hooks/useServiceMeetingConductors.ts",
+          "frontend/src/pages/ServiceMeetingConductors.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Implement the Visit Profile page UI to display the selected visit’s details and actions: show Publisher Name as the page heading; show Visit Date formatted like `Feb 7, 2026`; show Elders Present as a single free-text string; include a top-left button labeled `Back to Shepherding Visits` that navigates to `/shepherding`; include `Edit` and `Delete` buttons in the top-right.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx"
-        ]
+        "summary": "Add a new backend domain for \"Service Meeting Conductor\" assignments with stable storage and query APIs. The backend must persist and return assignment records with fields: id (Text, unique), weekOf (Int; timestamp in seconds for the Monday of that week), conductorId (Text; links to Publishers), conductorName (Text), createdAt (Int timestamp). Implement at least a read API to list all assignments (for populating the table now), keeping the structure ready for a future create-assignment API in the next prompt.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-4",
-        "summary": "Add a Notes section on the Visit Profile page that allows viewing and editing the existing backend `notes : Text` field for the visit. The section must include a textarea bound to the visit’s notes and a `Save Notes` button with background color `#43587A`. When `Save Notes` is clicked, persist the updated notes to the backend for that visit and show a green success toast with the exact text `Notes saved successfully!`.",
+        "summary": "Expose the new backend query in the generated frontend backend bindings and consume it from the Service Meeting Conductors page to populate the table rows (Week Of, Conductor Name) when assignments exist.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/hooks/useShepherdingVisit.ts"
+          "frontend/src/backend.d.ts",
+          "frontend/src/utils/formatters.ts",
+          "frontend/src/pages/ServiceMeetingConductors.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/hooks/useShepherdingVisit.ts"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Implement the Visit Edit flow on the Visit Profile page: clicking `Edit` opens a modal pre-filled with the visit’s current data and includes required fields: Publisher (dropdown, required, pre-selected), Visit Date (date picker, required, pre-filled), Elders Present (text input, required, pre-filled). The modal must have `Save` and `Cancel` buttons. Clicking `Save` must update the visit in the backend, refresh the Visit Profile page data, and show a green success toast with exact text `Visit updated successfully!`.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/hooks/useShepherdingVisit.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/hooks/useShepherdingVisit.ts"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Implement the Visit Delete flow on the Visit Profile page: clicking `Delete` opens a confirmation dialog with the exact title text `Delete this visit?` and `Yes` and `Cancel` buttons. Clicking `Yes` must delete the visit from the backend, navigate back to `/shepherding`, and show a green success toast with exact text `Visit deleted successfully!`.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/hooks/useShepherdingVisit.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/ShepherdingVisitProfile.tsx",
-          "frontend/src/hooks/useShepherdingVisit.ts"
-        ]
-      },
-      {
-        "id": "REQ-7",
-        "summary": "Add/ensure frontend React Query hooks needed by the Visit Profile page to load a single shepherding visit by ID and to perform update/delete/notes-save mutations, using the existing backend actor API created in PROMPT #29-30. Mutations must invalidate the appropriate React Query cache keys so the Shepherding Visits list (`['shepherdingVisits']`) and the single-visit query are refreshed correctly.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useShepherdingVisit.ts",
-          "frontend/src/pages/ShepherdingVisitProfile.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useShepherdingVisit.ts",
-          "frontend/src/pages/ShepherdingVisitProfile.tsx"
+          "frontend/src/backend.d.ts",
+          "frontend/src/utils/formatters.ts",
+          "frontend/src/pages/ServiceMeetingConductors.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
@@ -110,12 +70,11 @@
     "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/shepherding/EditShepherdingVisitModal.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useShepherdingVisit.ts",
-    "frontend/src/pages/Shepherding.tsx",
-    "frontend/src/pages/ShepherdingVisitProfile.tsx",
+    "frontend/src/hooks/useServiceMeetingConductors.ts",
+    "frontend/src/pages/ServiceMeetingConductors.tsx",
+    "frontend/src/utils/formatters.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,68 +1,36 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Build Shepherding Visits app UI: add a Visit Profile page for individual shepherding visits with notes editing plus edit/delete visit actions, using existing backend data.",
+  "summary": "Build a Service Meeting Conductors feature: add a new sidebar-accessible page with table UI and wire it to a new backend domain (stable storage) for conductor assignments, ready for future create-assignment flow.",
   "architectural_notes": [
-    "Use route /shepherding/:id where :id is the visit's unique ID (publisher name is not unique).",
-    "Backend already has visit.notes as a single Text field (default empty string); UI should edit this existing field.",
-    "visit.eldersPresent is stored as a single free-text string (comma-separated names), not a list."
+    "New backend domain 'Service Meeting Conductors' with stable storage for assignments: {id: Text, weekOf: Int (seconds, Monday), conductorId: Text, conductorName: Text, createdAt: Int}.",
+    "Conductor dropdown for create flow will be sourced from existing Publishers backend filtered by privileges in ['Elder','Ministerial Servant'].",
+    "Service Meeting Conductors page should query backend for assignments and show loading/empty states; create/edit UI to be added later."
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-shepherding-visits-list-so-the-publisher-name-cell-navigates-to-a-visit-specific-profile-route-using-the-visit-s-unique-id-not-publisher-name-clicking-a-row-s-publisher-name-must-navigate-to-shepherding-id-where-id-is-visit-id",
-      "title": "Update the Shepherding Visits list so the Publisher Name cell navigates to a visit-specific profile route using the visit’s unique ID (not publisher name). Clicking a row’s Publisher Name must navigate to `/shepherding/:id`, where `:id` is `visit.id`.",
+      "id": "feature-replace-the-existing-conductors-route-placeholder-with-a-real-service-meeting-conductors-page-that-uses-the-standard-app-layout-styling-and-includes-1-heading-text-service-meeting-conductors-2-a-top-assign-conductor-button-styled-with-background-color-43587a-and-white-text-that-is-clickable-but-currently-performs-no-action-3-a-table-with-columns-week-of-conductor-name-and-actions-actions-are-placeholder-only-4-an-empty-state-message-exactly-no-conductors-assigned-click-assign-conductor-to-create-one-when-no-assignments-exist",
+      "title": "Replace the existing \"/conductors\" route placeholder with a real \"Service Meeting Conductors\" page that uses the standard app layout/styling and includes: (1) heading text \"Service Meeting Conductors\"; (2) a top \"Assign Conductor\" button styled with background color #43587A and white text that is clickable but currently performs no action; (3) a table with columns \"Week Of\", \"Conductor Name\", and \"Actions\" (actions are placeholder only); (4) an empty-state message exactly: \"No conductors assigned. Click 'Assign Conductor' to create one.\" when no assignments exist.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-a-new-routed-page-for-the-visit-profile-at-shepherding-id-and-register-it-in-frontend-src-app-tsx-using-tanstack-router-similar-to-existing-profile-routes-e-g-territories-id-publishers-id",
-      "title": "Add a new routed page for the Visit Profile at `/shepherding/$id` and register it in `frontend/src/App.tsx` using TanStack Router, similar to existing profile routes (e.g. `/territories/$id`, `/publishers/$id`).",
+      "id": "feature-wire-the-service-meeting-conductors-page-to-real-backend-queries-using-react-query-including-a-loading-state-that-shows-a-spinner-and-the-text-loading-while-fetching-assignments-the-initial-ui-should-correctly-display-an-empty-table-empty-state-when-the-backend-returns-no-assignments",
+      "title": "Wire the Service Meeting Conductors page to real backend queries using React Query, including a loading state that shows a spinner and the text \"Loading...\" while fetching assignments. The initial UI should correctly display an empty table/empty-state when the backend returns no assignments.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-the-visit-profile-page-ui-to-display-the-selected-visit-s-details-and-actions-show-publisher-name-as-the-page-heading-show-visit-date-formatted-like-feb-7-2026-show-elders-present-as-a-single-free-text-string-include-a-top-left-button-labeled-back-to-shepherding-visits-that-navigates-to-shepherding-include-edit-and-delete-buttons-in-the-top-right",
-      "title": "Implement the Visit Profile page UI to display the selected visit’s details and actions: show Publisher Name as the page heading; show Visit Date formatted like `Feb 7, 2026`; show Elders Present as a single free-text string; include a top-left button labeled `Back to Shepherding Visits` that navigates to `/shepherding`; include `Edit` and `Delete` buttons in the top-right.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-notes-section-on-the-visit-profile-page-that-allows-viewing-and-editing-the-existing-backend-notes-text-field-for-the-visit-the-section-must-include-a-textarea-bound-to-the-visit-s-notes-and-a-save-notes-button-with-background-color-43587a-when-save-notes-is-clicked-persist-the-updated-notes-to-the-backend-for-that-visit-and-show-a-green-success-toast-with-the-exact-text-notes-saved-successfully",
-      "title": "Add a Notes section on the Visit Profile page that allows viewing and editing the existing backend `notes : Text` field for the visit. The section must include a textarea bound to the visit’s notes and a `Save Notes` button with background color `#43587A`. When `Save Notes` is clicked, persist the updated notes to the backend for that visit and show a green success toast with the exact text `Notes saved successfully!`.",
+      "id": "feature-expose-the-new-backend-query-in-the-generated-frontend-backend-bindings-and-consume-it-from-the-service-meeting-conductors-page-to-populate-the-table-rows-week-of-conductor-name-when-assignments-exist",
+      "title": "Expose the new backend query in the generated frontend backend bindings and consume it from the Service Meeting Conductors page to populate the table rows (Week Of, Conductor Name) when assignments exist.",
       "reqIds": [
         "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-the-visit-edit-flow-on-the-visit-profile-page-clicking-edit-opens-a-modal-pre-filled-with-the-visit-s-current-data-and-includes-required-fields-publisher-dropdown-required-pre-selected-visit-date-date-picker-required-pre-filled-elders-present-text-input-required-pre-filled-the-modal-must-have-save-and-cancel-buttons-clicking-save-must-update-the-visit-in-the-backend-refresh-the-visit-profile-page-data-and-show-a-green-success-toast-with-exact-text-visit-updated-successfully",
-      "title": "Implement the Visit Edit flow on the Visit Profile page: clicking `Edit` opens a modal pre-filled with the visit’s current data and includes required fields: Publisher (dropdown, required, pre-selected), Visit Date (date picker, required, pre-filled), Elders Present (text input, required, pre-filled). The modal must have `Save` and `Cancel` buttons. Clicking `Save` must update the visit in the backend, refresh the Visit Profile page data, and show a green success toast with exact text `Visit updated successfully!`.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-the-visit-delete-flow-on-the-visit-profile-page-clicking-delete-opens-a-confirmation-dialog-with-the-exact-title-text-delete-this-visit-and-yes-and-cancel-buttons-clicking-yes-must-delete-the-visit-from-the-backend-navigate-back-to-shepherding-and-show-a-green-success-toast-with-exact-text-visit-deleted-successfully",
-      "title": "Implement the Visit Delete flow on the Visit Profile page: clicking `Delete` opens a confirmation dialog with the exact title text `Delete this visit?` and `Yes` and `Cancel` buttons. Clicking `Yes` must delete the visit from the backend, navigate back to `/shepherding`, and show a green success toast with exact text `Visit deleted successfully!`.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-ensure-frontend-react-query-hooks-needed-by-the-visit-profile-page-to-load-a-single-shepherding-visit-by-id-and-to-perform-update-delete-notes-save-mutations-using-the-existing-backend-actor-api-created-in-prompt-29-30-mutations-must-invalidate-the-appropriate-react-query-cache-keys-so-the-shepherding-visits-list-shepherdingvisits-and-the-single-visit-query-are-refreshed-correctly",
-      "title": "Add/ensure frontend React Query hooks needed by the Visit Profile page to load a single shepherding visit by ID and to perform update/delete/notes-save mutations, using the existing backend actor API created in PROMPT #29-30. Mutations must invalidate the appropriate React Query cache keys so the Shepherding Visits list (`['shepherdingVisits']`) and the single-visit query are refreshed correctly.",
-      "reqIds": [
-        "REQ-7"
       ],
       "version": 1
     }
@@ -70,12 +38,32 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add Visit Profile page (/shepherding/:id) with visit details, notes editing (save to backend + success toast), edit modal (update backend + toast), and delete confirmation (delete backend + navigate back + toast); make Publisher Name in list link to visit by unique ID.",
+      "summary": "Add 'Service Meeting Conductors' page accessible from sidebar with heading, styled 'Assign Conductor' button (#43587A, white text), table (Week Of, Conductor Name, Actions placeholder), empty-state message, and loading spinner using app-wide layout/styling.",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Create new backend domain for Service Meeting Conductor assignments with stable storage (id, weekOf seconds timestamp for Monday, conductorId, conductorName, createdAt) and expose query endpoints; wire UI to real backend queries (initially empty until create flow is added).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Prepare for future 'Assign Conductor' create flow: Week Of date picker (Monday), Conductor dropdown filtered to Publishers with privileges Elder or Ministerial Servant; for now button is clickable placeholder with no modal/page yet.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add a new backend domain for \"Service Meeting Conductor\" assignments with stable storage and query APIs. The backend must persist and return assignment records with fields: id (Text, unique), weekOf (Int; timestamp in seconds for the Monday of that week), conductorId (Text; links to Publishers), conductorName (Text), createdAt (Int timestamp). Implement at least a read API to list all assignments (for populating the table now), keeping the structure ready for a future create-assignment API in the next prompt.",
+      "reqIds": [
+        "REQ-3"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Add Shepherding Visit Profile page with notes editing and edit/delete actions",
+  "projectName": "Service Meeting Conductors page wired to new stable backend domain (read-only list for now)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

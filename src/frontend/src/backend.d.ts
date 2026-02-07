@@ -16,6 +16,7 @@ export interface ShepherdingVisit {
     publisherName: string;
     notes: string;
 }
+export type PublisherId = bigint;
 export interface CreateTaskInput {
     title: string;
     dueDate: bigint;
@@ -23,7 +24,10 @@ export interface CreateTaskInput {
     notes?: string;
     category: string;
 }
-export type PublisherId = bigint;
+export interface CreateTerritoryNoteInput {
+    title: string;
+    content: string;
+}
 export interface Task {
     id: bigint;
     completedAt?: bigint;
@@ -35,6 +39,13 @@ export interface Task {
     parentTaskId?: bigint;
     notes?: string;
     category: string;
+}
+export interface ServiceMeetingConductor {
+    id: string;
+    createdAt: bigint;
+    conductorName: string;
+    conductorId: string;
+    weekOf: bigint;
 }
 export interface GlobalNote {
     id: bigint;
@@ -48,10 +59,6 @@ export interface EditPioneerInput {
     serviceYear: string;
     publisherId: string;
     publisherName: string;
-}
-export interface CreateTerritoryNoteInput {
-    title: string;
-    content: string;
 }
 export interface Pioneer {
     id: string;
@@ -146,6 +153,7 @@ export interface backendInterface {
     getAllGlobalNotes(): Promise<Array<GlobalNote>>;
     getAllPioneers(): Promise<Array<Pioneer>>;
     getAllPublishers(): Promise<Array<Publisher>>;
+    getAllServiceMeetingConductors(): Promise<Array<ServiceMeetingConductor>>;
     getAllShepherdingVisits(): Promise<Array<ShepherdingVisit>>;
     getAllTerritories(): Promise<Array<Territory>>;
     getAllTerritoryNotes(territoryId: string): Promise<Array<TerritoryNote>>;

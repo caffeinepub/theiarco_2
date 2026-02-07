@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,17 +34,12 @@ export default function ShepherdingVisitProfile() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Initialize notes when visit loads
-  useState(() => {
+  // Initialize notes when visit loads using useEffect
+  useEffect(() => {
     if (visit) {
       setNotes(visit.notes);
     }
-  });
-
-  // Update notes when visit changes
-  if (visit && notes !== visit.notes && !updateNotes.isPending) {
-    setNotes(visit.notes);
-  }
+  }, [visit?.id, visit?.notes]);
 
   const activePublishers = allPublishers?.filter((p) => p.isActive).sort((a, b) => a.fullName.localeCompare(b.fullName)) || [];
 
@@ -208,7 +203,7 @@ export default function ShepherdingVisitProfile() {
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add notes about this visit..."
+                placeholder="Add notes about this shepherding visit..."
                 className="mt-2 min-h-[200px]"
               />
             </div>

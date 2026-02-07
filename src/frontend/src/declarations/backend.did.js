@@ -71,6 +71,13 @@ export const Publisher = IDL.Record({
   'isActive' : IDL.Bool,
   'isGroupAssistant' : IDL.Bool,
 });
+export const ServiceMeetingConductor = IDL.Record({
+  'id' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'conductorName' : IDL.Text,
+  'conductorId' : IDL.Text,
+  'weekOf' : IDL.Int,
+});
 export const ShepherdingVisit = IDL.Record({
   'id' : IDL.Text,
   'eldersPresent' : IDL.Text,
@@ -174,6 +181,11 @@ export const idlService = IDL.Service({
   'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
   'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
   'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
+  'getAllServiceMeetingConductors' : IDL.Func(
+      [],
+      [IDL.Vec(ServiceMeetingConductor)],
+      ['query'],
+    ),
   'getAllShepherdingVisits' : IDL.Func(
       [],
       [IDL.Vec(ShepherdingVisit)],
@@ -334,6 +346,13 @@ export const idlFactory = ({ IDL }) => {
     'isActive' : IDL.Bool,
     'isGroupAssistant' : IDL.Bool,
   });
+  const ServiceMeetingConductor = IDL.Record({
+    'id' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'conductorName' : IDL.Text,
+    'conductorId' : IDL.Text,
+    'weekOf' : IDL.Int,
+  });
   const ShepherdingVisit = IDL.Record({
     'id' : IDL.Text,
     'eldersPresent' : IDL.Text,
@@ -437,6 +456,11 @@ export const idlFactory = ({ IDL }) => {
     'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
     'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
     'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
+    'getAllServiceMeetingConductors' : IDL.Func(
+        [],
+        [IDL.Vec(ServiceMeetingConductor)],
+        ['query'],
+      ),
     'getAllShepherdingVisits' : IDL.Func(
         [],
         [IDL.Vec(ShepherdingVisit)],

@@ -3,18 +3,38 @@ import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Pencil, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useGetAllShepherdingVisits } from '../hooks/useShepherdingVisits';
 import { useGetAllPublishers } from '../hooks/useQueries';
+import { useDeleteShepherdingVisit } from '../hooks/useShepherdingVisit';
 import { formatVisitDate } from '../utils/formatters';
 import RecordVisitModal from '../components/shepherding/RecordVisitModal';
+import { EditShepherdingVisitModal } from '../components/shepherding/EditShepherdingVisitModal';
+import { toast } from 'sonner';
 import type { ShepherdingVisit } from '../backend';
 
 export default function Shepherding() {
   const navigate = useNavigate();
   const { data: visits, isLoading } = useGetAllShepherdingVisits();
   const { data: allPublishers } = useGetAllPublishers();
+  const deleteVisit = useDeleteShepherdingVisit();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedVisit, setSelectedVisit] = useState<ShepherdingVisit | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [visitToDelete, setVisitToDelete] = useState<string | null>(null);
 
   // Filter and sort active publishers alphabetically by fullName
   const activePublishers = useMemo(() => {
@@ -50,6 +70,43 @@ export default function Shepherding() {
 
   const handleVisitClick = (visitId: string) => {
     navigate({ to: `/shepherding/${visitId}` });
+  };
+
+  const handleEditClick = (visit: ShepherdingVisit) => {
+    setSelectedVisit(visit);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (visitId: string) => {
+    setVisitToDelete(visitId);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!visitToDelete) return;
+
+    try {
+      await deleteVisit.mutateAsync(visitToDelete);
+      toast.success('Visit deleted successfully!', {
+        duration: 3000,
+        style: {
+          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
+          color: 'white',
+        },
+      });
+      setShowDeleteDialog(false);
+      setVisitToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete visit:', error);
+      toast.error('Failed to delete visit');
+      setShowDeleteDialog(false);
+      setVisitToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false);
+    setVisitToDelete(null);
   };
 
   return (
@@ -131,8 +188,24 @@ export default function Shepherding() {
                   <TableCell>{formatVisitDate(visit.visitDate)}</TableCell>
                   <TableCell>{visit.eldersPresent}</TableCell>
                   <TableCell>
-                    {/* Placeholder for future actions */}
-                    <span className="text-muted-foreground text-sm">—</span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditClick(visit)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteClick(visit.id)}
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -147,6 +220,32 @@ export default function Shepherding() {
         onOpenChange={setIsModalOpen}
         publishers={activePublishers}
       />
+
+      {/* Edit Visit Modal */}
+      {selectedVisit && (
+        <EditShepherdingVisitModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          visit={selectedVisit}
+          publishers={activePublishers}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => !open && handleDeleteCancel()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this visit?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

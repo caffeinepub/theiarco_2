@@ -75,6 +75,13 @@ export interface Publisher {
   'isGroupAssistant' : boolean,
 }
 export type PublisherId = bigint;
+export interface ServiceMeetingConductor {
+  'id' : string,
+  'createdAt' : bigint,
+  'conductorName' : string,
+  'conductorId' : string,
+  'weekOf' : bigint,
+}
 export interface ShepherdingVisit {
   'id' : string,
   'eldersPresent' : string,
@@ -159,6 +166,10 @@ export interface _SERVICE {
   'getAllGlobalNotes' : ActorMethod<[], Array<GlobalNote>>,
   'getAllPioneers' : ActorMethod<[], Array<Pioneer>>,
   'getAllPublishers' : ActorMethod<[], Array<Publisher>>,
+  'getAllServiceMeetingConductors' : ActorMethod<
+    [],
+    Array<ServiceMeetingConductor>
+  >,
   'getAllShepherdingVisits' : ActorMethod<[], Array<ShepherdingVisit>>,
   'getAllTerritories' : ActorMethod<[], Array<Territory>>,
   'getAllTerritoryNotes' : ActorMethod<[string], Array<TerritoryNote>>,

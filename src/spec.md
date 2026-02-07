@@ -1,15 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add a shepherding-visit Profile page that can be opened from the Shepherding Visits list (by visit ID) and supports viewing details plus editing notes, editing the visit, and deleting the visit.
+**Goal:** Replace the `/conductors` placeholder with a real “Service Meeting Conductors” page and connect it to a new stable backend query (read-only list for now).
 
 **Planned changes:**
-- Update the Shepherding Visits list so the Publisher Name cell links to `/shepherding/<visit.id>` (visit ID-based routing).
-- Add a new routed Visit Profile page at `/shepherding/$id` (TanStack Router) and register it in the app routing.
-- Build the Visit Profile UI to show Publisher Name (heading), Visit Date (formatted like existing `formatVisitDate`), and Elders Present (single free-text string), with a `Back to Shepherding Visits` button and top-right `Edit` / `Delete` actions.
-- Add a Notes section with a textarea bound to the visit’s `notes` field and a `Save Notes` button (background `#43587A`) that persists to the backend and shows a green toast: `Notes saved successfully!`.
-- Implement Edit flow: `Edit` opens a pre-filled modal (Publisher dropdown required, Visit Date required, Elders Present required) with Save/Cancel; saving updates backend, refreshes profile data, and shows green toast `Visit updated successfully!`.
-- Implement Delete flow: `Delete` opens confirmation dialog titled `Delete this visit?` with `Yes`/`Cancel`; `Yes` deletes in backend, navigates to `/shepherding`, and shows green toast `Visit deleted successfully!`.
-- Add/ensure React Query hooks for: fetching a single visit by ID, updating a visit, deleting a visit, and saving notes; invalidate `['shepherdingVisits']` and the single-visit query on successful mutations (adding missing backend actor methods only if required, without changing the existing model fields).
+- Frontend: Implement the “Service Meeting Conductors” page on `/conductors` using the standard app layout/styling, with a heading, an “Assign Conductor” button (#43587A background, white text) that is clickable but does nothing, and a table with columns “Week Of”, “Conductor Name”, and “Actions” (placeholder only).
+- Frontend: Add React Query data fetching for conductor assignments, including a loading state that shows a spinner and the text “Loading...”, and an empty-state message exactly: “No conductors assigned. Click 'Assign Conductor' to create one.” when no assignments exist.
+- Backend: Add a new stable-persisted Service Meeting Conductor assignments domain in the single Motoko actor (`backend/main.mo`) storing records with fields: `id` (Text), `weekOf` (Int; Monday timestamp in seconds), `conductorId` (Text), `conductorName` (Text), `createdAt` (Int).
+- Both: Expose a backend query to list all conductor assignments via generated frontend bindings and render returned rows in the table (formatted “Week Of” date and “Conductor Name”).
 
-**User-visible outcome:** Users can click a Publisher Name in the Shepherding Visits list to open a visit-specific profile page, view visit details, edit and save notes, edit visit fields via a modal, or delete the visit with confirmation and success toasts.
+**User-visible outcome:** Visiting `/conductors` shows a real “Service Meeting Conductors” page with an (inactive placeholder) “Assign Conductor” button, a loading state while fetching, and either an empty-state message or a read-only table populated from backend assignment records.
