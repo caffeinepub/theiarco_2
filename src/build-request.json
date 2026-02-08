@@ -1,116 +1,171 @@
 {
   "kind": "build_request",
-  "title": "Service Meeting Conductors page wired to new stable backend domain (read-only list for now)",
+  "title": "Service Meeting Conductors: Full CRUD UI (modal + table) connected to backend",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Replace the existing \"/conductors\" route placeholder with a real \"Service Meeting Conductors\" page that uses the standard app layout/styling and includes: (1) heading text \"Service Meeting Conductors\"; (2) a top \"Assign Conductor\" button styled with background color #43587A and white text that is clickable but currently performs no action; (3) a table with columns \"Week Of\", \"Conductor Name\", and \"Actions\" (actions are placeholder only); (4) an empty-state message exactly: \"No conductors assigned. Click 'Assign Conductor' to create one.\" when no assignments exist.",
-      "target": "frontend",
+      "text": "Update/align the ServiceMeetingConductor backend domain to use this record data model: { id: Text (unique), publisherId: Text, publisherName: Text, trainingDate: Int (timestamp in seconds), status: Text (\"Available\" | \"Unavailable\"), createdAt: Int }.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3"
+          "msg-6"
         ],
         "quotes": [
-          "Create a Service Meeting Conductors page in the app",
-          "Add an \"Assign Conductor\" button at the top using #43587A background color with white text.",
-          "Show placeholder text: \"No conductors assigned. Click 'Assign Conductor' to create one.\" if no assignments exist.",
-          "The \"Assign Conductor\" button should be functional but we're not building the modal yet... It can be a placeholder that doesn't do anything yet."
+          "ServiceMeetingConductor record data model ... id ... publisherId ... publisherName ... trainingDate (Int - timestamp in seconds) ... status ... createdAt"
         ]
       },
       "acceptanceCriteria": [
-        "Navigating to \"/conductors\" renders the new page (not the ComingSoon placeholder).",
-        "The page heading reads \"Service Meeting Conductors\".",
-        "The \"Assign Conductor\" button is clickable and has #43587A background with white text; clicking it does not navigate or open any modal yet.",
-        "The table renders with the three specified columns and no runtime errors.",
-        "When the backend returns zero assignments, the empty-state message matches exactly."
+        "Backend exposes a ServiceMeetingConductor type (or equivalent) with exactly the fields above.",
+        "trainingDate and createdAt are stored as Int timestamps; trainingDate is interpreted as seconds since epoch.",
+        "status values are restricted/validated to \"Available\" or \"Unavailable\" (reject/trap on invalid values)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Wire the Service Meeting Conductors page to real backend queries using React Query, including a loading state that shows a spinner and the text \"Loading...\" while fetching assignments. The initial UI should correctly display an empty table/empty-state when the backend returns no assignments.",
-      "target": "frontend",
+      "text": "Implement complete CRUD backend APIs for ServiceMeetingConductor records, protected by the same authorization checks used elsewhere (checkUserPermission(caller, #user)): create, list all, get by id (if needed by UI), update by id, and delete by id.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3"
+          "msg-6"
         ],
         "quotes": [
-          "Show a loading spinner with \"Loading...\" text while fetching data.",
-          "Wire the page to real backend queries now. The table should be empty initially"
+          "Build the complete CRUD system: Create (Add), Read (display table), Update (Edit), Delete."
         ]
       },
       "acceptanceCriteria": [
-        "While the assignments query is in-flight, the page shows a visible spinner and the text \"Loading...\".",
-        "When the assignments query resolves to an empty list, the loading UI disappears and the empty-state message is shown.",
-        "No mock data is displayed; data shown (if any) comes from the backend query."
+        "There are backend methods to create a conductor record, fetch all records, update an existing record by id, and delete by id.",
+        "Create returns the new record id (Text) and sets createdAt on the backend.",
+        "Update preserves createdAt and id; only updates publisherId, publisherName, trainingDate, and status.",
+        "Delete traps/returns an error when the id does not exist (consistent with existing patterns like deletePioneer/deleteTask)."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add a new backend domain for \"Service Meeting Conductor\" assignments with stable storage and query APIs. The backend must persist and return assignment records with fields: id (Text, unique), weekOf (Int; timestamp in seconds for the Monday of that week), conductorId (Text; links to Publishers), conductorName (Text), createdAt (Int timestamp). Implement at least a read API to list all assignments (for populating the table now), keeping the structure ready for a future create-assignment API in the next prompt.",
+      "text": "If the canister is already deployed with existing state, add conditional migration support so upgrading initializes the new conductor collection without breaking existing state.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-6"
         ],
         "quotes": [
-          "Yes, create a new Service Meeting Conductors backend domain with stable storage.",
-          "The backend should store assignments with: id (Text, unique) ... weekOf (Int - timestamp in seconds for the Monday of that week) ... conductorId (Text) ... conductorName (Text) ... createdAt (Int timestamp)",
-          "Set up the full backend structure now so the next prompt can add the create functionality smoothly."
+          "Build the complete CRUD system..."
         ]
       },
       "acceptanceCriteria": [
-        "Backend compiles and deploys with a new stable-persisted collection for conductor assignments.",
-        "A query method exists to fetch all conductor assignments and returns an array/list of records containing exactly the specified fields.",
-        "A fresh deployment returns an empty list from the assignments query (no seed data).",
-        "Assignments storage is preserved across canister upgrades (stable storage)."
+        "Upgrade does not trap due to uninitialized conductor storage.",
+        "Existing non-conductor state (publishers, pioneers, tasks, etc.) remains readable and unchanged after upgrade."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Expose the new backend query in the generated frontend backend bindings and consume it from the Service Meeting Conductors page to populate the table rows (Week Of, Conductor Name) when assignments exist.",
-      "target": "both",
+      "text": "Replace the current ServiceMeetingConductors page placeholder UI with a full CRUD UI for trained conductors: an \"Add Conductor\" button that opens a modal, a table that lists conductors, and per-row Edit/Delete actions wired to backend mutations.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3"
+          "msg-6"
         ],
         "quotes": [
-          "Wire the page to real backend queries now."
+          "add the full UI (modal, table, Edit/Delete, sorting, etc.) and connect it to the backend for the ServiceMeetingConductor"
         ]
       },
       "acceptanceCriteria": [
-        "Frontend type bindings include the conductor assignment type and the list query method.",
-        "When backend returns one or more assignments, the page renders a table row per assignment showing Week Of (formatted date) and Conductor Name.",
-        "No console errors related to missing actor methods/bindings when visiting the page authenticated."
+        "The page at route \"/conductors\" shows a header and an \"Add Conductor\" button.",
+        "Clicking \"Add Conductor\" opens the conductor modal in create mode with empty fields.",
+        "The table renders all conductors from the backend and updates automatically after create/edit/delete (React Query invalidation/refetch).",
+        "Loading state and empty state messages are shown in English."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Implement a single modal component used for BOTH Create and Edit of a ServiceMeetingConductor, with the same form fields: Publisher dropdown, Training Date picker, Status dropdown. The modal title must be \"Add Conductor\" for create mode and \"Edit Conductor\" for edit mode, and edit mode must pre-fill current row data.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "The modal should be used for BOTH Create and Edit ... Same form fields for both ... Modal title changes: \"Add Conductor\" for create, \"Edit Conductor\" for edit"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Create mode: opening modal shows empty Publisher/Training Date/Status controls and submit creates a new record.",
+        "Edit mode: clicking Edit on a row opens the same modal pre-filled with that row’s publisherId/publisherName, trainingDate, and status; submit updates that record.",
+        "Publisher dropdown is populated from the existing publishers backend list (use existing publishers query hook) and displays publisher full names.",
+        "Training Date picker writes/reads a seconds-based timestamp compatible with the backend model.",
+        "Status dropdown only allows \"Available\" and \"Unavailable\"."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Update the ServiceMeetingConductors table to use these columns and behaviors: Conductor Name (default alphabetical order; no user sorting UI required), Training Date (formatted like \"Feb 7, 2026\"), Status (green badge for \"Available\", red badge for \"Unavailable\"), Actions (Edit/Delete buttons).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Table columns: Conductor Name (no sorting needed, just alphabetically by default) ... Training Date (formatted like \"Feb 7, 2026\") ... Status (with color: Green badge ... Red badge ...) ... Actions (Edit and Delete buttons for each row)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Rows are displayed alphabetically by conductor/publisher name by default.",
+        "Training Date displays in the format \"MMM d, yyyy\" (e.g., \"Feb 7, 2026\").",
+        "Status renders as a colored badge: green for \"Available\", red for \"Unavailable\".",
+        "Each row includes working Edit and Delete buttons."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Add a delete confirmation dialog for conductors: clicking Delete opens a confirmation dialog with the exact prompt text \"Delete this conductor?\" before removing the record.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Delete shows confirmation dialog \"Delete this conductor?\" before removing."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Delete action does not call the backend until the user confirms in the dialog.",
+        "The dialog displays the exact question text \"Delete this conductor?\".",
+        "On successful delete, the dialog closes and the table refreshes to remove the row.",
+        "On error, the dialog remains usable and an English error toast/message is shown."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Create the necessary React Query hooks/mutations for ServiceMeetingConductors (create, update, delete) and ensure they invalidate/refetch the existing ['serviceMeetingConductors'] query so the UI stays consistent after mutations.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "connect it to the backend ... Build the complete CRUD system"
+        ]
+      },
+      "acceptanceCriteria": [
+        "There are mutation hooks for create/update/delete that call the corresponding backend actor methods.",
+        "After each successful mutation, the serviceMeetingConductors query is invalidated/refetched so the table updates without manual reload.",
+        "All user-facing success/error text is in English."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor (all logic in backend/main.mo).",
-    "Do not implement the Assign Conductor modal/page/form in this change (button is placeholder only).",
-    "Do not edit any files under frontend/src/components/ui or any paths listed in frontend.immutablePaths.",
-    "Use English for all user-facing text."
+    "Backend must remain a single-actor Motoko canister; keep all Motoko logic in backend/main.mo.",
+    "Only create backend/migration.mo if required by the conditional migration policy when upgrading existing state.",
+    "Do not edit files under frontend/src/components/ui or any other frontend immutable paths listed in SYSTEM_CONTEXT.",
+    "Use Internet Identity-based actor access patterns already present (useActor/useInternetIdentity)."
   ],
   "nonGoals": [
-    "Implementing create/update/delete conductor assignments.",
-    "Implementing the date picker and conductor dropdown (Elder/Ministerial Servant filtering) UI for assignment creation (next prompt).",
-    "Adding new authentication methods beyond existing Internet Identity flow."
+    "Implementing weekly assignment scheduling (e.g., \"Week Of\" assignments) for conductors.",
+    "Adding third-party auth providers or external databases.",
+    "Adding advanced table sorting/filtering UI beyond default alphabetical ordering."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

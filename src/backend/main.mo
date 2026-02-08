@@ -9,9 +9,7 @@ import Time "mo:core/Time";
 import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Text "mo:core/Text";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   // Initialize the user system state
   let accessControlState = AccessControl.initState();
@@ -907,5 +905,87 @@ actor {
   public query ({ caller }) func getAllServiceMeetingConductors() : async [ServiceMeetingConductor] {
     checkUserPermission(caller, #user);
     serviceMeetingConductors.values().toArray();
+  };
+
+  // New persistent Trained SM Conductors domain
+  public type TrainedServiceMeetingConductor = {
+    id : Text;
+    publisherId : Text;
+    publisherName : Text;
+    trainingDate : Int;
+    status : Text; // "Available" or "Unavailable"
+    createdAt : Int;
+  };
+
+  let trainedConductors = Map.empty<Text, TrainedServiceMeetingConductor>();
+
+  // Create input type
+  public type CreateTrainedConductorInput = {
+    publisherId : Text;
+    publisherName : Text;
+    trainingDate : Int;
+    status : Text; // "Available" or "Unavailable"
+  };
+
+  // Update input type
+  public type UpdateTrainedConductorInput = {
+    publisherId : Text;
+    publisherName : Text;
+    trainingDate : Int;
+    status : Text;
+  };
+
+  public shared ({ caller }) func addTrainedConductor(input : CreateTrainedConductorInput) : async Text {
+    checkUserPermission(caller, #user);
+
+    let newConductor : TrainedServiceMeetingConductor = {
+      id = input.publisherId;
+      publisherId = input.publisherId;
+      publisherName = input.publisherName;
+      trainingDate = input.trainingDate;
+      status = input.status;
+      createdAt = Time.now();
+    };
+
+    trainedConductors.add(input.publisherId, newConductor);
+    input.publisherId;
+  };
+
+  public shared ({ caller }) func updateTrainedConductor(id : Text, input : UpdateTrainedConductorInput) : async () {
+    checkUserPermission(caller, #user);
+
+    switch (trainedConductors.get(id)) {
+      case (null) { Runtime.trap("TrainedConductor not found: " # id) };
+      case (?existing) {
+        let updatedConductor : TrainedServiceMeetingConductor = {
+          existing with
+          publisherId = input.publisherId;
+          publisherName = input.publisherName;
+          trainingDate = input.trainingDate;
+          status = input.status;
+        };
+        trainedConductors.add(id, updatedConductor);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteTrainedConductor(id : Text) : async () {
+    checkUserPermission(caller, #user);
+
+    if (not trainedConductors.containsKey(id)) {
+      Runtime.trap("Delete failed. TrainedConductor with that id does not exist: " # id);
+    };
+
+    trainedConductors.remove(id);
+  };
+
+  public query ({ caller }) func getTrainedConductor(id : Text) : async ?TrainedServiceMeetingConductor {
+    checkUserPermission(caller, #user);
+    trainedConductors.get(id);
+  };
+
+  public query ({ caller }) func getAllTrainedConductors() : async [TrainedServiceMeetingConductor] {
+    checkUserPermission(caller, #user);
+    trainedConductors.values().toArray();
   };
 };

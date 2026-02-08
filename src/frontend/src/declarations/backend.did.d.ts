@@ -40,6 +40,12 @@ export interface CreateTerritoryNoteInput {
   'title' : string,
   'content' : string,
 }
+export interface CreateTrainedConductorInput {
+  'status' : string,
+  'publisherId' : string,
+  'publisherName' : string,
+  'trainingDate' : bigint,
+}
 export interface EditPioneerInput {
   'serviceYear' : string,
   'publisherId' : string,
@@ -121,6 +127,20 @@ export interface TerritoryNote {
   'content' : string,
   'createdAt' : bigint,
 }
+export interface TrainedServiceMeetingConductor {
+  'id' : string,
+  'status' : string,
+  'createdAt' : bigint,
+  'publisherId' : string,
+  'publisherName' : string,
+  'trainingDate' : bigint,
+}
+export interface UpdateTrainedConductorInput {
+  'status' : string,
+  'publisherId' : string,
+  'publisherName' : string,
+  'trainingDate' : bigint,
+}
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -138,6 +158,7 @@ export interface _SERVICE {
     ],
     PublisherId
   >,
+  'addTrainedConductor' : ActorMethod<[CreateTrainedConductorInput], string>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkOutTerritory' : ActorMethod<[string, PublisherId, boolean], undefined>,
   'createGlobalNote' : ActorMethod<
@@ -162,6 +183,7 @@ export interface _SERVICE {
   'deleteTask' : ActorMethod<[bigint], undefined>,
   'deleteTerritory' : ActorMethod<[string], undefined>,
   'deleteTerritoryNote' : ActorMethod<[string, bigint], undefined>,
+  'deleteTrainedConductor' : ActorMethod<[string], undefined>,
   'editPioneer' : ActorMethod<[string, EditPioneerInput], undefined>,
   'getAllGlobalNotes' : ActorMethod<[], Array<GlobalNote>>,
   'getAllPioneers' : ActorMethod<[], Array<Pioneer>>,
@@ -173,6 +195,10 @@ export interface _SERVICE {
   'getAllShepherdingVisits' : ActorMethod<[], Array<ShepherdingVisit>>,
   'getAllTerritories' : ActorMethod<[], Array<Territory>>,
   'getAllTerritoryNotes' : ActorMethod<[string], Array<TerritoryNote>>,
+  'getAllTrainedConductors' : ActorMethod<
+    [],
+    Array<TrainedServiceMeetingConductor>
+  >,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getGlobalNote' : ActorMethod<[bigint], [] | [GlobalNote]>,
@@ -187,6 +213,10 @@ export interface _SERVICE {
   'getTasksByParent' : ActorMethod<[[] | [bigint]], Array<Task>>,
   'getTerritory' : ActorMethod<[string], [] | [Territory]>,
   'getTerritoryNote' : ActorMethod<[string, bigint], [] | [TerritoryNote]>,
+  'getTrainedConductor' : ActorMethod<
+    [string],
+    [] | [TrainedServiceMeetingConductor]
+  >,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'makeTerritoryAvailable' : ActorMethod<[string], undefined>,
@@ -222,6 +252,10 @@ export interface _SERVICE {
   'updateTerritory' : ActorMethod<[string, string, string], undefined>,
   'updateTerritoryNote' : ActorMethod<
     [string, bigint, CreateTerritoryNoteInput],
+    undefined
+  >,
+  'updateTrainedConductor' : ActorMethod<
+    [string, UpdateTrainedConductorInput],
     undefined
   >,
 }

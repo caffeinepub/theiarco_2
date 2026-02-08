@@ -9,6 +9,12 @@
 import { IDL } from '@icp-sdk/core/candid';
 
 export const PublisherId = IDL.Nat;
+export const CreateTrainedConductorInput = IDL.Record({
+  'status' : IDL.Text,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'trainingDate' : IDL.Int,
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -109,6 +115,14 @@ export const TerritoryNote = IDL.Record({
   'content' : IDL.Text,
   'createdAt' : IDL.Int,
 });
+export const TrainedServiceMeetingConductor = IDL.Record({
+  'id' : IDL.Text,
+  'status' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'trainingDate' : IDL.Int,
+});
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 export const Task = IDL.Record({
   'id' : IDL.Nat,
@@ -127,6 +141,12 @@ export const TaskStatus = IDL.Variant({
   'completed' : IDL.Null,
   'uncompleted' : IDL.Null,
 });
+export const UpdateTrainedConductorInput = IDL.Record({
+  'status' : IDL.Text,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'trainingDate' : IDL.Int,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -144,6 +164,11 @@ export const idlService = IDL.Service({
         IDL.Opt(IDL.Bool),
       ],
       [PublisherId],
+      [],
+    ),
+  'addTrainedConductor' : IDL.Func(
+      [CreateTrainedConductorInput],
+      [IDL.Text],
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
@@ -177,6 +202,7 @@ export const idlService = IDL.Service({
   'deleteTask' : IDL.Func([IDL.Nat], [], []),
   'deleteTerritory' : IDL.Func([IDL.Text], [], []),
   'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+  'deleteTrainedConductor' : IDL.Func([IDL.Text], [], []),
   'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
   'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
   'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
@@ -195,6 +221,11 @@ export const idlService = IDL.Service({
   'getAllTerritoryNotes' : IDL.Func(
       [IDL.Text],
       [IDL.Vec(TerritoryNote)],
+      ['query'],
+    ),
+  'getAllTrainedConductors' : IDL.Func(
+      [],
+      [IDL.Vec(TrainedServiceMeetingConductor)],
       ['query'],
     ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -218,6 +249,11 @@ export const idlService = IDL.Service({
   'getTerritoryNote' : IDL.Func(
       [IDL.Text, IDL.Nat],
       [IDL.Opt(TerritoryNote)],
+      ['query'],
+    ),
+  'getTrainedConductor' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(TrainedServiceMeetingConductor)],
       ['query'],
     ),
   'getUserProfile' : IDL.Func(
@@ -278,12 +314,23 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'updateTrainedConductor' : IDL.Func(
+      [IDL.Text, UpdateTrainedConductorInput],
+      [],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
   const PublisherId = IDL.Nat;
+  const CreateTrainedConductorInput = IDL.Record({
+    'status' : IDL.Text,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'trainingDate' : IDL.Int,
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -384,6 +431,14 @@ export const idlFactory = ({ IDL }) => {
     'content' : IDL.Text,
     'createdAt' : IDL.Int,
   });
+  const TrainedServiceMeetingConductor = IDL.Record({
+    'id' : IDL.Text,
+    'status' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'trainingDate' : IDL.Int,
+  });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
   const Task = IDL.Record({
     'id' : IDL.Nat,
@@ -402,6 +457,12 @@ export const idlFactory = ({ IDL }) => {
     'completed' : IDL.Null,
     'uncompleted' : IDL.Null,
   });
+  const UpdateTrainedConductorInput = IDL.Record({
+    'status' : IDL.Text,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'trainingDate' : IDL.Int,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -419,6 +480,11 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(IDL.Bool),
         ],
         [PublisherId],
+        [],
+      ),
+    'addTrainedConductor' : IDL.Func(
+        [CreateTrainedConductorInput],
+        [IDL.Text],
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
@@ -452,6 +518,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteTask' : IDL.Func([IDL.Nat], [], []),
     'deleteTerritory' : IDL.Func([IDL.Text], [], []),
     'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
+    'deleteTrainedConductor' : IDL.Func([IDL.Text], [], []),
     'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
     'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
     'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
@@ -470,6 +537,11 @@ export const idlFactory = ({ IDL }) => {
     'getAllTerritoryNotes' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(TerritoryNote)],
+        ['query'],
+      ),
+    'getAllTrainedConductors' : IDL.Func(
+        [],
+        [IDL.Vec(TrainedServiceMeetingConductor)],
         ['query'],
       ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -497,6 +569,11 @@ export const idlFactory = ({ IDL }) => {
     'getTerritoryNote' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Opt(TerritoryNote)],
+        ['query'],
+      ),
+    'getTrainedConductor' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(TrainedServiceMeetingConductor)],
         ['query'],
       ),
     'getUserProfile' : IDL.Func(
@@ -554,6 +631,11 @@ export const idlFactory = ({ IDL }) => {
     'updateTerritory' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
     'updateTerritoryNote' : IDL.Func(
         [IDL.Text, IDL.Nat, CreateTerritoryNoteInput],
+        [],
+        [],
+      ),
+    'updateTrainedConductor' : IDL.Func(
+        [IDL.Text, UpdateTrainedConductorInput],
         [],
         [],
       ),

@@ -103,3 +103,22 @@ export function formatWeekOfDate(timestamp: bigint): string {
     year: 'numeric',
   });
 }
+
+/**
+ * Converts a backend training date timestamp (bigint) to a formatted date string.
+ * Backend training date timestamps are in seconds.
+ * @param timestamp - Backend timestamp as bigint (seconds)
+ * @returns Formatted date string like "Feb 7, 2026"
+ */
+export function formatTrainingDate(timestamp: bigint): string {
+  // Convert seconds to milliseconds
+  const milliseconds = Number(timestamp) * 1000;
+  const date = new Date(milliseconds);
+  
+  // Format as "MMM d, yyyy"
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}

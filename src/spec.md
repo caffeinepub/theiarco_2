@@ -1,12 +1,16 @@
 # Specification
 
 ## Summary
-**Goal:** Replace the `/conductors` placeholder with a real “Service Meeting Conductors” page and connect it to a new stable backend query (read-only list for now).
+**Goal:** Replace the Service Meeting Conductors placeholder with a full CRUD system (backend + UI) for managing trained conductors.
 
 **Planned changes:**
-- Frontend: Implement the “Service Meeting Conductors” page on `/conductors` using the standard app layout/styling, with a heading, an “Assign Conductor” button (#43587A background, white text) that is clickable but does nothing, and a table with columns “Week Of”, “Conductor Name”, and “Actions” (placeholder only).
-- Frontend: Add React Query data fetching for conductor assignments, including a loading state that shows a spinner and the text “Loading...”, and an empty-state message exactly: “No conductors assigned. Click 'Assign Conductor' to create one.” when no assignments exist.
-- Backend: Add a new stable-persisted Service Meeting Conductor assignments domain in the single Motoko actor (`backend/main.mo`) storing records with fields: `id` (Text), `weekOf` (Int; Monday timestamp in seconds), `conductorId` (Text), `conductorName` (Text), `createdAt` (Int).
-- Both: Expose a backend query to list all conductor assignments via generated frontend bindings and render returned rows in the table (formatted “Week Of” date and “Conductor Name”).
+- Align the backend ServiceMeetingConductor domain model to: `{ id: Text, publisherId: Text, publisherName: Text, trainingDate: Int (seconds), status: Text ("Available" | "Unavailable"), createdAt: Int }`, including status validation.
+- Add backend CRUD APIs (create, list all, get by id if needed, update by id, delete by id) with existing permission checks and createdAt/id handling rules.
+- Add conditional migration support so upgrades initialize the new conductor collection without breaking existing canister state.
+- Build the /conductors page UI: header + “Add Conductor” button, a table of conductors, and per-row Edit/Delete actions wired to backend.
+- Implement a single Add/Edit modal with fields: Publisher dropdown (from existing publishers query), Training Date picker (seconds-based timestamp), Status dropdown (“Available”/“Unavailable”), with mode-specific titles and edit prefill.
+- Update the conductors table columns/behavior: Conductor Name (default alphabetical order), Training Date (format “MMM d, yyyy”), Status (green/red badge), Actions (Edit/Delete).
+- Add a delete confirmation dialog that asks exactly: “Delete this conductor?” before calling delete.
+- Add React Query mutations (create/update/delete) and invalidate/refetch `['serviceMeetingConductors']` after successful mutations; show English loading/empty/success/error messaging.
 
-**User-visible outcome:** Visiting `/conductors` shows a real “Service Meeting Conductors” page with an (inactive placeholder) “Assign Conductor” button, a loading state while fetching, and either an empty-state message or a read-only table populated from backend assignment records.
+**User-visible outcome:** Users can view all service meeting conductors at `/conductors`, add new conductors, edit existing entries via a modal, and delete entries with confirmation, with the table updating automatically after changes.

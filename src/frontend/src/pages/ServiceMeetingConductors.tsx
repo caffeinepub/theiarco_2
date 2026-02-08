@@ -1,5 +1,7 @@
-import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -8,15 +10,38 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useGetAllServiceMeetingConductors } from '../hooks/useServiceMeetingConductors';
-import { formatWeekOfDate } from '../utils/formatters';
+import { useGetAllTrainedConductors } from '../hooks/useTrainedConductors';
+import { formatTrainingDate } from '../utils/formatters';
+import ConductorModal from '../components/conductors/ConductorModal';
+import DeleteConductorDialog from '../components/conductors/DeleteConductorDialog';
+import type { TrainedServiceMeetingConductor } from '../backend';
 
 export default function ServiceMeetingConductors() {
-  const { data: conductors, isLoading } = useGetAllServiceMeetingConductors();
+  const { data: conductors, isLoading } = useGetAllTrainedConductors();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedConductor, setSelectedConductor] = useState<TrainedServiceMeetingConductor | null>(null);
+  const [conductorToDelete, setConductorToDelete] = useState<string | null>(null);
 
-  const handleAssignConductor = () => {
-    // Placeholder - modal will be implemented in next prompt
+  const handleAddConductor = () => {
+    setSelectedConductor(null);
+    setModalOpen(true);
   };
+
+  const handleEditConductor = (conductor: TrainedServiceMeetingConductor) => {
+    setSelectedConductor(conductor);
+    setModalOpen(true);
+  };
+
+  const handleDeleteConductor = (conductorId: string) => {
+    setConductorToDelete(conductorId);
+    setDeleteDialogOpen(true);
+  };
+
+  // Sort conductors alphabetically by name
+  const sortedConductors = conductors
+    ? [...conductors].sort((a, b) => a.publisherName.localeCompare(b.publisherName))
+    : [];
 
   return (
     <div className="p-6 space-y-6">
@@ -24,11 +49,11 @@ export default function ServiceMeetingConductors() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Service Meeting Conductors</h1>
         <Button
-          onClick={handleAssignConductor}
+          onClick={handleAddConductor}
           style={{ backgroundColor: '#43587A' }}
           className="text-white hover:opacity-90"
         >
-          Assign Conductor
+          Add Conductor
         </Button>
       </div>
 
@@ -43,39 +68,81 @@ export default function ServiceMeetingConductors() {
       )}
 
       {/* Empty State */}
-      {!isLoading && conductors && conductors.length === 0 && (
+      {!isLoading && sortedConductors.length === 0 && (
         <div className="flex items-center justify-center py-12">
           <p className="text-muted-foreground">
-            No conductors assigned. Click 'Assign Conductor' to create one.
+            No trained conductors found. Click 'Add Conductor' to add one.
           </p>
         </div>
       )}
 
       {/* Table */}
-      {!isLoading && conductors && conductors.length > 0 && (
+      {!isLoading && sortedConductors.length > 0 && (
         <div className="border rounded-lg">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Week Of</TableHead>
                 <TableHead>Conductor Name</TableHead>
+                <TableHead>Training Date</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {conductors.map((conductor) => (
+              {sortedConductors.map((conductor) => (
                 <TableRow key={conductor.id}>
-                  <TableCell>{formatWeekOfDate(conductor.weekOf)}</TableCell>
-                  <TableCell>{conductor.conductorName}</TableCell>
+                  <TableCell className="font-medium">{conductor.publisherName}</TableCell>
+                  <TableCell>{formatTrainingDate(conductor.trainingDate)}</TableCell>
                   <TableCell>
-                    {/* Placeholder for actions */}
-                    <span className="text-muted-foreground text-sm">—</span>
+                    <Badge
+                      variant={conductor.status === 'Available' ? 'default' : 'destructive'}
+                      className={
+                        conductor.status === 'Available'
+                          ? 'bg-green-600 hover:bg-green-700'
+                          : 'bg-red-600 hover:bg-red-700'
+                      }
+                    >
+                      {conductor.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditConductor(conductor)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteConductor(conductor.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
+      )}
+
+      {/* Modals */}
+      <ConductorModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        conductor={selectedConductor}
+      />
+
+      {conductorToDelete && (
+        <DeleteConductorDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          conductorId={conductorToDelete}
+        />
       )}
     </div>
   );

@@ -1,75 +1,140 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Service Meeting Conductors page (real route + React Query read-only wiring)",
+  "title": "Service Meeting Conductors: CRUD table + shared modal wired to backend",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Replace the /conductors placeholder with a real Service Meeting Conductors page using the standard layout, header/button, table scaffold, and exact empty-state copy.",
-      "acceptanceCriteria": [
-        "Navigating to \"/conductors\" renders the new page (not the ComingSoon placeholder).",
-        "The page heading reads \"Service Meeting Conductors\".",
-        "The \"Assign Conductor\" button is clickable and has #43587A background with white text; clicking it does not navigate or open any modal yet.",
-        "The table renders with the three specified columns and no runtime errors.",
-        "When the backend returns zero assignments, the empty-state message matches exactly."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "operation": "create",
-          "description": "Create the \"Service Meeting Conductors\" page UI using the standard page padding/styling, with heading text, a top \"Assign Conductor\" button styled with background #43587A and white text (clickable no-op), and a table scaffold with columns \"Week Of\", \"Conductor Name\", and \"Actions\" (placeholder). Use shadcn-ui Table/Button components where appropriate. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire the existing \"/conductors\" route to render the new ServiceMeetingConductors page instead of the ComingSoon placeholder, keeping it under the authenticated AppLayout."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Fetch conductor assignments via React Query and show a visible spinner with \"Loading...\" while fetching; show the exact empty-state when the list is empty.",
-      "acceptanceCriteria": [
-        "While the assignments query is in-flight, the page shows a visible spinner and the text \"Loading...\".",
-        "When the assignments query resolves to an empty list, the loading UI disappears and the empty-state message is shown.",
-        "No mock data is displayed; data shown (if any) comes from the backend query."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useServiceMeetingConductors.ts",
-          "operation": "create",
-          "description": "Add a React Query hook (patterned after existing hooks like useGetAllPioneers) that uses useActor and queries the backend actor for all Service Meeting Conductor assignments, with enabled gating on actor availability and actor fetching state."
-        },
-        {
-          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "operation": "modify",
-          "description": "Consume the new React Query hook to drive UI states: show a centered spinner plus the exact text \"Loading...\" while loading; when results are empty, show the exact empty-state copy: \"No conductors assigned. Click 'Assign Conductor' to create one.\" Ensure no mock data is rendered."
-        }
-      ]
-    },
-    {
       "id": "REQ-4",
-      "summary": "Ensure frontend backend bindings expose the assignments list query/type and render assignment rows with formatted Week Of date and Conductor Name when data exists.",
+      "summary": "Replace the /conductors page placeholder with a full CRUD UI (Add button, modal, table, Edit/Delete wired to mutations).",
       "acceptanceCriteria": [
-        "Frontend type bindings include the conductor assignment type and the list query method.",
-        "When backend returns one or more assignments, the page renders a table row per assignment showing Week Of (formatted date) and Conductor Name.",
-        "No console errors related to missing actor methods/bindings when visiting the page authenticated."
+        "The page at route \"/conductors\" shows a header and an \"Add Conductor\" button.",
+        "Clicking \"Add Conductor\" opens the conductor modal in create mode with empty fields.",
+        "The table renders all conductors from the backend and updates automatically after create/edit/delete (React Query invalidation/refetch).",
+        "Loading state and empty state messages are shown in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/backend.d.ts",
+          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
           "operation": "modify",
-          "description": "Verify/align generated frontend bindings to include the ServiceMeetingConductor type and the getAllServiceMeetingConductors method signature used by the page (update declarations if they are missing or mismatched)."
+          "description": "Replace the current assignment-focused placeholder UI with a trained conductors CRUD page: header + \"Add Conductor\" button, table listing trained conductors (from the existing ['serviceMeetingConductors'] query), and per-row Edit/Delete actions that open the shared modal / delete dialog and trigger React Query mutations; include English loading + empty states."
+        },
+        {
+          "path": "frontend/src/components/conductors/ConductorModal.tsx",
+          "operation": "create",
+          "description": "Create a shared Create/Edit modal for trained conductors (Publisher dropdown, Training Date picker, Status dropdown) and wire it for both modes. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/conductors/DeleteConductorDialog.tsx",
+          "operation": "create",
+          "description": "Create a conductor delete confirmation dialog used by the /conductors page that blocks deletion until confirmed and triggers the delete mutation + English toast feedback. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Implement a single shared modal component for BOTH creating and editing a conductor with Publisher, Training Date, and Status fields.",
+      "acceptanceCriteria": [
+        "Create mode: opening modal shows empty Publisher/Training Date/Status controls and submit creates a new record.",
+        "Edit mode: clicking Edit on a row opens the same modal pre-filled with that row’s publisherId/publisherName, trainingDate, and status; submit updates that record.",
+        "Publisher dropdown is populated from the existing publishers backend list (use existing publishers query hook) and displays publisher full names.",
+        "Training Date picker writes/reads a seconds-based timestamp compatible with the backend model.",
+        "Status dropdown only allows \"Available\" and \"Unavailable\"."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/conductors/ConductorModal.tsx",
+          "operation": "modify",
+          "description": "Implement dual-mode behavior (create vs edit) with modal titles \"Add Conductor\" and \"Edit Conductor\", pre-fill values in edit mode, and validate/convert Training Date to a seconds-based bigint when calling mutations; populate Publisher dropdown via useGetAllPublishers and display publisher fullName; restrict Status options to \"Available\" and \"Unavailable\". Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
+          "operation": "modify",
+          "description": "Wire the shared ConductorModal into the /conductors page for both create and edit flows (open in create mode from \"Add Conductor\", open in edit mode from row action, and pass selected conductor data for prefill)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Update the conductors table columns, default alphabetical ordering, training date formatting, status badges, and actions.",
+      "acceptanceCriteria": [
+        "Rows are displayed alphabetically by conductor/publisher name by default.",
+        "Training Date displays in the format \"MMM d, yyyy\" (e.g., \"Feb 7, 2026\").",
+        "Status renders as a colored badge: green for \"Available\", red for \"Unavailable\".",
+        "Each row includes working Edit and Delete buttons."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
+          "operation": "modify",
+          "description": "Render the table with columns: Conductor Name (publisherName; default alphabetical sort only), Training Date (formatted \"MMM d, yyyy\"), Status (badge styling: green for \"Available\", red for \"Unavailable\"), and Actions (Edit/Delete buttons)."
         },
         {
           "path": "frontend/src/utils/formatters.ts",
           "operation": "modify",
-          "description": "Add a formatter utility for the conductor assignment weekOf value (bigint timestamp in seconds for the Monday of that week) to produce a user-friendly date string for the Week Of column."
+          "description": "Add or reuse a formatter for conductor training dates that formats a seconds-based bigint timestamp into \"MMM d, yyyy\" (e.g., by reusing the existing seconds-based task/visit formatting pattern)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Add a delete confirmation dialog with exact prompt text before deleting a conductor, with success/error feedback.",
+      "acceptanceCriteria": [
+        "Delete action does not call the backend until the user confirms in the dialog.",
+        "The dialog displays the exact question text \"Delete this conductor?\".",
+        "On successful delete, the dialog closes and the table refreshes to remove the row.",
+        "On error, the dialog remains usable and an English error toast/message is shown."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/conductors/DeleteConductorDialog.tsx",
+          "operation": "modify",
+          "description": "Implement the confirmation UI using the existing alert-dialog UI primitives with the exact prompt text \"Delete this conductor?\"; only call the delete mutation after confirm; on success close dialog and show an English success toast; on error keep dialog usable and show an English error toast. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
           "operation": "modify",
-          "description": "Render one table row per assignment returned from the backend query, showing Week Of using the new formatter and Conductor Name, with an Actions column containing placeholder content only. Use shadcn-ui Table components for consistent styling. Verify the component's usage instructions before implementing."
+          "description": "Wire Delete action buttons to open DeleteConductorDialog with the selected row, and ensure closing/reset behavior mirrors existing delete dialogs used elsewhere."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Create React Query mutation hooks for create/update/delete conductors and invalidate/refetch ['serviceMeetingConductors'] after success.",
+      "acceptanceCriteria": [
+        "There are mutation hooks for create/update/delete that call the corresponding backend actor methods.",
+        "After each successful mutation, the serviceMeetingConductors query is invalidated/refetched so the table updates without manual reload.",
+        "All user-facing success/error text is in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useServiceMeetingConductors.ts",
+          "operation": "modify",
+          "description": "Align the existing ['serviceMeetingConductors'] query hook to fetch the trained conductors list from the backend actor and return the trained conductor record shape used by the CRUD UI (keeping the same React Query key so invalidation works as required)."
+        },
+        {
+          "path": "frontend/src/hooks/useCreateTrainedConductor.ts",
+          "operation": "create",
+          "description": "Add a React Query mutation hook that creates a trained conductor via the backend actor and invalidates/refetches ['serviceMeetingConductors'] on success."
+        },
+        {
+          "path": "frontend/src/hooks/useUpdateTrainedConductor.ts",
+          "operation": "create",
+          "description": "Add a React Query mutation hook that updates a trained conductor via the backend actor and invalidates/refetches ['serviceMeetingConductors'] on success."
+        },
+        {
+          "path": "frontend/src/hooks/useDeleteTrainedConductor.ts",
+          "operation": "create",
+          "description": "Add a React Query mutation hook that deletes a trained conductor via the backend actor and invalidates/refetches ['serviceMeetingConductors'] on success."
+        },
+        {
+          "path": "frontend/src/components/conductors/ConductorModal.tsx",
+          "operation": "modify",
+          "description": "Use the new create/update mutation hooks and show English success/error toasts/messages; ensure successful mutation closes the modal and relies on query invalidation to refresh the table. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/conductors/DeleteConductorDialog.tsx",
+          "operation": "modify",
+          "description": "Use the new delete mutation hook and show English success/error toasts/messages; ensure successful mutation closes the dialog and relies on query invalidation to refresh the table. Verify the component's usage instructions before implementing."
         }
       ]
     }

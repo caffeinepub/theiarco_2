@@ -89,6 +89,12 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface CreateTrainedConductorInput {
+    status: string;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+}
 export interface ShepherdingVisit {
     id: string;
     eldersPresent: string;
@@ -105,10 +111,6 @@ export interface CreateTaskInput {
     parentTaskId?: bigint;
     notes?: string;
     category: string;
-}
-export interface CreateTerritoryNoteInput {
-    title: string;
-    content: string;
 }
 export interface Task {
     id: bigint;
@@ -150,6 +152,14 @@ export interface Pioneer {
     publisherName: string;
     isActive: boolean;
 }
+export interface TrainedServiceMeetingConductor {
+    id: string;
+    status: string;
+    createdAt: bigint;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+}
 export interface Territory {
     id: string;
     status: string;
@@ -158,6 +168,16 @@ export interface Territory {
     territoryType: string;
     notes: string;
     number: string;
+}
+export interface UpdateTrainedConductorInput {
+    status: string;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+}
+export interface CreateTerritoryNoteInput {
+    title: string;
+    content: string;
 }
 export interface TerritoryNote {
     id: bigint;
@@ -217,6 +237,7 @@ export interface backendInterface {
         publisher: boolean;
         elder: boolean;
     }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null): Promise<PublisherId>;
+    addTrainedConductor(input: CreateTrainedConductorInput): Promise<string>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkOutTerritory(territoryId: string, publisherId: PublisherId, isCampaign: boolean): Promise<void>;
     createGlobalNote(title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<bigint>;
@@ -232,6 +253,7 @@ export interface backendInterface {
     deleteTask(id: bigint): Promise<void>;
     deleteTerritory(id: string): Promise<void>;
     deleteTerritoryNote(territoryId: string, noteId: bigint): Promise<void>;
+    deleteTrainedConductor(id: string): Promise<void>;
     editPioneer(id: string, input: EditPioneerInput): Promise<void>;
     getAllGlobalNotes(): Promise<Array<GlobalNote>>;
     getAllPioneers(): Promise<Array<Pioneer>>;
@@ -240,6 +262,7 @@ export interface backendInterface {
     getAllShepherdingVisits(): Promise<Array<ShepherdingVisit>>;
     getAllTerritories(): Promise<Array<Territory>>;
     getAllTerritoryNotes(territoryId: string): Promise<Array<TerritoryNote>>;
+    getAllTrainedConductors(): Promise<Array<TrainedServiceMeetingConductor>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getGlobalNote(id: bigint): Promise<GlobalNote | null>;
@@ -251,6 +274,7 @@ export interface backendInterface {
     getTasksByParent(parentTaskId: bigint | null): Promise<Array<Task>>;
     getTerritory(id: string): Promise<Territory | null>;
     getTerritoryNote(territoryId: string, noteId: bigint): Promise<TerritoryNote | null>;
+    getTrainedConductor(id: string): Promise<TrainedServiceMeetingConductor | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     makeTerritoryAvailable(territoryId: string): Promise<void>;
@@ -269,8 +293,9 @@ export interface backendInterface {
     updateTaskCompletion(id: bigint, isCompleted: boolean): Promise<void>;
     updateTerritory(id: string, number: string, territoryType: string): Promise<void>;
     updateTerritoryNote(territoryId: string, noteId: bigint, input: CreateTerritoryNoteInput): Promise<void>;
+    updateTrainedConductor(id: string, input: UpdateTrainedConductorInput): Promise<void>;
 }
-import type { CheckoutRecord as _CheckoutRecord, CreateTaskInput as _CreateTaskInput, GlobalNote as _GlobalNote, Publisher as _Publisher, PublisherId as _PublisherId, ShepherdingVisit as _ShepherdingVisit, Task as _Task, TaskStatus as _TaskStatus, Territory as _Territory, TerritoryNote as _TerritoryNote, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { CheckoutRecord as _CheckoutRecord, CreateTaskInput as _CreateTaskInput, GlobalNote as _GlobalNote, Publisher as _Publisher, PublisherId as _PublisherId, ShepherdingVisit as _ShepherdingVisit, Task as _Task, TaskStatus as _TaskStatus, Territory as _Territory, TerritoryNote as _TerritoryNote, TrainedServiceMeetingConductor as _TrainedServiceMeetingConductor, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -302,6 +327,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.addPublisher(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg5));
+            return result;
+        }
+    }
+    async addTrainedConductor(arg0: CreateTrainedConductorInput): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addTrainedConductor(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addTrainedConductor(arg0);
             return result;
         }
     }
@@ -515,6 +554,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deleteTrainedConductor(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteTrainedConductor(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteTrainedConductor(arg0);
+            return result;
+        }
+    }
     async editPioneer(arg0: string, arg1: EditPioneerInput): Promise<void> {
         if (this.processError) {
             try {
@@ -624,6 +677,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getAllTerritoryNotes(arg0);
+            return result;
+        }
+    }
+    async getAllTrainedConductors(): Promise<Array<TrainedServiceMeetingConductor>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllTrainedConductors();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllTrainedConductors();
             return result;
         }
     }
@@ -781,6 +848,20 @@ export class Backend implements backendInterface {
             return from_candid_opt_n35(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getTrainedConductor(arg0: string): Promise<TrainedServiceMeetingConductor | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTrainedConductor(arg0);
+                return from_candid_opt_n36(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTrainedConductor(arg0);
+            return from_candid_opt_n36(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -868,14 +949,14 @@ export class Backend implements backendInterface {
     async updateCheckoutRecord(arg0: string, arg1: PublisherId, arg2: bigint, arg3: PublisherId, arg4: bigint, arg5: bigint | null, arg6: boolean): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n36(this._uploadFile, this._downloadFile, arg5), arg6);
+                const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n37(this._uploadFile, this._downloadFile, arg5), arg6);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n36(this._uploadFile, this._downloadFile, arg5), arg6);
+            const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n37(this._uploadFile, this._downloadFile, arg5), arg6);
             return result;
         }
     }
@@ -981,6 +1062,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateTrainedConductor(arg0: string, arg1: UpdateTrainedConductorInput): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateTrainedConductor(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateTrainedConductor(arg0, arg1);
+            return result;
+        }
+    }
 }
 function from_candid_CheckoutRecord_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CheckoutRecord): CheckoutRecord {
     return from_candid_record_n17(_uploadFile, _downloadFile, value);
@@ -1028,6 +1123,9 @@ function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
     return value.length === 0 ? null : from_candid_Territory_n13(_uploadFile, _downloadFile, value[0]);
 }
 function from_candid_opt_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TerritoryNote]): TerritoryNote | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TrainedServiceMeetingConductor]): TrainedServiceMeetingConductor | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_record_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -1174,7 +1272,7 @@ function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Arra
 function to_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
+function to_candid_opt_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
     return value === null ? candid_none() : candid_some(value);
 }
 function to_candid_opt_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PublisherId | null): [] | [_PublisherId] {
