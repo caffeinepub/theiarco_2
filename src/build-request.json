@@ -1,104 +1,120 @@
 {
   "kind": "build_request",
-  "title": "Update Dashboard page with overview statistic cards",
+  "title": "Add Recent Activity section to Dashboard showing latest shepherding visits",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the existing Dashboard page for the /dashboard route to display four statistic cards in a single row at the top of the page (keeping everything else unchanged).",
+      "text": "Update the Dashboard page to include a new section directly below the existing four stat cards with a heading labeled \"Recent Activity\".",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "The Dashboard page already exists at /dashboard route - it currently just shows a simple \"Dashboard\" heading. Update that existing page.",
-          "On the Dashboard page, show four stat cards in a row at the top."
+          "Add a Recent Activity section to the Dashboard below the stat cards:\n\n1. Add a heading \"Recent Activity\" below the four stat cards."
         ]
       },
       "acceptanceCriteria": [
-        "Navigating to /dashboard renders the Dashboard page (not a placeholder/Coming Soon screen).",
-        "The top section of the /dashboard page shows exactly 4 stat cards laid out in a single row on desktop (responsive stacking allowed on small screens).",
-        "Other routes/pages and existing layout components remain unchanged."
+        "On the Dashboard page, the \"Recent Activity\" heading renders beneath the stat cards grid without changing the existing stat cards, header, or layout above it.",
+        "The heading text is exactly \"Recent Activity\" (English, matching capitalization)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "On the Dashboard page, query the existing backends for publishers, territories, and tasks (using the existing frontend actor/query hooks where available) and compute the four counts based on the following rules: (1) Active Publishers = publishers where isActive == true; (2) Checked Out Territories = territories where status == \"Checked Out\"; (3) Upcoming Tasks = tasks where isCompleted == false and dueDate > currentTimestampSeconds; (4) Overdue Tasks = tasks where isCompleted == false and dueDate < currentTimestampSeconds. dueDate is an Int timestamp in seconds.",
+      "text": "In the new Dashboard \"Recent Activity\" section, fetch shepherding visits using the existing shepherding visits query hook and display the 5 most recent visits sorted by visit date (newest first).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Just query the existing backends (getPublishers, getTerritories, getTasks) and count the results based on the conditions I described.",
-          "dueDate is stored as Int (timestamp in seconds). To check if it's in the future: compare dueDate to current timestamp. To check if it's past: dueDate < current timestamp."
+          "2. Show the 5 most recent shepherding visits sorted by date (newest first)."
         ]
       },
       "acceptanceCriteria": [
-        "The Dashboard page fetches publishers, territories, and tasks via existing backend APIs (no new backend endpoints are introduced).",
-        "The displayed Active Publishers count equals the number of publishers with isActive === true.",
-        "The displayed Checked Out Territories count equals the number of territories with status exactly equal to \"Checked Out\".",
-        "The displayed Upcoming Tasks count equals the number of tasks with isCompleted === false and dueDate strictly greater than the current timestamp in seconds.",
-        "The displayed Overdue Tasks count equals the number of tasks with isCompleted === false and dueDate strictly less than the current timestamp in seconds.",
-        "The timestamp used for comparisons is computed at runtime on the client as the current Unix timestamp in seconds (not milliseconds).",
-        "If dueDate values arrive as a bigint-like type, the implementation converts safely for comparison without crashing the page."
+        "The Dashboard uses the existing query hook used elsewhere for shepherding visits (useGetAllShepherdingVisits) to retrieve the list.",
+        "The displayed list is sorted descending by the visit date field used by the Shepherding pages (e.g., visit.visitDate).",
+        "Only the 5 most recent visits are rendered (or fewer if fewer exist)."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Render the four Dashboard stat cards with the exact labels and color backgrounds: (1) Green background card labeled \"Active Publishers\"; (2) Blue background card labeled \"Checked Out Territories\"; (3) Orange background card labeled \"Upcoming Tasks\"; (4) Red background card labeled \"Overdue Tasks\". Each card must show the computed number prominently, with the label text below it.",
+      "text": "For each visit shown in Dashboard \"Recent Activity\", render: publisher name, formatted visit date, and a small \"View\" link that navigates to that visit’s profile route.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "First card: \"Active Publishers\" ... Use a green background.",
-          "Second card: \"Checked Out Territories\" ... Use a blue background.",
-          "Third card: \"Upcoming Tasks\" ... Use an orange background.",
-          "Fourth card: \"Overdue Tasks\" ... Use a red background."
+          "3. For each visit, show:\n   - Publisher name\n   - Visit date\n   - A small \"View\" link that goes to that visit's profile page"
         ]
       },
       "acceptanceCriteria": [
-        "Each of the four cards shows a large numeric value and the specified label beneath it.",
-        "The four card labels match exactly: \"Active Publishers\", \"Checked Out Territories\", \"Upcoming Tasks\", \"Overdue Tasks\".",
-        "The card background colors are visually green/blue/orange/red respectively (Tailwind utility classes are acceptable).",
-        "User-facing text on the cards is in English."
+        "Each list item shows the visit publisher name using the same field currently used in the Shepherding visit list/profile pages (e.g., visit.publisherName).",
+        "Each list item shows the visit date formatted using the existing visit date formatter utility (formatVisitDate).",
+        "Each list item includes a \"View\" link (text exactly \"View\") that navigates to the existing shepherding visit profile route pattern (/shepherding/<visitId>).",
+        "Clicking \"View\" opens the correct ShepherdingVisitProfile page for that visit."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Update routing/navigation so that the Dashboard page is accessible at /dashboard as specified, without breaking existing navigation. If the app currently uses / for Dashboard navigation, ensure users can still reach the Dashboard from the sidebar and the route configuration aligns with /dashboard.",
+      "text": "If there are no shepherding visits available, show muted/gray text \"No recent activity\" in the Dashboard \"Recent Activity\" section.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "The Dashboard page already exists at /dashboard route"
+          "4. If there are no shepherding visits, show gray text saying \"No recent activity\"."
         ]
       },
       "acceptanceCriteria": [
-        "Entering /dashboard in the browser loads the Dashboard page.",
-        "The sidebar has a working Dashboard navigation link that takes the user to the Dashboard page.",
-        "No other route definitions are removed or broken."
+        "When the shepherding visits query returns an empty list, the Dashboard shows the text \"No recent activity\" styled with a muted/gray treatment (e.g., text-muted-foreground) in the Recent Activity section.",
+        "When at least one visit exists, the empty-state text is not shown."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Keep all other Dashboard behavior and UI unchanged aside from adding the new Recent Activity section described above.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Keep everything else unchanged."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The existing Dashboard header text (\"Dashboard\" and its subheading) remains unchanged.",
+        "The existing four stat cards (labels, colors, computed values, and grid layout) remain unchanged.",
+        "No other routes, pages, or non-dashboard components are modified except what is necessary to support rendering the Recent Activity section on the Dashboard."
       ]
     }
   ],
   "constraints": [
-    "Do not create or modify backend data models for publishers, territories, or tasks; they already exist.",
-    "Do not change the meaning/storage of Task.dueDate; it remains an Int timestamp in seconds.",
-    "Keep everything else unchanged outside the Dashboard page and minimal routing updates needed to support /dashboard.",
-    "Do not edit files under frontend/src/components/ui or any other frontend immutable paths listed in SYSTEM_CONTEXT."
+    "Do not edit files under frontend/src/components/ui (Shadcn components); compose them instead if needed.",
+    "Do not modify immutable auth/actor hook files (frontend/src/hooks/useInternetIdentity.ts / .tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx).",
+    "Backend is single-actor Motoko; do not introduce additional canisters/services."
   ],
   "nonGoals": [
-    "Adding new backend endpoints or changing backend persistence/state.",
-    "Adding charts, tables, drill-down links, or additional dashboard widgets beyond the four stat cards.",
-    "Changing publishers/territories/tasks CRUD behavior or filtering behavior on their existing pages."
+    "Do not add new shepherding visit creation/editing capabilities to the Dashboard.",
+    "Do not change the existing Dashboard stat calculations or card styling.",
+    "Do not implement real-time updates or push notifications for recent activity."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

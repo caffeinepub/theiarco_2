@@ -1,13 +1,17 @@
 import { useGetAllPublishers } from '../hooks/useQueries';
 import { useGetAllTerritories } from '../hooks/useTerritories';
 import { useGetTasks } from '../hooks/useTasks';
+import { useGetAllShepherdingVisits } from '../hooks/useShepherdingVisits';
 import { TaskStatus } from '../backend';
 import { Users, Map, Clock, AlertCircle } from 'lucide-react';
+import { formatVisitDate } from '../utils/formatters';
+import { Link } from '@tanstack/react-router';
 
 export default function Dashboard() {
   const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
   const { data: territories = [], isLoading: territoriesLoading } = useGetAllTerritories();
   const { data: tasks = [], isLoading: tasksLoading } = useGetTasks(TaskStatus.all);
+  const { data: shepherdingVisits = [], isLoading: visitsLoading } = useGetAllShepherdingVisits();
 
   // Calculate current timestamp in seconds
   const nowSeconds = Math.floor(Date.now() / 1000);
@@ -30,7 +34,16 @@ export default function Dashboard() {
     return dueDate < nowSeconds;
   }).length;
 
-  const isLoading = publishersLoading || territoriesLoading || tasksLoading;
+  // Get 5 most recent shepherding visits sorted by date (newest first)
+  const recentVisits = [...shepherdingVisits]
+    .sort((a, b) => {
+      const dateA = typeof a.visitDate === 'bigint' ? Number(a.visitDate) : a.visitDate;
+      const dateB = typeof b.visitDate === 'bigint' ? Number(b.visitDate) : b.visitDate;
+      return dateB - dateA;
+    })
+    .slice(0, 5);
+
+  const isLoading = publishersLoading || territoriesLoading || tasksLoading || visitsLoading;
 
   if (isLoading) {
     return (
@@ -96,6 +109,37 @@ export default function Dashboard() {
             <p className="text-lg font-medium opacity-90">Overdue Tasks</p>
           </div>
         </div>
+      </div>
+
+      {/* Recent Activity Section */}
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-4">Recent Activity</h2>
+        {recentVisits.length === 0 ? (
+          <p className="text-muted-foreground">No recent activity</p>
+        ) : (
+          <div className="space-y-3">
+            {recentVisits.map((visit) => (
+              <div
+                key={visit.id}
+                className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm"
+              >
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">{visit.publisherName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatVisitDate(visit.visitDate)}
+                  </p>
+                </div>
+                <Link
+                  to="/shepherding/$id"
+                  params={{ id: visit.id }}
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  View
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

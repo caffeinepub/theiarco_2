@@ -2,8 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-existing-dashboard-page-for-the-dashboard-route-to-display-four-statistic-cards-in-a-single-row-at-the-top-of-the-page-keeping-everything-else-unchanged",
-      "featureTitle": "Update the existing Dashboard page for the /dashboard route to display four statistic cards in a single row at the top of the page (keeping everything else unchanged).",
+      "featureId": "feature-update-the-dashboard-page-to-include-a-new-section-directly-below-the-existing-four-stat-cards-with-a-heading-labeled-recent-activity",
+      "featureTitle": "Update the Dashboard page to include a new section directly below the existing four stat cards with a heading labeled \"Recent Activity\".",
       "files": [
         "frontend/src/pages/Dashboard.tsx"
       ],
@@ -21,8 +21,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-on-the-dashboard-page-query-the-existing-backends-for-publishers-territories-and-tasks-using-the-existing-frontend-actor-query-hooks-where-available-and-compute-the-four-counts-based-on-the-following-rules-1-active-publishers-publishers-where-isactive-true-2-checked-out-territories-territories-where-status-checked-out-3-upcoming-tasks-tasks-where-iscompleted-false-and-duedate-currenttimestampseconds-4-overdue-tasks-tasks-where-iscompleted-false-and-duedate-currenttimestampseconds-duedate-is-an-int-timestamp-in-seconds",
-      "featureTitle": "On the Dashboard page, query the existing backends for publishers, territories, and tasks (using the existing frontend actor/query hooks where available) and compute the four counts based on the following rules: (1) Active Publishers = publishers where isActive == true; (2) Checked Out Territories = territories where status == \"Checked Out\"; (3) Upcoming Tasks = tasks where isCompleted == false and dueDate > currentTimestampSeconds; (4) Overdue Tasks = tasks where isCompleted == false and dueDate < currentTimestampSeconds. dueDate is an Int timestamp in seconds.",
+      "featureId": "feature-in-the-new-dashboard-recent-activity-section-fetch-shepherding-visits-using-the-existing-shepherding-visits-query-hook-and-display-the-5-most-recent-visits-sorted-by-visit-date-newest-first",
+      "featureTitle": "In the new Dashboard \"Recent Activity\" section, fetch shepherding visits using the existing shepherding visits query hook and display the 5 most recent visits sorted by visit date (newest first).",
       "files": [
         "frontend/src/pages/Dashboard.tsx"
       ],
@@ -40,8 +40,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-render-the-four-dashboard-stat-cards-with-the-exact-labels-and-color-backgrounds-1-green-background-card-labeled-active-publishers-2-blue-background-card-labeled-checked-out-territories-3-orange-background-card-labeled-upcoming-tasks-4-red-background-card-labeled-overdue-tasks-each-card-must-show-the-computed-number-prominently-with-the-label-text-below-it",
-      "featureTitle": "Render the four Dashboard stat cards with the exact labels and color backgrounds: (1) Green background card labeled \"Active Publishers\"; (2) Blue background card labeled \"Checked Out Territories\"; (3) Orange background card labeled \"Upcoming Tasks\"; (4) Red background card labeled \"Overdue Tasks\". Each card must show the computed number prominently, with the label text below it.",
+      "featureId": "feature-for-each-visit-shown-in-dashboard-recent-activity-render-publisher-name-formatted-visit-date-and-a-small-view-link-that-navigates-to-that-visit-s-profile-route",
+      "featureTitle": "For each visit shown in Dashboard \"Recent Activity\", render: publisher name, formatted visit date, and a small \"View\" link that navigates to that visit’s profile route.",
       "files": [
         "frontend/src/pages/Dashboard.tsx"
       ],
@@ -59,10 +59,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-routing-navigation-so-that-the-dashboard-page-is-accessible-at-dashboard-as-specified-without-breaking-existing-navigation-if-the-app-currently-uses-for-dashboard-navigation-ensure-users-can-still-reach-the-dashboard-from-the-sidebar-and-the-route-configuration-aligns-with-dashboard",
-      "featureTitle": "Update routing/navigation so that the Dashboard page is accessible at /dashboard as specified, without breaking existing navigation. If the app currently uses / for Dashboard navigation, ensure users can still reach the Dashboard from the sidebar and the route configuration aligns with /dashboard.",
+      "featureId": "feature-if-there-are-no-shepherding-visits-available-show-muted-gray-text-no-recent-activity-in-the-dashboard-recent-activity-section",
+      "featureTitle": "If there are no shepherding visits available, show muted/gray text \"No recent activity\" in the Dashboard \"Recent Activity\" section.",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/pages/Dashboard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -74,6 +74,25 @@
       ],
       "testIds": [
         "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-keep-all-other-dashboard-behavior-and-ui-unchanged-aside-from-adding-the-new-recent-activity-section-described-above",
+      "featureTitle": "Keep all other Dashboard behavior and UI unchanged aside from adding the new Recent Activity section described above.",
+      "files": [
+        "frontend/src/pages/Dashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
       ],
       "confidence": "high"
     }

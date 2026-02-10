@@ -1,12 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Enhance the existing /dashboard page by adding a top-row overview of four statistic cards populated from existing publishers, territories, and tasks data.
+**Goal:** Add a "Recent Activity" section to the Dashboard to show the latest shepherding visits.
 
 **Planned changes:**
-- Update the existing Dashboard page at `/dashboard` to render exactly four statistic cards in a single top row (with responsive stacking on smaller screens), leaving the rest of the page/layout unchanged.
-- Fetch publishers, territories, and tasks via existing frontend actor/query hooks (no new backend endpoints) and compute counts for: Active Publishers, Checked Out Territories, Upcoming Tasks, and Overdue Tasks.
-- Implement runtime client-side Unix timestamp (seconds) comparison logic for task `dueDate` (Int seconds), including safe conversion if `dueDate` arrives as a bigint-like type.
-- Ensure routing/navigation supports accessing the Dashboard at `/dashboard`, including a working sidebar link, without breaking existing routes.
+- Add a new "Recent Activity" heading directly below the existing four stat cards on the Dashboard.
+- Use the existing shepherding visits query hook (useGetAllShepherdingVisits) to fetch visits, sort by visit date (newest first), and display up to 5 most recent items.
+- For each displayed visit, render publisher name, the formatted visit date (using formatVisitDate), and a "View" link to `/shepherding/<visitId>`.
+- Show muted/gray "No recent activity" text when there are no visits.
+- Keep all other Dashboard UI and behavior unchanged.
 
-**User-visible outcome:** Visiting `/dashboard` shows four colored stat cards at the top—Active Publishers (green), Checked Out Territories (blue), Upcoming Tasks (orange), and Overdue Tasks (red)—each displaying the correct computed count, with existing navigation and other pages unchanged.
+**User-visible outcome:** The Dashboard shows a "Recent Activity" list of up to five most recent shepherding visits (with a link to view each visit), or a muted "No recent activity" message when none exist.

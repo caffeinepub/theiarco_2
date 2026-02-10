@@ -1,18 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T19:19:39.392Z",
+  "generatedAt": "2026-02-10T19:35:23.659Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 5,
+    "implemented": 5,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the existing Dashboard page for the /dashboard route to display four statistic cards in a single row at the top of the page (keeping everything else unchanged).",
+        "summary": "Update the Dashboard page to include a new section directly below the existing four stat cards with a heading labeled \"Recent Activity\".",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Dashboard.tsx"
@@ -23,7 +23,7 @@
       },
       {
         "id": "REQ-2",
-        "summary": "On the Dashboard page, query the existing backends for publishers, territories, and tasks (using the existing frontend actor/query hooks where available) and compute the four counts based on the following rules: (1) Active Publishers = publishers where isActive == true; (2) Checked Out Territories = territories where status == \"Checked Out\"; (3) Upcoming Tasks = tasks where isCompleted == false and dueDate > currentTimestampSeconds; (4) Overdue Tasks = tasks where isCompleted == false and dueDate < currentTimestampSeconds. dueDate is an Int timestamp in seconds.",
+        "summary": "In the new Dashboard \"Recent Activity\" section, fetch shepherding visits using the existing shepherding visits query hook and display the 5 most recent visits sorted by visit date (newest first).",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Dashboard.tsx"
@@ -34,7 +34,7 @@
       },
       {
         "id": "REQ-3",
-        "summary": "Render the four Dashboard stat cards with the exact labels and color backgrounds: (1) Green background card labeled \"Active Publishers\"; (2) Blue background card labeled \"Checked Out Territories\"; (3) Orange background card labeled \"Upcoming Tasks\"; (4) Red background card labeled \"Overdue Tasks\". Each card must show the computed number prominently, with the label text below it.",
+        "summary": "For each visit shown in Dashboard \"Recent Activity\", render: publisher name, formatted visit date, and a small \"View\" link that navigates to that visit’s profile route.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Dashboard.tsx"
@@ -45,25 +45,33 @@
       },
       {
         "id": "REQ-4",
-        "summary": "Update routing/navigation so that the Dashboard page is accessible at /dashboard as specified, without breaking existing navigation. If the app currently uses / for Dashboard navigation, ensure users can still reach the Dashboard from the sidebar and the route configuration aligns with /dashboard.",
+        "summary": "If there are no shepherding visits available, show muted/gray text \"No recent activity\" in the Dashboard \"Recent Activity\" section.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/components/layout/Sidebar.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/pages/Dashboard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Keep all other Dashboard behavior and UI unchanged aside from adding the new Recent Activity section described above.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "build-request.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
     "frontend/src/pages/Dashboard.tsx",
     "project_state.json",
     "scratch/component-selection.json",
