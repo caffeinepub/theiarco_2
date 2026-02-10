@@ -2,84 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-dashboard-page-to-include-a-new-section-directly-below-the-existing-four-stat-cards-with-a-heading-labeled-recent-activity",
-      "featureTitle": "Update the Dashboard page to include a new section directly below the existing four stat cards with a heading labeled \"Recent Activity\".",
-      "files": [
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-in-the-new-dashboard-recent-activity-section-fetch-shepherding-visits-using-the-existing-shepherding-visits-query-hook-and-display-the-5-most-recent-visits-sorted-by-visit-date-newest-first",
-      "featureTitle": "In the new Dashboard \"Recent Activity\" section, fetch shepherding visits using the existing shepherding visits query hook and display the 5 most recent visits sorted by visit date (newest first).",
-      "files": [
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-for-each-visit-shown-in-dashboard-recent-activity-render-publisher-name-formatted-visit-date-and-a-small-view-link-that-navigates-to-that-visit-s-profile-route",
-      "featureTitle": "For each visit shown in Dashboard \"Recent Activity\", render: publisher name, formatted visit date, and a small \"View\" link that navigates to that visit’s profile route.",
-      "files": [
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-if-there-are-no-shepherding-visits-available-show-muted-gray-text-no-recent-activity-in-the-dashboard-recent-activity-section",
-      "featureTitle": "If there are no shepherding visits available, show muted/gray text \"No recent activity\" in the Dashboard \"Recent Activity\" section.",
-      "files": [
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-keep-all-other-dashboard-behavior-and-ui-unchanged-aside-from-adding-the-new-recent-activity-section-described-above",
-      "featureTitle": "Keep all other Dashboard behavior and UI unchanged aside from adding the new Recent Activity section described above.",
+      "featureId": "feature-update-the-dashboard-page-frontend-src-pages-dashboard-tsx-to-render-a-new-section-titled-alerts-directly-below-the-existing-recent-activity-section-using-the-same-spacing-and-card-styling-patterns-as-the-rest-of-the-dashboard",
+      "featureTitle": "Update the Dashboard page (frontend/src/pages/Dashboard.tsx) to render a new section titled \"Alerts\" directly below the existing \"Recent Activity\" section, using the same spacing and card styling patterns as the rest of the Dashboard.",
       "files": [
         "frontend/src/pages/Dashboard.tsx"
       ],
@@ -93,6 +17,25 @@
       ],
       "testIds": [
         "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-the-new-dashboard-alerts-section-compute-and-display-alert-items-as-follows-1-if-there-are-any-territories-that-are-currently-checked-out-and-have-been-checked-out-for-4-months-or-more-display-a-red-alert-box-with-the-text-x-territories-overdue-for-return-and-a-link-that-navigates-to-the-territories-page-2-if-there-are-any-tasks-where-duedate-is-in-the-past-and-iscompleted-is-false-display-an-orange-alert-box-with-the-text-x-overdue-tasks-and-a-link-that-navigates-to-the-tasks-page-3-if-neither-condition-is-present-display-muted-gray-text-no-alerts",
+      "featureTitle": "In the new Dashboard \"Alerts\" section, compute and display alert items as follows: (1) If there are any territories that are currently checked out and have been checked out for 4 months or more, display a red alert box with the text \"X territories overdue for return\" and a link that navigates to the Territories page. (2) If there are any tasks where dueDate is in the past and isCompleted is false, display an orange alert box with the text \"X overdue tasks\" and a link that navigates to the Tasks page. (3) If neither condition is present, display muted gray text \"No alerts\".",
+      "files": [
+        "frontend/src/pages/Dashboard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
       ],
       "confidence": "high"
     }

@@ -1,13 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Add a "Recent Activity" section to the Dashboard to show the latest shepherding visits.
+**Goal:** Add an Alerts section to the Dashboard, displayed directly below Recent Activity, to surface overdue territories and tasks with navigation links.
 
 **Planned changes:**
-- Add a new "Recent Activity" heading directly below the existing four stat cards on the Dashboard.
-- Use the existing shepherding visits query hook (useGetAllShepherdingVisits) to fetch visits, sort by visit date (newest first), and display up to 5 most recent items.
-- For each displayed visit, render publisher name, the formatted visit date (using formatVisitDate), and a "View" link to `/shepherding/<visitId>`.
-- Show muted/gray "No recent activity" text when there are no visits.
-- Keep all other Dashboard UI and behavior unchanged.
+- Update `frontend/src/pages/Dashboard.tsx` to render a new "Alerts" section directly below the "Recent Activity" section using existing Dashboard spacing/card styling patterns.
+- Compute and display up to two alert items in the Alerts section:
+  - Red alert: count of territories currently checked out for 4+ months, with text "X territories overdue for return" and a link to `/territories`.
+  - Orange alert: count of overdue tasks (past `dueDate` and `isCompleted` is false), with text "X overdue tasks" and a link to `/tasks`.
+- If neither alert condition applies, show muted gray text "No alerts" (no alert boxes).
 
-**User-visible outcome:** The Dashboard shows a "Recent Activity" list of up to five most recent shepherding visits (with a link to view each visit), or a muted "No recent activity" message when none exist.
+**User-visible outcome:** The Dashboard shows an "Alerts" section under Recent Activity that either lists overdue territory/task alerts with links to the relevant pages or displays "No alerts" when everything is up to date.

@@ -1,84 +1,42 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Dashboard: Recent Activity for Shepherding Visits",
+  "title": "Dashboard: Add Alerts section below Recent Activity",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Add a new \"Recent Activity\" section heading directly below the existing Dashboard stat cards.",
-      "acceptanceCriteria": [
-        "On the Dashboard page, the \"Recent Activity\" heading renders beneath the stat cards grid without changing the existing stat cards, header, or layout above it.",
-        "The heading text is exactly \"Recent Activity\" (English, matching capitalization)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/Dashboard.tsx",
-          "operation": "modify",
-          "description": "Insert a new section immediately after the existing stat cards grid, rendering a heading with text exactly \"Recent Activity\" while keeping the existing header and stat cards unchanged."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Fetch shepherding visits on the Dashboard using the existing query hook and display the 5 most recent visits sorted by visit date (newest first).",
-      "acceptanceCriteria": [
-        "The Dashboard uses the existing query hook used elsewhere for shepherding visits (useGetAllShepherdingVisits) to retrieve the list.",
-        "The displayed list is sorted descending by the visit date field used by the Shepherding pages (e.g., visit.visitDate).",
-        "Only the 5 most recent visits are rendered (or fewer if fewer exist)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/Dashboard.tsx",
-          "operation": "modify",
-          "description": "Import and use the existing useGetAllShepherdingVisits hook to retrieve visits, then compute a derived list sorted by visitDate descending and limited to 5 items for rendering in the new Recent Activity section."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Render each recent visit with publisher name, formatted visit date, and a \"View\" link navigating to the existing visit profile route.",
-      "acceptanceCriteria": [
-        "Each list item shows the visit publisher name using the same field currently used in the Shepherding visit list/profile pages (e.g., visit.publisherName).",
-        "Each list item shows the visit date formatted using the existing visit date formatter utility (formatVisitDate).",
-        "Each list item includes a \"View\" link (text exactly \"View\") that navigates to the existing shepherding visit profile route pattern (/shepherding/<visitId>).",
-        "Clicking \"View\" opens the correct ShepherdingVisitProfile page for that visit."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/Dashboard.tsx",
-          "operation": "modify",
-          "description": "In the Recent Activity list rendering, display visit.publisherName and formatVisitDate(visit.visitDate), and add a small \"View\" link/button using TanStack Router navigation to route to /shepherding/<visitId> for each item."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Show a muted \"No recent activity\" empty state when there are no shepherding visits.",
-      "acceptanceCriteria": [
-        "When the shepherding visits query returns an empty list, the Dashboard shows the text \"No recent activity\" styled with a muted/gray treatment (e.g., text-muted-foreground) in the Recent Activity section.",
-        "When at least one visit exists, the empty-state text is not shown."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/Dashboard.tsx",
-          "operation": "modify",
-          "description": "Add an empty-state branch within the Recent Activity section that renders muted/gray text exactly \"No recent activity\" when the derived recent-visits list is empty, and hides it otherwise."
-        }
-      ]
-    },
-    {
       "id": "REQ-5",
-      "summary": "Keep all other Dashboard UI and behavior unchanged aside from adding the Recent Activity section.",
+      "summary": "Render a new \"Alerts\" section on the Dashboard directly below the existing \"Recent Activity\" section, matching existing spacing and card styling patterns.",
       "acceptanceCriteria": [
-        "The existing Dashboard header text (\"Dashboard\" and its subheading) remains unchanged.",
-        "The existing four stat cards (labels, colors, computed values, and grid layout) remain unchanged.",
-        "No other routes, pages, or non-dashboard components are modified except what is necessary to support rendering the Recent Activity section on the Dashboard."
+        "On the Dashboard, an \"Alerts\" heading appears below the entire \"Recent Activity\" section content (regardless of whether Recent Activity is empty or not).",
+        "The Alerts section uses consistent spacing relative to other Dashboard sections (e.g., similar margins/padding as used for the Recent Activity heading and list).",
+        "Existing Dashboard content (header, stat cards, recent activity list behavior/content) remains unchanged aside from being followed by the new Alerts section."
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/Dashboard.tsx",
           "operation": "modify",
-          "description": "Constrain changes to additive UI below the stat cards (and minimal imports needed for shepherding visits, date formatting, and navigation), ensuring existing Dashboard header text and stat card calculations/styling remain untouched."
+          "description": "Insert an \"Alerts\" section immediately after the existing \"Recent Activity\" section, using the same section heading styling and the same card/container styling patterns already used on the Dashboard for list items (rounded card, border, bg-card, padding, shadow, and vertical spacing)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Compute and display Alerts for overdue territories (>= 4 months checked out) and overdue tasks (past due and incomplete), with TanStack Router navigation links to Territories and Tasks; otherwise show \"No alerts\".",
+      "acceptanceCriteria": [
+        "If at least one territory meets the \"checked out for 4 months or more\" condition, the Alerts section shows exactly one red-styled alert item for territories with the correct count substituted for X.",
+        "The territory overdue count includes only territories that are currently checked out and whose active (non-returned) checkout duration is >= 4 months.",
+        "The territory alert item includes a working navigation link that takes the user to the route \"/territories\".",
+        "If at least one task meets the overdue condition (dueDate has passed AND isCompleted is false), the Alerts section shows exactly one orange-styled alert item for tasks with the correct count substituted for X.",
+        "The task alert item includes a working navigation link that takes the user to the route \"/tasks\".",
+        "If both territory and task alert conditions are true, both alert items are shown (stacked with consistent spacing) under the \"Alerts\" heading.",
+        "If neither condition is true, no alert boxes are shown and the section displays the muted gray text \"No alerts\".",
+        "All user-facing strings in the Alerts section are exactly: \"Alerts\", \"X territories overdue for return\", \"X overdue tasks\", and \"No alerts\" (with X replaced by the computed number)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Compute (a) overdue territories count by filtering to territories with status \"Checked Out\" and an active (non-returned) checkout record whose checkout duration is >= 4 months (using the same month calculation approach already used elsewhere in the app), and (b) overdue tasks count by filtering tasks where dueDate is in the past and isCompleted is false. In the new Alerts section: render a single red-styled alert item as a TanStack Router Link to \"/territories\" with the exact text \"X territories overdue for return\" when count > 0; render a single orange-styled alert item as a Link to \"/tasks\" with the exact text \"X overdue tasks\" when count > 0; if both counts are 0, render muted gray text \"No alerts\" and no alert boxes. Ensure no additional user-facing strings are introduced in this section beyond the required ones."
         }
       ]
     }

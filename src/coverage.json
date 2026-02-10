@@ -1,62 +1,29 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T19:35:23.659Z",
+  "generatedAt": "2026-02-10T20:21:41.616Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 5,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Update the Dashboard page to include a new section directly below the existing four stat cards with a heading labeled \"Recent Activity\".",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "In the new Dashboard \"Recent Activity\" section, fetch shepherding visits using the existing shepherding visits query hook and display the 5 most recent visits sorted by visit date (newest first).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "For each visit shown in Dashboard \"Recent Activity\", render: publisher name, formatted visit date, and a small \"View\" link that navigates to that visit’s profile route.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "If there are no shepherding visits available, show muted/gray text \"No recent activity\" in the Dashboard \"Recent Activity\" section.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ]
-      },
-      {
         "id": "REQ-5",
-        "summary": "Keep all other Dashboard behavior and UI unchanged aside from adding the new Recent Activity section described above.",
+        "summary": "Update the Dashboard page (frontend/src/pages/Dashboard.tsx) to render a new section titled \"Alerts\" directly below the existing \"Recent Activity\" section, using the same spacing and card styling patterns as the rest of the Dashboard.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "In the new Dashboard \"Alerts\" section, compute and display alert items as follows: (1) If there are any territories that are currently checked out and have been checked out for 4 months or more, display a red alert box with the text \"X territories overdue for return\" and a link that navigates to the Territories page. (2) If there are any tasks where dueDate is in the past and isCompleted is false, display an orange alert box with the text \"X overdue tasks\" and a link that navigates to the Tasks page. (3) If neither condition is present, display muted gray text \"No alerts\".",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Dashboard.tsx"

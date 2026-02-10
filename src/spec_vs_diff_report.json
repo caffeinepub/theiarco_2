@@ -1,59 +1,28 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T19:35:23.656Z",
-  "summary": "Dashboard.tsx was updated to import the shepherding visits query hook, a visit date formatter, and router Link, and to compute a `recentVisits` array by sorting shepherding visits by `visitDate` descending and slicing to 5. However, the diff is truncated before showing any JSX that renders the new \"Recent Activity\" section, its list items, the \"View\" links, or the empty state, so those requirements cannot be confirmed as implemented from the provided evidence. Two non-requested files (frontend-file-summaries.txt and project_state.json) were also modified.",
+  "generatedAt": "2026-02-10T20:21:41.612Z",
+  "summary": "Diff shows new alert-related computations added to Dashboard.tsx (overdue tasks count; overdue territories count based on active checkout duration in months) and TanStack Router Link import, but the file is truncated before any JSX confirming the new \"Alerts\" section rendering, exact user-facing strings, styling, placement below Recent Activity, and the required links.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Update the Dashboard page to include a new section directly below the existing four stat cards with a heading labeled \"Recent Activity\".",
-      "reason": "The diff shows data preparation for recent visits but the provided Dashboard.tsx content is truncated before any JSX that would render the \"Recent Activity\" heading/section, so its presence and placement beneath the stat cards cannot be verified.",
-      "evidence": [
-        "frontend/src/pages/Dashboard.tsx (truncated before Recent Activity JSX)"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "For each visit shown, render publisher name, formatted visit date, and a small \"View\" link navigating to /shepherding/<visitId>.",
-      "reason": "Although `formatVisitDate` and `Link` are imported, the truncated diff does not show the list item rendering, use of `visit.publisherName`, application of `formatVisitDate(...)`, or a \"View\" link with the required route pattern.",
-      "evidence": [
-        "frontend/src/pages/Dashboard.tsx (imports Link and formatVisitDate, but JSX not shown due to truncation)"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "requirement": "If there are no shepherding visits, show muted/gray text \"No recent activity\" in the Recent Activity section.",
-      "reason": "No JSX is shown that conditionally renders an empty-state message or applies muted/gray styling; the relevant portion of the component render is truncated.",
-      "evidence": [
-        "frontend/src/pages/Dashboard.tsx (truncated before Recent Activity/empty-state JSX)"
-      ]
-    },
-    {
       "id": "REQ-5",
-      "requirement": "Keep all other Dashboard behavior and UI unchanged aside from adding the new Recent Activity section.",
-      "reason": "Because the Dashboard.tsx diff is truncated, it is not possible to confirm that only the intended section was added and that no other Dashboard UI/behavior was altered beyond what is shown.",
+      "requirement": "Render a new \"Alerts\" section titled \"Alerts\" directly below the existing \"Recent Activity\" section on the Dashboard, using consistent spacing/card styling, without changing existing Dashboard content/behavior beyond insertion.",
+      "reason": "The diff excerpt only shows added imports and alert/stat computation logic; it does not include the JSX that renders an \"Alerts\" heading/section or its placement below the full Recent Activity section. Because the file is truncated before the render area, implementation cannot be confirmed from provided evidence.",
+      "evidence": [
+        "frontend/src/pages/Dashboard.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "requirement": "In the new \"Alerts\" section: show (1) a red alert box \"X territories overdue for return\" linking to \"/territories\" when any territories are checked out for >=4 months; (2) an orange alert box \"X overdue tasks\" linking to \"/tasks\" when any tasks are overdue (dueDate past and not completed); (3) otherwise show muted gray text \"No alerts\"; show both alert items if both conditions true; exact strings required.",
+      "reason": "The diff excerpt shows computation for overdueTerritoriesCount and overdueTasksCount and imports Link and alert icons, but does not show any rendered alert UI, exact strings, styling (red/orange/muted), or the required navigation links/routes. Truncation prevents verification that these acceptance criteria are implemented.",
       "evidence": [
         "frontend/src/pages/Dashboard.tsx (truncated)"
       ]
     }
   ],
-  "hallucinated_features": [
-    {
-      "description": "Modified project tracking/state file unrelated to the requested Dashboard UI change.",
-      "reason": "The BuildRequest does not request updating any project state metadata file; only Dashboard behavior/UI changes are in scope.",
-      "evidence": [
-        "project_state.json"
-      ]
-    },
-    {
-      "description": "Modified repository documentation/snapshot file (frontend-file-summaries.txt) unrelated to implementing the Dashboard Recent Activity section.",
-      "reason": "The BuildRequest does not request updating summary/documentation files; it only specifies functional UI changes on the Dashboard page.",
-      "evidence": [
-        "frontend-file-summaries.txt"
-      ]
-    }
-  ],
-  "confidence": 0.62,
+  "hallucinated_features": [],
+  "confidence": 0.56,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/pages/Dashboard.tsx",

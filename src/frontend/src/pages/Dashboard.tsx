@@ -2,8 +2,8 @@ import { useGetAllPublishers } from '../hooks/useQueries';
 import { useGetAllTerritories } from '../hooks/useTerritories';
 import { useGetTasks } from '../hooks/useTasks';
 import { useGetAllShepherdingVisits } from '../hooks/useShepherdingVisits';
-import { TaskStatus } from '../backend';
-import { Users, Map, Clock, AlertCircle } from 'lucide-react';
+import { TaskStatus, Territory, CheckoutRecord } from '../backend';
+import { Users, Map, Clock, AlertCircle, AlertTriangle } from 'lucide-react';
 import { formatVisitDate } from '../utils/formatters';
 import { Link } from '@tanstack/react-router';
 
@@ -34,6 +34,44 @@ export default function Dashboard() {
     return dueDate < nowSeconds;
   }).length;
 
+  // Helper to get the active checkout record (most recent with dateReturned = null)
+  const getActiveCheckoutRecord = (territory: Territory): CheckoutRecord | null => {
+    const activeRecords = territory.checkOutHistory.filter(
+      (record) => record.dateReturned === undefined || record.dateReturned === null
+    );
+
+    if (activeRecords.length === 0) return null;
+
+    // Return the record with the largest dateCheckedOut
+    return activeRecords.reduce((latest, current) => {
+      return Number(current.dateCheckedOut) > Number(latest.dateCheckedOut) ? current : latest;
+    });
+  };
+
+  // Helper to calculate checked out duration in months
+  const getCheckedOutDuration = (territory: Territory): number | null => {
+    if (territory.status !== 'Checked Out') {
+      return null;
+    }
+
+    const activeRecord = getActiveCheckoutRecord(territory);
+    if (!activeRecord) {
+      return null;
+    }
+
+    const currentTimestampSeconds = Math.floor(Date.now() / 1000);
+    const dateCheckedOutSeconds = Number(activeRecord.dateCheckedOut);
+    const months = Math.floor((currentTimestampSeconds - dateCheckedOutSeconds) / (30 * 24 * 60 * 60));
+
+    return months;
+  };
+
+  // Calculate overdue territories (checked out for 4+ months)
+  const overdueTerritoriesCount = territories.filter(territory => {
+    const duration = getCheckedOutDuration(territory);
+    return duration !== null && duration >= 4;
+  }).length;
+
   // Get 5 most recent shepherding visits sorted by date (newest first)
   const recentVisits = [...shepherdingVisits]
     .sort((a, b) => {
@@ -57,17 +95,17 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="p-6">
       {/* Header */}
-      <div>
+      <div className="mb-6">
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
         <p className="text-muted-foreground mt-1">Overview of your congregation's activities</p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Active Publishers Card */}
-        <div className="rounded-lg bg-green-500 p-6 text-white shadow-md">
+        <div className="rounded-lg bg-dashboard-stat-1 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <Users className="h-8 w-8 opacity-80" />
           </div>
@@ -78,7 +116,7 @@ export default function Dashboard() {
         </div>
 
         {/* Checked Out Territories Card */}
-        <div className="rounded-lg bg-blue-500 p-6 text-white shadow-md">
+        <div className="rounded-lg bg-dashboard-stat-2 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <Map className="h-8 w-8 opacity-80" />
           </div>
@@ -89,7 +127,7 @@ export default function Dashboard() {
         </div>
 
         {/* Upcoming Tasks Card */}
-        <div className="rounded-lg bg-orange-500 p-6 text-white shadow-md">
+        <div className="rounded-lg bg-dashboard-stat-3 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <Clock className="h-8 w-8 opacity-80" />
           </div>
@@ -100,7 +138,7 @@ export default function Dashboard() {
         </div>
 
         {/* Overdue Tasks Card */}
-        <div className="rounded-lg bg-red-500 p-6 text-white shadow-md">
+        <div className="rounded-lg bg-dashboard-stat-4 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <AlertCircle className="h-8 w-8 opacity-80" />
           </div>
@@ -112,7 +150,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Activity Section */}
-      <div>
+      <div className="mb-6">
         <h2 className="text-2xl font-bold text-foreground mb-4">Recent Activity</h2>
         {recentVisits.length === 0 ? (
           <p className="text-muted-foreground">No recent activity</p>
@@ -121,7 +159,7 @@ export default function Dashboard() {
             {recentVisits.map((visit) => (
               <div
                 key={visit.id}
-                className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm"
+                className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="flex-1">
                   <p className="font-medium text-foreground">{visit.publisherName}</p>
@@ -138,6 +176,52 @@ export default function Dashboard() {
                 </Link>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* Alerts Section */}
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-4">Alerts</h2>
+        {overdueTerritoriesCount === 0 && overdueTasksCount === 0 ? (
+          <p className="text-muted-foreground">No alerts</p>
+        ) : (
+          <div className="space-y-3">
+            {/* Overdue Territories Alert */}
+            {overdueTerritoriesCount > 0 && (
+              <div className="flex items-center justify-between rounded-lg border border-red-300 bg-red-50 p-4 shadow-sm">
+                <div className="flex items-center gap-3 flex-1">
+                  <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                  <p className="font-medium text-red-900">
+                    {overdueTerritoriesCount} {overdueTerritoriesCount === 1 ? 'territory' : 'territories'} overdue for return
+                  </p>
+                </div>
+                <Link
+                  to="/territories"
+                  className="text-sm font-medium text-red-700 hover:underline whitespace-nowrap"
+                >
+                  View Territories
+                </Link>
+              </div>
+            )}
+
+            {/* Overdue Tasks Alert */}
+            {overdueTasksCount > 0 && (
+              <div className="flex items-center justify-between rounded-lg border border-orange-300 bg-orange-50 p-4 shadow-sm">
+                <div className="flex items-center gap-3 flex-1">
+                  <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0" />
+                  <p className="font-medium text-orange-900">
+                    {overdueTasksCount} overdue {overdueTasksCount === 1 ? 'task' : 'tasks'}
+                  </p>
+                </div>
+                <Link
+                  to="/tasks"
+                  className="text-sm font-medium text-orange-700 hover:underline whitespace-nowrap"
+                >
+                  View Tasks
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>

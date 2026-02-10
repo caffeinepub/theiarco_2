@@ -1,48 +1,24 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Dashboard enhancement: add a Recent Activity section listing latest shepherding visits.",
+  "summary": "Dashboard enhancement: add an Alerts section below Recent Activity showing overdue territory returns and overdue tasks, with links and consistent card styling.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-dashboard-page-to-include-a-new-section-directly-below-the-existing-four-stat-cards-with-a-heading-labeled-recent-activity",
-      "title": "Update the Dashboard page to include a new section directly below the existing four stat cards with a heading labeled \"Recent Activity\".",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-in-the-new-dashboard-recent-activity-section-fetch-shepherding-visits-using-the-existing-shepherding-visits-query-hook-and-display-the-5-most-recent-visits-sorted-by-visit-date-newest-first",
-      "title": "In the new Dashboard \"Recent Activity\" section, fetch shepherding visits using the existing shepherding visits query hook and display the 5 most recent visits sorted by visit date (newest first).",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-for-each-visit-shown-in-dashboard-recent-activity-render-publisher-name-formatted-visit-date-and-a-small-view-link-that-navigates-to-that-visit-s-profile-route",
-      "title": "For each visit shown in Dashboard \"Recent Activity\", render: publisher name, formatted visit date, and a small \"View\" link that navigates to that visit’s profile route.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-if-there-are-no-shepherding-visits-available-show-muted-gray-text-no-recent-activity-in-the-dashboard-recent-activity-section",
-      "title": "If there are no shepherding visits available, show muted/gray text \"No recent activity\" in the Dashboard \"Recent Activity\" section.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-keep-all-other-dashboard-behavior-and-ui-unchanged-aside-from-adding-the-new-recent-activity-section-described-above",
-      "title": "Keep all other Dashboard behavior and UI unchanged aside from adding the new Recent Activity section described above.",
+      "id": "feature-update-the-dashboard-page-frontend-src-pages-dashboard-tsx-to-render-a-new-section-titled-alerts-directly-below-the-existing-recent-activity-section-using-the-same-spacing-and-card-styling-patterns-as-the-rest-of-the-dashboard",
+      "title": "Update the Dashboard page (frontend/src/pages/Dashboard.tsx) to render a new section titled \"Alerts\" directly below the existing \"Recent Activity\" section, using the same spacing and card styling patterns as the rest of the Dashboard.",
       "reqIds": [
         "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-new-dashboard-alerts-section-compute-and-display-alert-items-as-follows-1-if-there-are-any-territories-that-are-currently-checked-out-and-have-been-checked-out-for-4-months-or-more-display-a-red-alert-box-with-the-text-x-territories-overdue-for-return-and-a-link-that-navigates-to-the-territories-page-2-if-there-are-any-tasks-where-duedate-is-in-the-past-and-iscompleted-is-false-display-an-orange-alert-box-with-the-text-x-overdue-tasks-and-a-link-that-navigates-to-the-tasks-page-3-if-neither-condition-is-present-display-muted-gray-text-no-alerts",
+      "title": "In the new Dashboard \"Alerts\" section, compute and display alert items as follows: (1) If there are any territories that are currently checked out and have been checked out for 4 months or more, display a red alert box with the text \"X territories overdue for return\" and a link that navigates to the Territories page. (2) If there are any tasks where dueDate is in the past and isCompleted is false, display an orange alert box with the text \"X overdue tasks\" and a link that navigates to the Tasks page. (3) If neither condition is present, display muted gray text \"No alerts\".",
+      "reqIds": [
+        "REQ-6"
       ],
       "version": 1
     }
@@ -50,12 +26,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add 'Recent Activity' section to Dashboard showing 5 most recent shepherding visits with publisher, date, and View link; show 'No recent activity' when empty.",
+      "summary": "Add an Alerts section to the Dashboard below Recent Activity showing overdue territories (>=4 months checked out) and overdue tasks (dueDate passed and not completed), with links; show 'No alerts' when none; match existing dashboard spacing/card style.",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Add Recent Activity section to Dashboard showing latest shepherding visits",
+  "projectName": "Add Alerts section to Dashboard below Recent Activity",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -32,6 +32,12 @@
         
         /* Theiarco custom color #43587A */
         --theiarco-primary: 0.38 0.08 240;
+        
+        /* Dashboard stat card colors - blue shades based on #43587A */
+        --dashboard-stat-1: 0.48 0.10 240;
+        --dashboard-stat-2: 0.42 0.09 240;
+        --dashboard-stat-3: 0.36 0.07 240;
+        --dashboard-stat-4: 0.30 0.06 240;
     }
 
     .dark {
@@ -62,6 +68,12 @@
         
         /* Theiarco custom color for dark mode - slightly lighter */
         --theiarco-primary: 0.45 0.09 240;
+        
+        /* Dashboard stat card colors for dark mode - adjusted for better contrast */
+        --dashboard-stat-1: 0.52 0.11 240;
+        --dashboard-stat-2: 0.46 0.10 240;
+        --dashboard-stat-3: 0.40 0.08 240;
+        --dashboard-stat-4: 0.34 0.07 240;
     }
 
     * {
@@ -81,5 +93,17 @@
     }
     .border-theiarco-primary {
         border-color: oklch(var(--theiarco-primary));
+    }
+    .bg-dashboard-stat-1 {
+        background-color: oklch(var(--dashboard-stat-1));
+    }
+    .bg-dashboard-stat-2 {
+        background-color: oklch(var(--dashboard-stat-2));
+    }
+    .bg-dashboard-stat-3 {
+        background-color: oklch(var(--dashboard-stat-3));
+    }
+    .bg-dashboard-stat-4 {
+        background-color: oklch(var(--dashboard-stat-4));
     }
 }
