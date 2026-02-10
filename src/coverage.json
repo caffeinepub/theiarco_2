@@ -1,35 +1,30 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T20:21:41.616Z",
+  "generatedAt": "2026-02-10T23:09:42.619Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-5",
-        "summary": "Update the Dashboard page (frontend/src/pages/Dashboard.tsx) to render a new section titled \"Alerts\" directly below the existing \"Recent Activity\" section, using the same spacing and card styling patterns as the rest of the Dashboard.",
+        "id": "REQ-1",
+        "summary": "Update the Publisher dropdown menus in the following modals so the dropdown list is scrollable with a maximum height of 250px, shows a scrollbar when the list exceeds that height, and stays visually contained within the modal/viewport (i.e., does not extend beyond the modal or off-screen):\n- Add Pioneer modal on the Pioneers page (frontend/src/components/pioneers/AddPioneerModal.tsx)\n- Record Visit modal on the Shepherding page (frontend/src/components/shepherding/RecordVisitModal.tsx)\n- Add Conductor modal on the Service Meeting Conductors page (frontend/src/components/conductors/ConductorModal.tsx)\n- Add Trained Publisher modal on the Public Witnessing page (frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx)\n\nKeep all other behavior, styling, validation, and text unchanged.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
+          "frontend/src/components/pioneers/AddPioneerModal.tsx",
+          "frontend/src/components/shepherding/RecordVisitModal.tsx",
+          "frontend/src/components/conductors/ConductorModal.tsx",
+          "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "In the new Dashboard \"Alerts\" section, compute and display alert items as follows: (1) If there are any territories that are currently checked out and have been checked out for 4 months or more, display a red alert box with the text \"X territories overdue for return\" and a link that navigates to the Territories page. (2) If there are any tasks where dueDate is in the past and isCompleted is false, display an orange alert box with the text \"X overdue tasks\" and a link that navigates to the Tasks page. (3) If neither condition is present, display muted gray text \"No alerts\".",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Dashboard.tsx"
+          "frontend/src/components/pioneers/AddPioneerModal.tsx",
+          "frontend/src/components/shepherding/RecordVisitModal.tsx",
+          "frontend/src/components/conductors/ConductorModal.tsx",
+          "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx"
         ]
       }
     ]
@@ -39,7 +34,11 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/Dashboard.tsx",
+    "frontend/src/components/conductors/ConductorModal.tsx",
+    "frontend/src/components/pioneers/AddPioneerModal.tsx",
+    "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx",
+    "frontend/src/components/shepherding/RecordVisitModal.tsx",
+    "frontend/src/pages/PublicWitnessing.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

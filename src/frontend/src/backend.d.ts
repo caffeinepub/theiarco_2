@@ -163,6 +163,7 @@ export interface TrainedPublisher {
 }
 export interface UserProfile {
     name: string;
+    congregationName: string;
 }
 export interface CreatePioneerInput {
     serviceYear: string;

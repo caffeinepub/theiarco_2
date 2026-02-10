@@ -110,7 +110,7 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
               <SelectTrigger id="publisher" className={errors.publisherId ? 'border-destructive' : ''}>
                 <SelectValue placeholder="Select a publisher" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[250px]">
                 {publishers.map((publisher) => (
                   <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
                     {publisher.fullName}

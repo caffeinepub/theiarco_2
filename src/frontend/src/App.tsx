@@ -17,6 +17,7 @@ import ServiceMeetingConductors from './pages/ServiceMeetingConductors';
 import PublicWitnessing from './pages/PublicWitnessing';
 import FieldServiceGroups from './pages/FieldServiceGroups';
 import FieldServiceGroupProfile from './pages/FieldServiceGroupProfile';
+import UserProfile from './pages/UserProfile';
 
 // Root component that handles auth state
 function RootComponent() {
@@ -137,7 +138,7 @@ const tasksRoute = createRoute({
 const userProfileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/user-profile',
-  component: () => <ComingSoon title="User Profile" />
+  component: UserProfile
 });
 
 // Create route tree

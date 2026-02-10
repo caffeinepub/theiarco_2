@@ -1,31 +1,38 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T20:21:41.612Z",
-  "summary": "Diff shows new alert-related computations added to Dashboard.tsx (overdue tasks count; overdue territories count based on active checkout duration in months) and TanStack Router Link import, but the file is truncated before any JSX confirming the new \"Alerts\" section rendering, exact user-facing strings, styling, placement below Recent Activity, and the required links.",
+  "generatedAt": "2026-02-10T23:09:42.616Z",
+  "summary": "The diff shows partial work toward making Publisher dropdowns scrollable by adding a max-height class to SelectContent in at least two modals (AddPioneerModal, RecordVisitModal). However, based on the truncated snippets, it is not verifiable that all four specified modals were updated, nor that overflow/scrollbar behavior and off-screen containment/repositioning are implemented. Additionally, there is an unrelated change in the PublicWitnessing page (sorting) that was not requested.",
   "missing_requirements": [
     {
-      "id": "REQ-5",
-      "requirement": "Render a new \"Alerts\" section titled \"Alerts\" directly below the existing \"Recent Activity\" section on the Dashboard, using consistent spacing/card styling, without changing existing Dashboard content/behavior beyond insertion.",
-      "reason": "The diff excerpt only shows added imports and alert/stat computation logic; it does not include the JSX that renders an \"Alerts\" heading/section or its placement below the full Recent Activity section. Because the file is truncated before the render area, implementation cannot be confirmed from provided evidence.",
+      "id": "REQ-1",
+      "requirement": "In each of the four specified modals, the Publisher dropdown list has a maximum height of 250px, becomes vertically scrollable with a scrollbar when exceeding that height, and repositions/constrains so it does not render off-screen or visually escape the modal/viewport.",
+      "reason": "Only two modals explicitly show `SelectContent className=\"max-h-[250px]\"` in the provided diff (AddPioneerModal, RecordVisitModal). The TrainedPublisherModal and ConductorModal portions containing the Publisher SelectContent are truncated, so it cannot be confirmed they were updated. Also, `max-h-[250px]` alone does not, by itself, prove overflow scrolling (e.g., `overflow-y-auto`) or off-screen containment/repositioning behavior was implemented.",
       "evidence": [
-        "frontend/src/pages/Dashboard.tsx (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "In the new \"Alerts\" section: show (1) a red alert box \"X territories overdue for return\" linking to \"/territories\" when any territories are checked out for >=4 months; (2) an orange alert box \"X overdue tasks\" linking to \"/tasks\" when any tasks are overdue (dueDate past and not completed); (3) otherwise show muted gray text \"No alerts\"; show both alert items if both conditions true; exact strings required.",
-      "reason": "The diff excerpt shows computation for overdueTerritoriesCount and overdueTasksCount and imports Link and alert icons, but does not show any rendered alert UI, exact strings, styling (red/orange/muted), or the required navigation links/routes. Truncation prevents verification that these acceptance criteria are implemented.",
-      "evidence": [
-        "frontend/src/pages/Dashboard.tsx (truncated)"
+        "frontend/src/components/pioneers/AddPioneerModal.tsx (shows `SelectContent className=\"max-h-[250px]\"` but no explicit overflow/reposition props in shown snippet)",
+        "frontend/src/components/shepherding/RecordVisitModal.tsx (shows `SelectContent className=\"max-h-[250px]\"` but no explicit overflow/reposition props in shown snippet)",
+        "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx (publisher dropdown area truncated before SelectContent; cannot verify changes)",
+        "frontend/src/components/conductors/ConductorModal.tsx (modal content truncated before publisher dropdown; cannot verify changes)"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.56,
+  "hallucinated_features": [
+    {
+      "description": "Public Witnessing page now sorts trained publishers alphabetically by publisher name.",
+      "reason": "The BuildRequest only asked to adjust Publisher dropdown behavior inside four modal components, and explicitly stated to keep other behavior unchanged; sorting in the page component is outside that scope.",
+      "evidence": [
+        "frontend/src/pages/PublicWitnessing.tsx (adds `sortedPublishers` via `useMemo` and uses it for rendering)"
+      ]
+    }
+  ],
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/Dashboard.tsx",
+    "frontend/src/components/conductors/ConductorModal.tsx",
+    "frontend/src/components/pioneers/AddPioneerModal.tsx",
+    "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx",
+    "frontend/src/components/shepherding/RecordVisitModal.tsx",
+    "frontend/src/pages/PublicWitnessing.tsx",
     "project_state.json"
   ]
 }

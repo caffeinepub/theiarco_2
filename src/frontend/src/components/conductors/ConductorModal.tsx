@@ -131,7 +131,7 @@ export default function ConductorModal({
                 <SelectTrigger id="publisher">
                   <SelectValue placeholder="Select a publisher" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[250px]">
                   {sortedPublishers.map((publisher) => (
                     <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
                       {publisher.fullName}
@@ -229,25 +229,21 @@ export default function ConductorModal({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !publisherId || !trainingDate}
+              disabled={isSubmitting}
               style={{ backgroundColor: '#43587A' }}
               className="text-white hover:opacity-90"
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isEditMode ? 'Saving...' : 'Adding...'}
-                </>
-              ) : isEditMode ? (
-                'Save'
-              ) : (
-                'Add'
-              )}
+              {isSubmitting ? 'Saving...' : 'Save'}
             </Button>
           </DialogFooter>
         </form>

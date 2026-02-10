@@ -1,42 +1,37 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Dashboard: Add Alerts section below Recent Activity",
+  "title": "Make Publisher dropdowns scrollable and constrained within modals (max height 250px)",
   "requirements": [
     {
-      "id": "REQ-5",
-      "summary": "Render a new \"Alerts\" section on the Dashboard directly below the existing \"Recent Activity\" section, matching existing spacing and card styling patterns.",
+      "id": "REQ-1",
+      "summary": "Constrain the Publisher Select dropdown lists in the four specified modals to a max height of 250px with vertical scrolling and collision-aware positioning so they remain visually contained within the modal/viewport, without changing any other behavior or text.",
       "acceptanceCriteria": [
-        "On the Dashboard, an \"Alerts\" heading appears below the entire \"Recent Activity\" section content (regardless of whether Recent Activity is empty or not).",
-        "The Alerts section uses consistent spacing relative to other Dashboard sections (e.g., similar margins/padding as used for the Recent Activity heading and list).",
-        "Existing Dashboard content (header, stat cards, recent activity list behavior/content) remains unchanged aside from being followed by the new Alerts section."
+        "In each of the four specified modals, the Publisher dropdown list has a maximum height of 250px.",
+        "When the Publisher list exceeds 250px in height, the dropdown list becomes vertically scrollable and a scrollbar is available.",
+        "When opened near the bottom/top of the modal/viewport, the dropdown list repositions and/or constrains itself so it does not render off-screen and does not visually escape the modal experience.",
+        "No other fields, dropdowns (e.g., service year, status), form validation, submission behavior, or user-facing text is changed."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Dashboard.tsx",
+          "path": "frontend/src/components/pioneers/AddPioneerModal.tsx",
           "operation": "modify",
-          "description": "Insert an \"Alerts\" section immediately after the existing \"Recent Activity\" section, using the same section heading styling and the same card/container styling patterns already used on the Dashboard for list items (rounded card, border, bg-card, padding, shadow, and vertical spacing)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Compute and display Alerts for overdue territories (>= 4 months checked out) and overdue tasks (past due and incomplete), with TanStack Router navigation links to Territories and Tasks; otherwise show \"No alerts\".",
-      "acceptanceCriteria": [
-        "If at least one territory meets the \"checked out for 4 months or more\" condition, the Alerts section shows exactly one red-styled alert item for territories with the correct count substituted for X.",
-        "The territory overdue count includes only territories that are currently checked out and whose active (non-returned) checkout duration is >= 4 months.",
-        "The territory alert item includes a working navigation link that takes the user to the route \"/territories\".",
-        "If at least one task meets the overdue condition (dueDate has passed AND isCompleted is false), the Alerts section shows exactly one orange-styled alert item for tasks with the correct count substituted for X.",
-        "The task alert item includes a working navigation link that takes the user to the route \"/tasks\".",
-        "If both territory and task alert conditions are true, both alert items are shown (stacked with consistent spacing) under the \"Alerts\" heading.",
-        "If neither condition is true, no alert boxes are shown and the section displays the muted gray text \"No alerts\".",
-        "All user-facing strings in the Alerts section are exactly: \"Alerts\", \"X territories overdue for return\", \"X overdue tasks\", and \"No alerts\" (with X replaced by the computed number)."
-      ],
-      "file_operations": [
+          "description": "Update ONLY the Publisher Select dropdown usage to make the list scrollable with max height 250px (e.g., applying max-height and overflow-y styles to SelectContent) and enable collision-aware/contained rendering within the modal/viewport using supported SelectContent positioning props. Use the existing shadcn-ui Select/SelectContent components (do not modify any files under frontend/src/components/ui). Verify the component's usage instructions before implementing."
+        },
         {
-          "path": "frontend/src/pages/Dashboard.tsx",
+          "path": "frontend/src/components/shepherding/RecordVisitModal.tsx",
           "operation": "modify",
-          "description": "Compute (a) overdue territories count by filtering to territories with status \"Checked Out\" and an active (non-returned) checkout record whose checkout duration is >= 4 months (using the same month calculation approach already used elsewhere in the app), and (b) overdue tasks count by filtering tasks where dueDate is in the past and isCompleted is false. In the new Alerts section: render a single red-styled alert item as a TanStack Router Link to \"/territories\" with the exact text \"X territories overdue for return\" when count > 0; render a single orange-styled alert item as a Link to \"/tasks\" with the exact text \"X overdue tasks\" when count > 0; if both counts are 0, render muted gray text \"No alerts\" and no alert boxes. Ensure no additional user-facing strings are introduced in this section beyond the required ones."
+          "description": "Update ONLY the Publisher Select dropdown usage to enforce max height 250px with vertical scrolling on the SelectContent, and ensure the dropdown is constrained/repositioned to remain within the modal/viewport when opened near edges (using supported SelectContent positioning/collision props). Keep all other styling, validation, and text unchanged. Do not modify any files under frontend/src/components/ui. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/conductors/ConductorModal.tsx",
+          "operation": "modify",
+          "description": "Update ONLY the Publisher Select dropdown usage (not Status or other controls) so SelectContent has max height 250px with overflow-y scrolling and remains contained within the modal/viewport via supported positioning/collision settings. Preserve all existing behavior, validation, and text. Do not modify any files under frontend/src/components/ui. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx",
+          "operation": "modify",
+          "description": "Update ONLY the Publisher Select dropdown usage to apply a 250px max height with vertical scrolling to SelectContent and ensure the dropdown stays within the modal/viewport using supported collision-aware positioning options. Keep all other behavior, styling, and text unchanged. Do not modify any files under frontend/src/components/ui. Verify the component's usage instructions before implementing."
         }
       ]
     }

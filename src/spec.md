@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add an Alerts section to the Dashboard, displayed directly below Recent Activity, to surface overdue territories and tasks with navigation links.
+**Goal:** Make Publisher dropdown option lists scrollable and visually contained within their modals, with a maximum dropdown height of 250px.
 
 **Planned changes:**
-- Update `frontend/src/pages/Dashboard.tsx` to render a new "Alerts" section directly below the "Recent Activity" section using existing Dashboard spacing/card styling patterns.
-- Compute and display up to two alert items in the Alerts section:
-  - Red alert: count of territories currently checked out for 4+ months, with text "X territories overdue for return" and a link to `/territories`.
-  - Orange alert: count of overdue tasks (past `dueDate` and `isCompleted` is false), with text "X overdue tasks" and a link to `/tasks`.
-- If neither alert condition applies, show muted gray text "No alerts" (no alert boxes).
+- Update the Publisher dropdown usage in the Add Pioneer modal to constrain the dropdown list to max-height: 250px, enable vertical scrolling, and keep it within the modal/viewport.
+- Update the Publisher dropdown usage in the Record Visit modal to constrain the dropdown list to max-height: 250px, enable vertical scrolling, and keep it within the modal/viewport.
+- Update the Publisher dropdown usage in the Add Conductor modal to constrain the dropdown list to max-height: 250px, enable vertical scrolling, and keep it within the modal/viewport.
+- Update the Publisher dropdown usage in the Add Trained Publisher modal to constrain the dropdown list to max-height: 250px, enable vertical scrolling, and keep it within the modal/viewport.
 
-**User-visible outcome:** The Dashboard shows an "Alerts" section under Recent Activity that either lists overdue territory/task alerts with links to the relevant pages or displays "No alerts" when everything is up to date.
+**User-visible outcome:** In all four modals, long Publisher dropdown lists show a scrollbar and remain contained within the modal/viewport instead of extending off-screen, while all other behavior and UI remains unchanged.

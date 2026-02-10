@@ -172,7 +172,7 @@ export interface UpdateTrainedPublisherInput {
   'publisherName' : string,
   'trainingDate' : bigint,
 }
-export interface UserProfile { 'name' : string }
+export interface UserProfile { 'name' : string, 'congregationName' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };

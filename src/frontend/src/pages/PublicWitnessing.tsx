@@ -106,7 +106,6 @@ export default function PublicWitnessing() {
       <TrainedPublisherModal
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
-        mode="create"
       />
 
       {/* Edit Modal */}
@@ -114,7 +113,6 @@ export default function PublicWitnessing() {
         <TrainedPublisherModal
           open={!!editingPublisher}
           onOpenChange={(open) => !open && setEditingPublisher(null)}
-          mode="edit"
           publisher={editingPublisher}
         />
       )}

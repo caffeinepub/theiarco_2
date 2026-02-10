@@ -1,24 +1,16 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Dashboard enhancement: add an Alerts section below Recent Activity showing overdue territory returns and overdue tasks, with links and consistent card styling.",
+  "summary": "New project",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-dashboard-page-frontend-src-pages-dashboard-tsx-to-render-a-new-section-titled-alerts-directly-below-the-existing-recent-activity-section-using-the-same-spacing-and-card-styling-patterns-as-the-rest-of-the-dashboard",
-      "title": "Update the Dashboard page (frontend/src/pages/Dashboard.tsx) to render a new section titled \"Alerts\" directly below the existing \"Recent Activity\" section, using the same spacing and card styling patterns as the rest of the Dashboard.",
+      "id": "feature-update-the-publisher-dropdown-menus-in-the-following-modals-so-the-dropdown-list-is-scrollable-with-a-maximum-height-of-250px-shows-a-scrollbar-when-the-list-exceeds-that-height-and-stays-visually-contained-within-the-modal-viewport-i-e-does-not-extend-beyond-the-modal-or-off-screen-add-pioneer-modal-on-the-pioneers-page-frontend-src-components-pioneers-addpioneermodal-tsx-record-visit-modal-on-the-shepherding-page-frontend-src-components-shepherding-recordvisitmodal-tsx-add-conductor-modal-on-the-service-meeting-conductors-page-frontend-src-components-conductors-conductormodal-tsx-add-trained-publisher-modal-on-the-public-witnessing-page-frontend-src-components-publicwitnessing-trainedpublishermodal-tsx-keep-all-other-behavior-styling-validation-and-text-unchanged",
+      "title": "Update the Publisher dropdown menus in the following modals so the dropdown list is scrollable with a maximum height of 250px, shows a scrollbar when the list exceeds that height, and stays visually contained within the modal/viewport (i.e., does not extend beyond the modal or off-screen):\n- Add Pioneer modal on the Pioneers page (frontend/src/components/pioneers/AddPioneerModal.tsx)\n- Record Visit modal on the Shepherding page (frontend/src/components/shepherding/RecordVisitModal.tsx)\n- Add Conductor modal on the Service Meeting Conductors page (frontend/src/components/conductors/ConductorModal.tsx)\n- Add Trained Publisher modal on the Public Witnessing page (frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx)\n\nKeep all other behavior, styling, validation, and text unchanged.",
       "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-in-the-new-dashboard-alerts-section-compute-and-display-alert-items-as-follows-1-if-there-are-any-territories-that-are-currently-checked-out-and-have-been-checked-out-for-4-months-or-more-display-a-red-alert-box-with-the-text-x-territories-overdue-for-return-and-a-link-that-navigates-to-the-territories-page-2-if-there-are-any-tasks-where-duedate-is-in-the-past-and-iscompleted-is-false-display-an-orange-alert-box-with-the-text-x-overdue-tasks-and-a-link-that-navigates-to-the-tasks-page-3-if-neither-condition-is-present-display-muted-gray-text-no-alerts",
-      "title": "In the new Dashboard \"Alerts\" section, compute and display alert items as follows: (1) If there are any territories that are currently checked out and have been checked out for 4 months or more, display a red alert box with the text \"X territories overdue for return\" and a link that navigates to the Territories page. (2) If there are any tasks where dueDate is in the past and isCompleted is false, display an orange alert box with the text \"X overdue tasks\" and a link that navigates to the Tasks page. (3) If neither condition is present, display muted gray text \"No alerts\".",
-      "reqIds": [
-        "REQ-6"
+        "REQ-1"
       ],
       "version": 1
     }
@@ -26,12 +18,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add an Alerts section to the Dashboard below Recent Activity showing overdue territories (>=4 months checked out) and overdue tasks (dueDate passed and not completed), with links; show 'No alerts' when none; match existing dashboard spacing/card style.",
+      "summary": "Make publisher dropdown menus scrollable (max-height 250px, scrollbar, stay within modal/screen) in four modals: Add Pioneer, Record Visit, Add Conductor, Add Trained Publisher",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Add Alerts section to Dashboard below Recent Activity",
+  "projectName": "Make publisher dropdowns scrollable within modals (max height 250px)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

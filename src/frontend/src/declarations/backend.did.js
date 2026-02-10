@@ -144,7 +144,10 @@ export const TrainedPublisher = IDL.Record({
   'publisherName' : IDL.Text,
   'trainingDate' : IDL.Int,
 });
-export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const UserProfile = IDL.Record({
+  'name' : IDL.Text,
+  'congregationName' : IDL.Text,
+});
 export const Task = IDL.Record({
   'id' : IDL.Nat,
   'completedAt' : IDL.Opt(IDL.Int),
@@ -513,7 +516,10 @@ export const idlFactory = ({ IDL }) => {
     'publisherName' : IDL.Text,
     'trainingDate' : IDL.Int,
   });
-  const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const UserProfile = IDL.Record({
+    'name' : IDL.Text,
+    'congregationName' : IDL.Text,
+  });
   const Task = IDL.Record({
     'id' : IDL.Nat,
     'completedAt' : IDL.Opt(IDL.Int),

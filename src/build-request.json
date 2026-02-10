@@ -1,73 +1,39 @@
 {
   "kind": "build_request",
-  "title": "Add Alerts section to Dashboard below Recent Activity",
+  "title": "Make publisher dropdowns scrollable within modals (max height 250px)",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-5",
-      "text": "Update the Dashboard page (frontend/src/pages/Dashboard.tsx) to render a new section titled \"Alerts\" directly below the existing \"Recent Activity\" section, using the same spacing and card styling patterns as the rest of the Dashboard.",
+      "id": "REQ-1",
+      "text": "Update the Publisher dropdown menus in the following modals so the dropdown list is scrollable with a maximum height of 250px, shows a scrollbar when the list exceeds that height, and stays visually contained within the modal/viewport (i.e., does not extend beyond the modal or off-screen):\n- Add Pioneer modal on the Pioneers page (frontend/src/components/pioneers/AddPioneerModal.tsx)\n- Record Visit modal on the Shepherding page (frontend/src/components/shepherding/RecordVisitModal.tsx)\n- Add Conductor modal on the Service Meeting Conductors page (frontend/src/components/conductors/ConductorModal.tsx)\n- Add Trained Publisher modal on the Public Witnessing page (frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx)\n\nKeep all other behavior, styling, validation, and text unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Add an Alerts section to the Dashboard below Recent Activity:\n\n1. Add a heading \"Alerts\" below the Recent Activity section.\n\n5. Use the same spacing and card style as the rest of the Dashboard.\n\nKeep everything else unchanged."
+          "Update the publisher dropdown menus in four specific modals to support scrolling:\n\n1. Add Pioneer modal on the Pioneers page - make the publisher dropdown scrollable.\n\n2. Record Visit modal on the Shepherding page - make the publisher dropdown scrollable.\n\n3. Add Conductor modal on the Service Meeting Conductors page - make the publisher dropdown scrollable.\n\n4. Add Trained Publisher modal on the Public Witnessing page - make the publisher dropdown scrollable.\n\nFor each dropdown:\n- Set a maximum height of 250 pixels\n- Add a scrollbar when there are more publishers than fit in that height\n- Make sure the dropdown stays inside the modal and doesn't extend beyond the screen\n\nKeep everything else unchanged."
         ]
       },
       "acceptanceCriteria": [
-        "On the Dashboard, an \"Alerts\" heading appears below the entire \"Recent Activity\" section content (regardless of whether Recent Activity is empty or not).",
-        "The Alerts section uses consistent spacing relative to other Dashboard sections (e.g., similar margins/padding as used for the Recent Activity heading and list).",
-        "Existing Dashboard content (header, stat cards, recent activity list behavior/content) remains unchanged aside from being followed by the new Alerts section."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "In the new Dashboard \"Alerts\" section, compute and display alert items as follows: (1) If there are any territories that are currently checked out and have been checked out for 4 months or more, display a red alert box with the text \"X territories overdue for return\" and a link that navigates to the Territories page. (2) If there are any tasks where dueDate is in the past and isCompleted is false, display an orange alert box with the text \"X overdue tasks\" and a link that navigates to the Tasks page. (3) If neither condition is present, display muted gray text \"No alerts\".",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-1"
-        ],
-        "quotes": [
-          "2. If there are any territories that have been checked out for 4 months or more, show a red alert box saying \"X territories overdue for return\" with a link to view territories.\n\n3. If there are any tasks that are overdue (dueDate has passed and isCompleted = false), show an orange alert box saying \"X overdue tasks\" with a link to view tasks.\n\n4. If there are no alerts, show gray text saying \"No alerts\"."
-        ]
-      },
-      "acceptanceCriteria": [
-        "If at least one territory meets the \"checked out for 4 months or more\" condition, the Alerts section shows exactly one red-styled alert item for territories with the correct count substituted for X.",
-        "The territory overdue count includes only territories that are currently checked out and whose active (non-returned) checkout duration is >= 4 months.",
-        "The territory alert item includes a working navigation link that takes the user to the route \"/territories\".",
-        "If at least one task meets the overdue condition (dueDate has passed AND isCompleted is false), the Alerts section shows exactly one orange-styled alert item for tasks with the correct count substituted for X.",
-        "The task alert item includes a working navigation link that takes the user to the route \"/tasks\".",
-        "If both territory and task alert conditions are true, both alert items are shown (stacked with consistent spacing) under the \"Alerts\" heading.",
-        "If neither condition is true, no alert boxes are shown and the section displays the muted gray text \"No alerts\".",
-        "All user-facing strings in the Alerts section are exactly: \"Alerts\", \"X territories overdue for return\", \"X overdue tasks\", and \"No alerts\" (with X replaced by the computed number)."
+        "In each of the four specified modals, the Publisher dropdown list has a maximum height of 250px.",
+        "When the Publisher list exceeds 250px in height, the dropdown list becomes vertically scrollable and a scrollbar is available.",
+        "When opened near the bottom/top of the modal/viewport, the dropdown list repositions and/or constrains itself so it does not render off-screen and does not visually escape the modal experience.",
+        "No other fields, dropdowns (e.g., service year, status), form validation, submission behavior, or user-facing text is changed."
       ]
     }
   ],
   "constraints": [
-    "Keep all existing Dashboard functionality and content unchanged except for adding the new Alerts section below Recent Activity.",
-    "Do not modify files in frontend immutablePaths (e.g., frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Use existing routing/navigation approach used in the app (TanStack Router Link) for the \"view\" links.",
-    "Backend remains single-actor; do not introduce new backend services or external dependencies."
+    "Do not modify any files under frontend/src/components/ui (read-only / immutable UI component sources). Achieve the behavior by adjusting how the existing Select/SelectContent components are used in the four specified modal components.",
+    "No backend changes are required for this request."
   ],
   "nonGoals": [
-    "Do not add new backend endpoints or change backend data models for alerts.",
-    "Do not add new pages; reuse existing Territories and Tasks pages for the alert links.",
-    "Do not change the existing stat cards, recent activity sorting, or loading state behavior beyond what is necessary to insert the new Alerts section."
+    "Custom scrollbar styling beyond ensuring a scrollbar appears when needed.",
+    "Changing option ordering, filtering logic, or which publishers appear in the lists.",
+    "Modifying modal sizes/layouts beyond what is necessary to keep the dropdown contained and scrollable."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

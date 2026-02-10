@@ -119,7 +119,7 @@ export default function AddPioneerModal({
               <SelectTrigger id="publisher">
                 <SelectValue placeholder="Select publisher" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[250px]">
                 {activePublishers.map((publisher) => (
                   <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
                     {publisher.fullName}

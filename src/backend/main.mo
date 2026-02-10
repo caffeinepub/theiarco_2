@@ -10,6 +10,8 @@ import Order "mo:core/Order";
 import Int "mo:core/Int";
 import Text "mo:core/Text";
 
+
+
 actor {
   // AccessControl state and authorization system
   let accessControlState = AccessControl.initState();
@@ -18,7 +20,7 @@ actor {
   // Generic Collector application domain
   public type UserProfile = {
     name : Text;
-    // Other user metadata if needed
+    congregationName : Text;
   };
 
   let userProfiles = Map.empty<Principal, UserProfile>();
@@ -1108,4 +1110,3 @@ actor {
     trainedPublishers.values().toArray();
   };
 };
-
