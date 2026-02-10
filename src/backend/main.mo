@@ -11,10 +11,11 @@ import Int "mo:core/Int";
 import Text "mo:core/Text";
 
 actor {
-  // Initialize the user system state
+  // AccessControl state and authorization system
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
+  // Generic Collector application domain
   public type UserProfile = {
     name : Text;
     // Other user metadata if needed
@@ -23,17 +24,23 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    checkUserPermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
     userProfiles.get(caller);
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    checkUserPermission(caller, #user);
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
     userProfiles.get(user);
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-    checkUserPermission(caller, #user);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
     userProfiles.add(caller, profile);
   };
 
@@ -149,6 +156,12 @@ actor {
   };
 
   public query ({ caller }) func getAllPublishers() : async [Publisher] {
+    checkUserPermission(caller, #user);
+    publishers.values().toArray();
+  };
+
+  // Added for backward compatibility (implementation plan)
+  public query ({ caller }) func getPublishers() : async [Publisher] {
     checkUserPermission(caller, #user);
     publishers.values().toArray();
   };
@@ -915,6 +928,10 @@ actor {
     trainingDate : Int;
     status : Text; // "Available" or "Unavailable"
     createdAt : Int;
+    availableThursday : Bool;
+    availableFriday : Bool;
+    availableSaturday : Bool;
+    availableSunday : Bool;
   };
 
   let trainedConductors = Map.empty<Text, TrainedServiceMeetingConductor>();
@@ -925,6 +942,10 @@ actor {
     publisherName : Text;
     trainingDate : Int;
     status : Text; // "Available" or "Unavailable"
+    availableThursday : ?Bool;
+    availableFriday : ?Bool;
+    availableSaturday : ?Bool;
+    availableSunday : ?Bool;
   };
 
   // Update input type
@@ -933,6 +954,10 @@ actor {
     publisherName : Text;
     trainingDate : Int;
     status : Text;
+    availableThursday : ?Bool;
+    availableFriday : ?Bool;
+    availableSaturday : ?Bool;
+    availableSunday : ?Bool;
   };
 
   public shared ({ caller }) func addTrainedConductor(input : CreateTrainedConductorInput) : async Text {
@@ -945,6 +970,10 @@ actor {
       trainingDate = input.trainingDate;
       status = input.status;
       createdAt = Time.now();
+      availableThursday = switch (input.availableThursday) { case (null) { false }; case (?v) { v } };
+      availableFriday = switch (input.availableFriday) { case (null) { false }; case (?v) { v } };
+      availableSaturday = switch (input.availableSaturday) { case (null) { false }; case (?v) { v } };
+      availableSunday = switch (input.availableSunday) { case (null) { false }; case (?v) { v } };
     };
 
     trainedConductors.add(input.publisherId, newConductor);
@@ -963,6 +992,10 @@ actor {
           publisherName = input.publisherName;
           trainingDate = input.trainingDate;
           status = input.status;
+          availableThursday = switch (input.availableThursday) { case (null) { existing.availableThursday }; case (?v) { v } };
+          availableFriday = switch (input.availableFriday) { case (null) { existing.availableFriday }; case (?v) { v } };
+          availableSaturday = switch (input.availableSaturday) { case (null) { existing.availableSaturday }; case (?v) { v } };
+          availableSunday = switch (input.availableSunday) { case (null) { existing.availableSunday }; case (?v) { v } };
         };
         trainedConductors.add(id, updatedConductor);
       };
@@ -988,4 +1021,91 @@ actor {
     checkUserPermission(caller, #user);
     trainedConductors.values().toArray();
   };
+
+  // Persistent Trained Publishers Domain
+  public type TrainedPublisher = {
+    id : Text;
+    publisherId : Text;
+    publisherName : Text;
+    trainingDate : Int;
+    isAuthorized : Bool; // Default false
+    createdAt : Int;
+  };
+
+  let trainedPublishers = Map.empty<Text, TrainedPublisher>();
+
+  // Create input type
+  public type CreateTrainedPublisherInput = {
+    publisherId : Text;
+    publisherName : Text;
+    trainingDate : Int;
+  };
+
+  // Update input type
+  public type UpdateTrainedPublisherInput = {
+    publisherId : Text;
+    publisherName : Text;
+    trainingDate : Int;
+    isAuthorized : Bool;
+  };
+
+  // Add Trained Publisher
+  public shared ({ caller }) func addTrainedPublisher(input : CreateTrainedPublisherInput) : async Text {
+    checkUserPermission(caller, #user);
+
+    let newPublisher : TrainedPublisher = {
+      id = input.publisherId;
+      publisherId = input.publisherId;
+      publisherName = input.publisherName;
+      trainingDate = input.trainingDate;
+      isAuthorized = false; // Default to false
+      createdAt = Time.now();
+    };
+
+    trainedPublishers.add(input.publisherId, newPublisher);
+    input.publisherId;
+  };
+
+  // Update Trained Publisher
+  public shared ({ caller }) func updateTrainedPublisher(id : Text, input : UpdateTrainedPublisherInput) : async () {
+    checkUserPermission(caller, #user);
+
+    switch (trainedPublishers.get(id)) {
+      case (null) { Runtime.trap("TrainedPublisher not found: " # id) };
+      case (?existing) {
+        let updatedPublisher : TrainedPublisher = {
+          existing with
+          publisherId = input.publisherId;
+          publisherName = input.publisherName;
+          trainingDate = input.trainingDate;
+          isAuthorized = input.isAuthorized;
+        };
+        trainedPublishers.add(id, updatedPublisher);
+      };
+    };
+  };
+
+  // Delete Trained Publisher
+  public shared ({ caller }) func deleteTrainedPublisher(id : Text) : async () {
+    checkUserPermission(caller, #user);
+
+    if (not trainedPublishers.containsKey(id)) {
+      Runtime.trap("Delete failed. TrainedPublisher with that id does not exist: " # id);
+    };
+
+    trainedPublishers.remove(id);
+  };
+
+  // Query Trained Publisher (internal type)
+  public query ({ caller }) func getTrainedPublisher(id : Text) : async ?TrainedPublisher {
+    checkUserPermission(caller, #user);
+    trainedPublishers.get(id);
+  };
+
+  // Query all Trained Publishers (internal type)
+  public query ({ caller }) func getAllTrainedPublishers() : async [TrainedPublisher] {
+    checkUserPermission(caller, #user);
+    trainedPublishers.values().toArray();
+  };
 };
+

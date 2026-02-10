@@ -1,125 +1,70 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T03:11:52.637Z",
+  "generatedAt": "2026-02-10T19:19:39.392Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 8,
-    "implemented": 5,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update/align the ServiceMeetingConductor backend domain to use this record data model: { id: Text (unique), publisherId: Text, publisherName: Text, trainingDate: Int (timestamp in seconds), status: Text (\"Available\" | \"Unavailable\"), createdAt: Int }.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Update the existing Dashboard page for the /dashboard route to display four statistic cards in a single row at the top of the page (keeping everything else unchanged).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ]
       },
       {
         "id": "REQ-2",
-        "summary": "Implement complete CRUD backend APIs for ServiceMeetingConductor records, protected by the same authorization checks used elsewhere (checkUserPermission(caller, #user)): create, list all, get by id (if needed by UI), update by id, and delete by id.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "On the Dashboard page, query the existing backends for publishers, territories, and tasks (using the existing frontend actor/query hooks where available) and compute the four counts based on the following rules: (1) Active Publishers = publishers where isActive == true; (2) Checked Out Territories = territories where status == \"Checked Out\"; (3) Upcoming Tasks = tasks where isCompleted == false and dueDate > currentTimestampSeconds; (4) Overdue Tasks = tasks where isCompleted == false and dueDate < currentTimestampSeconds. dueDate is an Int timestamp in seconds.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ]
       },
       {
         "id": "REQ-3",
-        "summary": "If the canister is already deployed with existing state, add conditional migration support so upgrading initializes the new conductor collection without breaking existing state.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Render the four Dashboard stat cards with the exact labels and color backgrounds: (1) Green background card labeled \"Active Publishers\"; (2) Blue background card labeled \"Checked Out Territories\"; (3) Orange background card labeled \"Upcoming Tasks\"; (4) Red background card labeled \"Overdue Tasks\". Each card must show the computed number prominently, with the label text below it.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Dashboard.tsx"
+        ]
       },
       {
         "id": "REQ-4",
-        "summary": "Replace the current ServiceMeetingConductors page placeholder UI with a full CRUD UI for trained conductors: an \"Add Conductor\" button that opens a modal, a table that lists conductors, and per-row Edit/Delete actions wired to backend mutations.",
+        "summary": "Update routing/navigation so that the Dashboard page is accessible at /dashboard as specified, without breaking existing navigation. If the app currently uses / for Dashboard navigation, ensure users can still reach the Dashboard from the sidebar and the route configuration aligns with /dashboard.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "frontend/src/components/conductors/ConductorModal.tsx",
-          "frontend/src/components/conductors/DeleteConductorDialog.tsx"
+          "frontend/src/App.tsx",
+          "frontend/src/components/layout/Sidebar.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "frontend/src/components/conductors/ConductorModal.tsx",
-          "frontend/src/components/conductors/DeleteConductorDialog.tsx"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Implement a single modal component used for BOTH Create and Edit of a ServiceMeetingConductor, with the same form fields: Publisher dropdown, Training Date picker, Status dropdown. The modal title must be \"Add Conductor\" for create mode and \"Edit Conductor\" for edit mode, and edit mode must pre-fill current row data.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/conductors/ConductorModal.tsx",
-          "frontend/src/pages/ServiceMeetingConductors.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/conductors/ConductorModal.tsx",
-          "frontend/src/pages/ServiceMeetingConductors.tsx"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Update the ServiceMeetingConductors table to use these columns and behaviors: Conductor Name (default alphabetical order; no user sorting UI required), Training Date (formatted like \"Feb 7, 2026\"), Status (green badge for \"Available\", red badge for \"Unavailable\"), Actions (Edit/Delete buttons).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "frontend/src/utils/formatters.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "frontend/src/utils/formatters.ts"
-        ]
-      },
-      {
-        "id": "REQ-7",
-        "summary": "Add a delete confirmation dialog for conductors: clicking Delete opens a confirmation dialog with the exact prompt text \"Delete this conductor?\" before removing the record.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/conductors/DeleteConductorDialog.tsx",
-          "frontend/src/pages/ServiceMeetingConductors.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/conductors/DeleteConductorDialog.tsx",
-          "frontend/src/pages/ServiceMeetingConductors.tsx"
-        ]
-      },
-      {
-        "id": "REQ-8",
-        "summary": "Create the necessary React Query hooks/mutations for ServiceMeetingConductors (create, update, delete) and ensure they invalidate/refetch the existing ['serviceMeetingConductors'] query so the UI stays consistent after mutations.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useServiceMeetingConductors.ts",
-          "frontend/src/hooks/useCreateTrainedConductor.ts",
-          "frontend/src/hooks/useUpdateTrainedConductor.ts",
-          "frontend/src/hooks/useDeleteTrainedConductor.ts",
-          "frontend/src/components/conductors/ConductorModal.tsx",
-          "frontend/src/components/conductors/DeleteConductorDialog.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useCreateTrainedConductor.ts",
-          "frontend/src/hooks/useUpdateTrainedConductor.ts",
-          "frontend/src/hooks/useDeleteTrainedConductor.ts",
-          "frontend/src/components/conductors/ConductorModal.tsx",
-          "frontend/src/components/conductors/DeleteConductorDialog.tsx"
+          "frontend/src/App.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "build-request.json",
+    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/conductors/ConductorModal.tsx",
-    "frontend/src/components/conductors/DeleteConductorDialog.tsx",
-    "frontend/src/hooks/useCreateTrainedConductor.ts",
-    "frontend/src/hooks/useDeleteTrainedConductor.ts",
-    "frontend/src/hooks/useTrainedConductors.ts",
-    "frontend/src/hooks/useUpdateTrainedConductor.ts",
-    "frontend/src/pages/ServiceMeetingConductors.tsx",
-    "frontend/src/utils/formatters.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/pages/Dashboard.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

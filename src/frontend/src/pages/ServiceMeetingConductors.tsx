@@ -85,46 +85,68 @@ export default function ServiceMeetingConductors() {
                 <TableHead>Conductor Name</TableHead>
                 <TableHead>Training Date</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Available Days</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedConductors.map((conductor) => (
-                <TableRow key={conductor.id}>
-                  <TableCell className="font-medium">{conductor.publisherName}</TableCell>
-                  <TableCell>{formatTrainingDate(conductor.trainingDate)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={conductor.status === 'Available' ? 'default' : 'destructive'}
-                      className={
-                        conductor.status === 'Available'
-                          ? 'bg-green-600 hover:bg-green-700'
-                          : 'bg-red-600 hover:bg-red-700'
-                      }
-                    >
-                      {conductor.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditConductor(conductor)}
+              {sortedConductors.map((conductor) => {
+                const availableDays: string[] = [];
+                if (conductor.availableThursday) availableDays.push('Thu');
+                if (conductor.availableFriday) availableDays.push('Fri');
+                if (conductor.availableSaturday) availableDays.push('Sat');
+                if (conductor.availableSunday) availableDays.push('Sun');
+
+                return (
+                  <TableRow key={conductor.id}>
+                    <TableCell className="font-medium">{conductor.publisherName}</TableCell>
+                    <TableCell>{formatTrainingDate(conductor.trainingDate)}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={conductor.status === 'Available' ? 'default' : 'destructive'}
+                        className={
+                          conductor.status === 'Available'
+                            ? 'bg-green-600 hover:bg-green-700'
+                            : 'bg-red-600 hover:bg-red-700'
+                        }
                       >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteConductor(conductor.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                        {conductor.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {availableDays.length > 0 ? (
+                        <div className="flex gap-1 flex-wrap">
+                          {availableDays.map((day) => (
+                            <Badge key={day} variant="outline" className="text-xs">
+                              {day}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditConductor(conductor)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteConductor(conductor.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

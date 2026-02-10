@@ -1,73 +1,47 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T03:11:52.633Z",
-  "summary": "Frontend CRUD UI for conductors (modal, table, delete confirmation, React Query hooks) was implemented, but the backend/domain CRUD + migration work is not evidenced in the diff. Additionally, the React Query cache key used is ['trainedConductors'] rather than the required ['serviceMeetingConductors'], which may prevent required invalidation/refetch behavior per spec.",
+  "generatedAt": "2026-02-10T19:19:39.388Z",
+  "summary": "Dashboard stat-card UI and client-side counting logic were added, but routing appears to keep Dashboard at '/' rather than making it accessible at '/dashboard' as required. Some extra UI elements (icons, loading screen, descriptive subtitle) were added that were not explicitly requested.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Update/align the ServiceMeetingConductor backend domain to use the specified record data model with exact fields and validate status to only \"Available\"|\"Unavailable\".",
-      "reason": "No backend files (e.g., backend/main.mo) are shown as added/modified in the diff summary; only frontend files are changed/added.",
+      "requirement": "Navigating to /dashboard renders the Dashboard page (not a placeholder/Coming Soon screen).",
+      "reason": "The router configuration shown defines the Dashboard route at path '/' (root) and does not show any '/dashboard' route mapping to the Dashboard component.",
       "evidence": [
-        "File diff summary shows only frontend/* changes; no backend/main.mo modifications listed."
+        "frontend/src/App.tsx"
       ]
     },
     {
-      "id": "REQ-2",
-      "requirement": "Implement complete CRUD backend APIs for ServiceMeetingConductor records with authorization checks; create returns id and sets createdAt; update preserves id/createdAt; delete errors if id missing.",
-      "reason": "No backend implementation changes are present in the diff summary; frontend hooks call actor methods but their backend existence/behavior is not evidenced.",
+      "id": "REQ-4",
+      "requirement": "Update routing/navigation so that the Dashboard page is accessible at /dashboard, and the sidebar has a working Dashboard link without breaking existing navigation.",
+      "reason": "The diff shows Dashboard routed at '/' and does not show a '/dashboard' route. The sidebar link update is not evidenced in the provided diff summary.",
       "evidence": [
-        "File diff summary shows only frontend/* changes; no backend/main.mo modifications listed.",
-        "frontend/src/hooks/useCreateTrainedConductor.ts",
-        "frontend/src/hooks/useUpdateTrainedConductor.ts",
-        "frontend/src/hooks/useDeleteTrainedConductor.ts"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Add conditional migration support on upgrade so conductor storage is initialized without breaking existing state.",
-      "reason": "No backend upgrade/migration-related changes are present in the diff summary (no backend/main.mo or backend/migration.mo changes shown).",
-      "evidence": [
-        "File diff summary shows only frontend/* changes; no backend migration/upgrade modifications listed."
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "requirement": "Create React Query mutations for conductors and ensure they invalidate/refetch the existing ['serviceMeetingConductors'] query so the UI stays consistent after mutations.",
-      "reason": "The added query and mutations use the queryKey ['trainedConductors'] (invalidateQueries/queryKey), not the required ['serviceMeetingConductors'] key.",
-      "evidence": [
-        "frontend/src/hooks/useTrainedConductors.ts (queryKey: ['trainedConductors'])",
-        "frontend/src/hooks/useCreateTrainedConductor.ts (invalidateQueries: ['trainedConductors'])",
-        "frontend/src/hooks/useUpdateTrainedConductor.ts (invalidateQueries: ['trainedConductors'])",
-        "frontend/src/hooks/useDeleteTrainedConductor.ts (invalidateQueries: ['trainedConductors'])"
+        "frontend/src/App.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Introduced a new/alternate React Query cache namespace and naming scheme ('trainedConductors', addTrainedConductor/updateTrainedConductor/deleteTrainedConductor, TrainedServiceMeetingConductor types) instead of the specified ServiceMeetingConductor / ['serviceMeetingConductors'] naming.",
-      "reason": "The BuildRequest consistently specifies \"ServiceMeetingConductor\" and explicitly requires invalidation of ['serviceMeetingConductors']; the diff implements parallel naming and a different query key.",
+      "description": "Dashboard stat cards include lucide-react icons (Users/Map/Clock/AlertCircle) and an added header subtitle ('Overview of your congregation's activities').",
+      "reason": "Requirements only specify four colored stat cards with labels and numbers; icons and additional descriptive copy were not requested.",
       "evidence": [
-        "frontend/src/hooks/useTrainedConductors.ts",
-        "frontend/src/hooks/useCreateTrainedConductor.ts",
-        "frontend/src/hooks/useUpdateTrainedConductor.ts",
-        "frontend/src/hooks/useDeleteTrainedConductor.ts",
-        "frontend/src/pages/ServiceMeetingConductors.tsx",
-        "frontend/src/components/conductors/ConductorModal.tsx"
+        "frontend/src/pages/Dashboard.tsx"
+      ]
+    },
+    {
+      "description": "Added a Dashboard-specific loading spinner screen ('Loading dashboard...').",
+      "reason": "Requirements do not mention adding loading-state UI; only the presence of four stat cards and correct counts/colors/labels.",
+      "evidence": [
+        "frontend/src/pages/Dashboard.tsx"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.68,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/conductors/ConductorModal.tsx",
-    "frontend/src/components/conductors/DeleteConductorDialog.tsx",
-    "frontend/src/hooks/useCreateTrainedConductor.ts",
-    "frontend/src/hooks/useDeleteTrainedConductor.ts",
-    "frontend/src/hooks/useTrainedConductors.ts",
-    "frontend/src/hooks/useUpdateTrainedConductor.ts",
-    "frontend/src/pages/ServiceMeetingConductors.tsx",
-    "frontend/src/utils/formatters.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/pages/Dashboard.tsx",
     "project_state.json"
   ]
 }

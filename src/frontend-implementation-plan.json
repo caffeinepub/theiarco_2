@@ -1,140 +1,79 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Service Meeting Conductors: CRUD table + shared modal wired to backend",
+  "title": "Dashboard overview statistic cards",
   "requirements": [
     {
+      "id": "REQ-1",
+      "summary": "Update the Dashboard page at /dashboard to show four statistic cards in a single top-row section while leaving the rest of the page/layout unchanged.",
+      "acceptanceCriteria": [
+        "Navigating to /dashboard renders the Dashboard page (not a placeholder/Coming Soon screen).",
+        "The top section of the /dashboard page shows exactly 4 stat cards laid out in a single row on desktop (responsive stacking allowed on small screens).",
+        "Other routes/pages and existing layout components remain unchanged."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "create",
+          "description": "Create the real Dashboard page UI that renders a top section containing exactly four stat cards in a responsive single-row grid on desktop, keeping the rest of the page minimal (e.g., existing heading) so the overall layout remains unchanged."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Fetch publishers, territories, and tasks using existing React Query actor hooks and compute the four Dashboard counts using client runtime Unix timestamp seconds with safe bigint handling.",
+      "acceptanceCriteria": [
+        "The Dashboard page fetches publishers, territories, and tasks via existing backend APIs (no new backend endpoints are introduced).",
+        "The displayed Active Publishers count equals the number of publishers with isActive === true.",
+        "The displayed Checked Out Territories count equals the number of territories with status exactly equal to \"Checked Out\".",
+        "The displayed Upcoming Tasks count equals the number of tasks with isCompleted === false and dueDate strictly greater than the current timestamp in seconds.",
+        "The displayed Overdue Tasks count equals the number of tasks with isCompleted === false and dueDate strictly less than the current timestamp in seconds.",
+        "The timestamp used for comparisons is computed at runtime on the client as the current Unix timestamp in seconds (not milliseconds).",
+        "If dueDate values arrive as a bigint-like type, the implementation converts safely for comparison without crashing the page."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Implement data fetching via existing hooks (useGetAllPublishers, useGetAllTerritories, useGetTasks(TaskStatus.all)) and compute counts with rules provided. Compute current timestamp at runtime in seconds and compare using safe bigint-friendly logic (e.g., normalize dueDate to bigint and compare against BigInt(nowSeconds)) to avoid crashes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Render four labeled stat cards with specified color backgrounds and prominent numeric values.",
+      "acceptanceCriteria": [
+        "Each of the four cards shows a large numeric value and the specified label beneath it.",
+        "The four card labels match exactly: \"Active Publishers\", \"Checked Out Territories\", \"Upcoming Tasks\", \"Overdue Tasks\".",
+        "The card background colors are visually green/blue/orange/red respectively (Tailwind utility classes are acceptable).",
+        "User-facing text on the cards is in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Add the four stat cards with exact labels and background colors (green/blue/orange/red) and render the computed count prominently with the label beneath; use Tailwind utilities to match color requirements and keep card count exactly four."
+        }
+      ]
+    },
+    {
       "id": "REQ-4",
-      "summary": "Replace the /conductors page placeholder with a full CRUD UI (Add button, modal, table, Edit/Delete wired to mutations).",
+      "summary": "Align routing and sidebar navigation so Dashboard is accessible at /dashboard without breaking existing routes, preserving access from the sidebar.",
       "acceptanceCriteria": [
-        "The page at route \"/conductors\" shows a header and an \"Add Conductor\" button.",
-        "Clicking \"Add Conductor\" opens the conductor modal in create mode with empty fields.",
-        "The table renders all conductors from the backend and updates automatically after create/edit/delete (React Query invalidation/refetch).",
-        "Loading state and empty state messages are shown in English."
+        "Entering /dashboard in the browser loads the Dashboard page.",
+        "The sidebar has a working Dashboard navigation link that takes the user to the Dashboard page.",
+        "No other route definitions are removed or broken."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Replace the current assignment-focused placeholder UI with a trained conductors CRUD page: header + \"Add Conductor\" button, table listing trained conductors (from the existing ['serviceMeetingConductors'] query), and per-row Edit/Delete actions that open the shared modal / delete dialog and trigger React Query mutations; include English loading + empty states."
+          "description": "Register the Dashboard page at path /dashboard in the TanStack Router configuration and ensure the current / route behavior does not break existing navigation (e.g., redirect / to /dashboard or render the same Dashboard component at / as a compatibility route)."
         },
         {
-          "path": "frontend/src/components/conductors/ConductorModal.tsx",
-          "operation": "create",
-          "description": "Create a shared Create/Edit modal for trained conductors (Publisher dropdown, Training Date picker, Status dropdown) and wire it for both modes. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/conductors/DeleteConductorDialog.tsx",
-          "operation": "create",
-          "description": "Create a conductor delete confirmation dialog used by the /conductors page that blocks deletion until confirmed and triggers the delete mutation + English toast feedback. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Implement a single shared modal component for BOTH creating and editing a conductor with Publisher, Training Date, and Status fields.",
-      "acceptanceCriteria": [
-        "Create mode: opening modal shows empty Publisher/Training Date/Status controls and submit creates a new record.",
-        "Edit mode: clicking Edit on a row opens the same modal pre-filled with that row’s publisherId/publisherName, trainingDate, and status; submit updates that record.",
-        "Publisher dropdown is populated from the existing publishers backend list (use existing publishers query hook) and displays publisher full names.",
-        "Training Date picker writes/reads a seconds-based timestamp compatible with the backend model.",
-        "Status dropdown only allows \"Available\" and \"Unavailable\"."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/conductors/ConductorModal.tsx",
+          "path": "frontend/src/components/layout/Sidebar.tsx",
           "operation": "modify",
-          "description": "Implement dual-mode behavior (create vs edit) with modal titles \"Add Conductor\" and \"Edit Conductor\", pre-fill values in edit mode, and validate/convert Training Date to a seconds-based bigint when calling mutations; populate Publisher dropdown via useGetAllPublishers and display publisher fullName; restrict Status options to \"Available\" and \"Unavailable\". Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "operation": "modify",
-          "description": "Wire the shared ConductorModal into the /conductors page for both create and edit flows (open in create mode from \"Add Conductor\", open in edit mode from row action, and pass selected conductor data for prefill)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Update the conductors table columns, default alphabetical ordering, training date formatting, status badges, and actions.",
-      "acceptanceCriteria": [
-        "Rows are displayed alphabetically by conductor/publisher name by default.",
-        "Training Date displays in the format \"MMM d, yyyy\" (e.g., \"Feb 7, 2026\").",
-        "Status renders as a colored badge: green for \"Available\", red for \"Unavailable\".",
-        "Each row includes working Edit and Delete buttons."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "operation": "modify",
-          "description": "Render the table with columns: Conductor Name (publisherName; default alphabetical sort only), Training Date (formatted \"MMM d, yyyy\"), Status (badge styling: green for \"Available\", red for \"Unavailable\"), and Actions (Edit/Delete buttons)."
-        },
-        {
-          "path": "frontend/src/utils/formatters.ts",
-          "operation": "modify",
-          "description": "Add or reuse a formatter for conductor training dates that formats a seconds-based bigint timestamp into \"MMM d, yyyy\" (e.g., by reusing the existing seconds-based task/visit formatting pattern)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Add a delete confirmation dialog with exact prompt text before deleting a conductor, with success/error feedback.",
-      "acceptanceCriteria": [
-        "Delete action does not call the backend until the user confirms in the dialog.",
-        "The dialog displays the exact question text \"Delete this conductor?\".",
-        "On successful delete, the dialog closes and the table refreshes to remove the row.",
-        "On error, the dialog remains usable and an English error toast/message is shown."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/conductors/DeleteConductorDialog.tsx",
-          "operation": "modify",
-          "description": "Implement the confirmation UI using the existing alert-dialog UI primitives with the exact prompt text \"Delete this conductor?\"; only call the delete mutation after confirm; on success close dialog and show an English success toast; on error keep dialog usable and show an English error toast. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/ServiceMeetingConductors.tsx",
-          "operation": "modify",
-          "description": "Wire Delete action buttons to open DeleteConductorDialog with the selected row, and ensure closing/reset behavior mirrors existing delete dialogs used elsewhere."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Create React Query mutation hooks for create/update/delete conductors and invalidate/refetch ['serviceMeetingConductors'] after success.",
-      "acceptanceCriteria": [
-        "There are mutation hooks for create/update/delete that call the corresponding backend actor methods.",
-        "After each successful mutation, the serviceMeetingConductors query is invalidated/refetched so the table updates without manual reload.",
-        "All user-facing success/error text is in English."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useServiceMeetingConductors.ts",
-          "operation": "modify",
-          "description": "Align the existing ['serviceMeetingConductors'] query hook to fetch the trained conductors list from the backend actor and return the trained conductor record shape used by the CRUD UI (keeping the same React Query key so invalidation works as required)."
-        },
-        {
-          "path": "frontend/src/hooks/useCreateTrainedConductor.ts",
-          "operation": "create",
-          "description": "Add a React Query mutation hook that creates a trained conductor via the backend actor and invalidates/refetches ['serviceMeetingConductors'] on success."
-        },
-        {
-          "path": "frontend/src/hooks/useUpdateTrainedConductor.ts",
-          "operation": "create",
-          "description": "Add a React Query mutation hook that updates a trained conductor via the backend actor and invalidates/refetches ['serviceMeetingConductors'] on success."
-        },
-        {
-          "path": "frontend/src/hooks/useDeleteTrainedConductor.ts",
-          "operation": "create",
-          "description": "Add a React Query mutation hook that deletes a trained conductor via the backend actor and invalidates/refetches ['serviceMeetingConductors'] on success."
-        },
-        {
-          "path": "frontend/src/components/conductors/ConductorModal.tsx",
-          "operation": "modify",
-          "description": "Use the new create/update mutation hooks and show English success/error toasts/messages; ensure successful mutation closes the modal and relies on query invalidation to refresh the table. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/conductors/DeleteConductorDialog.tsx",
-          "operation": "modify",
-          "description": "Use the new delete mutation hook and show English success/error toasts/messages; ensure successful mutation closes the dialog and relies on query invalidation to refresh the table. Verify the component's usage instructions before implementing."
+          "description": "Update the Dashboard navigation item to link to /dashboard and ensure active highlighting continues to work for the Dashboard route without affecting other sidebar links."
         }
       ]
     }

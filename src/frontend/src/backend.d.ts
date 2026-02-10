@@ -7,8 +7,8 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface CreateTrainedConductorInput {
-    status: string;
+export interface UpdateTrainedPublisherInput {
+    isAuthorized: boolean;
     publisherId: string;
     publisherName: string;
     trainingDate: bigint;
@@ -23,12 +23,15 @@ export interface ShepherdingVisit {
     notes: string;
 }
 export type PublisherId = bigint;
-export interface CreateTaskInput {
-    title: string;
-    dueDate: bigint;
-    parentTaskId?: bigint;
-    notes?: string;
-    category: string;
+export interface CreateTrainedConductorInput {
+    status: string;
+    availableSaturday?: boolean;
+    availableThursday?: boolean;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+    availableSunday?: boolean;
+    availableFriday?: boolean;
 }
 export interface Task {
     id: bigint;
@@ -70,14 +73,6 @@ export interface Pioneer {
     publisherName: string;
     isActive: boolean;
 }
-export interface TrainedServiceMeetingConductor {
-    id: string;
-    status: string;
-    createdAt: bigint;
-    publisherId: string;
-    publisherName: string;
-    trainingDate: bigint;
-}
 export interface Territory {
     id: string;
     status: string;
@@ -87,15 +82,32 @@ export interface Territory {
     notes: string;
     number: string;
 }
-export interface UpdateTrainedConductorInput {
+export interface TrainedServiceMeetingConductor {
+    id: string;
     status: string;
+    availableSaturday: boolean;
+    availableThursday: boolean;
+    createdAt: bigint;
     publisherId: string;
     publisherName: string;
     trainingDate: bigint;
+    availableSunday: boolean;
+    availableFriday: boolean;
 }
-export interface CreateTerritoryNoteInput {
-    title: string;
-    content: string;
+export interface UpdateTrainedConductorInput {
+    status: string;
+    availableSaturday?: boolean;
+    availableThursday?: boolean;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+    availableSunday?: boolean;
+    availableFriday?: boolean;
+}
+export interface CreateTrainedPublisherInput {
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
 }
 export interface TerritoryNote {
     id: bigint;
@@ -116,6 +128,17 @@ export interface Publisher {
     isActive: boolean;
     isGroupAssistant: boolean;
 }
+export interface CreateTerritoryNoteInput {
+    title: string;
+    content: string;
+}
+export interface CreateTaskInput {
+    title: string;
+    dueDate: bigint;
+    parentTaskId?: bigint;
+    notes?: string;
+    category: string;
+}
 export interface CreateShepherdingVisitInput {
     eldersPresent: string;
     visitDate: bigint;
@@ -129,6 +152,14 @@ export interface CheckoutRecord {
     dateReturned?: bigint;
     isCampaign: boolean;
     dateCheckedOut: bigint;
+}
+export interface TrainedPublisher {
+    id: string;
+    isAuthorized: boolean;
+    createdAt: bigint;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
 }
 export interface UserProfile {
     name: string;
@@ -155,6 +186,7 @@ export interface backendInterface {
         elder: boolean;
     }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null): Promise<PublisherId>;
     addTrainedConductor(input: CreateTrainedConductorInput): Promise<string>;
+    addTrainedPublisher(input: CreateTrainedPublisherInput): Promise<string>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkOutTerritory(territoryId: string, publisherId: PublisherId, isCampaign: boolean): Promise<void>;
     createGlobalNote(title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<bigint>;
@@ -171,6 +203,7 @@ export interface backendInterface {
     deleteTerritory(id: string): Promise<void>;
     deleteTerritoryNote(territoryId: string, noteId: bigint): Promise<void>;
     deleteTrainedConductor(id: string): Promise<void>;
+    deleteTrainedPublisher(id: string): Promise<void>;
     editPioneer(id: string, input: EditPioneerInput): Promise<void>;
     getAllGlobalNotes(): Promise<Array<GlobalNote>>;
     getAllPioneers(): Promise<Array<Pioneer>>;
@@ -180,10 +213,12 @@ export interface backendInterface {
     getAllTerritories(): Promise<Array<Territory>>;
     getAllTerritoryNotes(territoryId: string): Promise<Array<TerritoryNote>>;
     getAllTrainedConductors(): Promise<Array<TrainedServiceMeetingConductor>>;
+    getAllTrainedPublishers(): Promise<Array<TrainedPublisher>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getGlobalNote(id: bigint): Promise<GlobalNote | null>;
     getPublisher(id: PublisherId): Promise<Publisher | null>;
+    getPublishers(): Promise<Array<Publisher>>;
     getShepherdingVisit(id: string): Promise<ShepherdingVisit | null>;
     getShepherdingVisitsByPublisher(publisherId: string): Promise<Array<ShepherdingVisit>>;
     getTask(id: bigint): Promise<Task | null>;
@@ -192,6 +227,7 @@ export interface backendInterface {
     getTerritory(id: string): Promise<Territory | null>;
     getTerritoryNote(territoryId: string, noteId: bigint): Promise<TerritoryNote | null>;
     getTrainedConductor(id: string): Promise<TrainedServiceMeetingConductor | null>;
+    getTrainedPublisher(id: string): Promise<TrainedPublisher | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     makeTerritoryAvailable(territoryId: string): Promise<void>;
@@ -211,4 +247,5 @@ export interface backendInterface {
     updateTerritory(id: string, number: string, territoryType: string): Promise<void>;
     updateTerritoryNote(territoryId: string, noteId: bigint, input: CreateTerritoryNoteInput): Promise<void>;
     updateTrainedConductor(id: string, input: UpdateTrainedConductorInput): Promise<void>;
+    updateTrainedPublisher(id: string, input: UpdateTrainedPublisherInput): Promise<void>;
 }

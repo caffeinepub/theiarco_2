@@ -3,6 +3,7 @@ import { useInternetIdentity } from './hooks/useInternetIdentity';
 import Login from './pages/Login';
 import AppLayout from './components/layout/AppLayout';
 import ComingSoon from './pages/ComingSoon';
+import Dashboard from './pages/Dashboard';
 import Publishers from './pages/Publishers';
 import PublisherProfile from './pages/PublisherProfile';
 import Notes from './pages/Notes';
@@ -13,6 +14,9 @@ import Pioneers from './pages/Pioneers';
 import Shepherding from './pages/Shepherding';
 import ShepherdingVisitProfile from './pages/ShepherdingVisitProfile';
 import ServiceMeetingConductors from './pages/ServiceMeetingConductors';
+import PublicWitnessing from './pages/PublicWitnessing';
+import FieldServiceGroups from './pages/FieldServiceGroups';
+import FieldServiceGroupProfile from './pages/FieldServiceGroupProfile';
 
 // Root component that handles auth state
 function RootComponent() {
@@ -45,11 +49,11 @@ const rootRoute = createRootRoute({
   component: RootComponent
 });
 
-// Protected routes - all render ComingSoon with different titles
+// Dashboard route
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: () => <ComingSoon title="Dashboard" />
+  component: Dashboard
 });
 
 const publishersRoute = createRoute({
@@ -103,13 +107,19 @@ const conductorsRoute = createRoute({
 const publicWitnessingRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/public-witnessing',
-  component: () => <ComingSoon title="Public Witnessing" />
+  component: PublicWitnessing
 });
 
 const fieldServiceGroupsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/field-service-groups',
-  component: () => <ComingSoon title="Field Service Groups" />
+  component: FieldServiceGroups
+});
+
+const fieldServiceGroupProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/field-service-groups/$groupNumber',
+  component: FieldServiceGroupProfile
 });
 
 const notesRoute = createRoute({
@@ -143,6 +153,7 @@ const routeTree = rootRoute.addChildren([
   conductorsRoute,
   publicWitnessingRoute,
   fieldServiceGroupsRoute,
+  fieldServiceGroupProfileRoute,
   notesRoute,
   tasksRoute,
   userProfileRoute

@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -40,8 +41,12 @@ export default function ConductorModal({
   const [publisherId, setPublisherId] = useState('');
   const [trainingDate, setTrainingDate] = useState('');
   const [status, setStatus] = useState<'Available' | 'Unavailable'>('Available');
+  const [availableThursday, setAvailableThursday] = useState(false);
+  const [availableFriday, setAvailableFriday] = useState(false);
+  const [availableSaturday, setAvailableSaturday] = useState(false);
+  const [availableSunday, setAvailableSunday] = useState(false);
 
-  // Pre-fill form in edit mode
+  // Pre-fill form in edit mode and reset in create mode
   useEffect(() => {
     if (conductor) {
       setPublisherId(conductor.publisherId);
@@ -49,11 +54,19 @@ export default function ConductorModal({
       const date = new Date(Number(conductor.trainingDate) * 1000);
       setTrainingDate(date.toISOString().split('T')[0]);
       setStatus(conductor.status as 'Available' | 'Unavailable');
+      setAvailableThursday(conductor.availableThursday || false);
+      setAvailableFriday(conductor.availableFriday || false);
+      setAvailableSaturday(conductor.availableSaturday || false);
+      setAvailableSunday(conductor.availableSunday || false);
     } else {
       // Reset form in create mode
       setPublisherId('');
       setTrainingDate('');
       setStatus('Available');
+      setAvailableThursday(false);
+      setAvailableFriday(false);
+      setAvailableSaturday(false);
+      setAvailableSunday(false);
     }
   }, [conductor, open]);
 
@@ -76,6 +89,10 @@ export default function ConductorModal({
       publisherName: selectedPublisher.fullName,
       trainingDate: timestampSeconds,
       status,
+      availableThursday,
+      availableFriday,
+      availableSaturday,
+      availableSunday,
     };
 
     if (isEditMode) {
@@ -150,6 +167,65 @@ export default function ConductorModal({
                 <SelectItem value="Unavailable">Unavailable</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Availability Section */}
+          <div className="space-y-3">
+            <Label>Availability</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="thursday"
+                  checked={availableThursday}
+                  onCheckedChange={(checked) => setAvailableThursday(checked === true)}
+                />
+                <label
+                  htmlFor="thursday"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Thursday
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="friday"
+                  checked={availableFriday}
+                  onCheckedChange={(checked) => setAvailableFriday(checked === true)}
+                />
+                <label
+                  htmlFor="friday"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Friday
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="saturday"
+                  checked={availableSaturday}
+                  onCheckedChange={(checked) => setAvailableSaturday(checked === true)}
+                />
+                <label
+                  htmlFor="saturday"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Saturday
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="sunday"
+                  checked={availableSunday}
+                  onCheckedChange={(checked) => setAvailableSunday(checked === true)}
+                />
+                <label
+                  htmlFor="sunday"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Sunday
+                </label>
+              </div>
+            </div>
           </div>
 
           <DialogFooter>

@@ -1,53 +1,43 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Build a complete ServiceMeetingConductor CRUD system with full UI (modal + table) connected to the backend.",
+  "summary": "Build/update an existing /dashboard page to display overview statistic cards derived from existing Publishers, Territories, and Tasks backends.",
   "architectural_notes": [
-    "ServiceMeetingConductor data model: id(Text unique), publisherId(Text), publisherName(Text), trainingDate(Int seconds timestamp), status(Text: \"Available\"|\"Unavailable\"), createdAt(Int).",
-    "UI: single modal used for both Create and Edit; same form fields (Publisher dropdown, Training Date picker, Status dropdown); modal title switches between \"Add Conductor\" and \"Edit Conductor\".",
-    "Table: columns Conductor Name (default alphabetical, no sorting needed), Training Date (formatted like \"Feb 7, 2026\"), Status (green badge for Available, red badge for Unavailable), Actions (Edit/Delete per row).",
-    "Delete requires confirmation dialog: \"Delete this conductor?\""
+    "Dashboard stats must be computed by querying existing backends: getPublishers (count isActive=true), getTerritories (count status=\"Checked Out\"), getTasks (count isCompleted=false with dueDate compared to current timestamp).",
+    "Tasks dueDate is stored as Int timestamp in seconds; Upcoming if dueDate > now, Overdue if dueDate < now."
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-replace-the-current-servicemeetingconductors-page-placeholder-ui-with-a-full-crud-ui-for-trained-conductors-an-add-conductor-button-that-opens-a-modal-a-table-that-lists-conductors-and-per-row-edit-delete-actions-wired-to-backend-mutations",
-      "title": "Replace the current ServiceMeetingConductors page placeholder UI with a full CRUD UI for trained conductors: an \"Add Conductor\" button that opens a modal, a table that lists conductors, and per-row Edit/Delete actions wired to backend mutations.",
+      "id": "feature-update-the-existing-dashboard-page-for-the-dashboard-route-to-display-four-statistic-cards-in-a-single-row-at-the-top-of-the-page-keeping-everything-else-unchanged",
+      "title": "Update the existing Dashboard page for the /dashboard route to display four statistic cards in a single row at the top of the page (keeping everything else unchanged).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-on-the-dashboard-page-query-the-existing-backends-for-publishers-territories-and-tasks-using-the-existing-frontend-actor-query-hooks-where-available-and-compute-the-four-counts-based-on-the-following-rules-1-active-publishers-publishers-where-isactive-true-2-checked-out-territories-territories-where-status-checked-out-3-upcoming-tasks-tasks-where-iscompleted-false-and-duedate-currenttimestampseconds-4-overdue-tasks-tasks-where-iscompleted-false-and-duedate-currenttimestampseconds-duedate-is-an-int-timestamp-in-seconds",
+      "title": "On the Dashboard page, query the existing backends for publishers, territories, and tasks (using the existing frontend actor/query hooks where available) and compute the four counts based on the following rules: (1) Active Publishers = publishers where isActive == true; (2) Checked Out Territories = territories where status == \"Checked Out\"; (3) Upcoming Tasks = tasks where isCompleted == false and dueDate > currentTimestampSeconds; (4) Overdue Tasks = tasks where isCompleted == false and dueDate < currentTimestampSeconds. dueDate is an Int timestamp in seconds.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-render-the-four-dashboard-stat-cards-with-the-exact-labels-and-color-backgrounds-1-green-background-card-labeled-active-publishers-2-blue-background-card-labeled-checked-out-territories-3-orange-background-card-labeled-upcoming-tasks-4-red-background-card-labeled-overdue-tasks-each-card-must-show-the-computed-number-prominently-with-the-label-text-below-it",
+      "title": "Render the four Dashboard stat cards with the exact labels and color backgrounds: (1) Green background card labeled \"Active Publishers\"; (2) Blue background card labeled \"Checked Out Territories\"; (3) Orange background card labeled \"Upcoming Tasks\"; (4) Red background card labeled \"Overdue Tasks\". Each card must show the computed number prominently, with the label text below it.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-routing-navigation-so-that-the-dashboard-page-is-accessible-at-dashboard-as-specified-without-breaking-existing-navigation-if-the-app-currently-uses-for-dashboard-navigation-ensure-users-can-still-reach-the-dashboard-from-the-sidebar-and-the-route-configuration-aligns-with-dashboard",
+      "title": "Update routing/navigation so that the Dashboard page is accessible at /dashboard as specified, without breaking existing navigation. If the app currently uses / for Dashboard navigation, ensure users can still reach the Dashboard from the sidebar and the route configuration aligns with /dashboard.",
       "reqIds": [
         "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-single-modal-component-used-for-both-create-and-edit-of-a-servicemeetingconductor-with-the-same-form-fields-publisher-dropdown-training-date-picker-status-dropdown-the-modal-title-must-be-add-conductor-for-create-mode-and-edit-conductor-for-edit-mode-and-edit-mode-must-pre-fill-current-row-data",
-      "title": "Implement a single modal component used for BOTH Create and Edit of a ServiceMeetingConductor, with the same form fields: Publisher dropdown, Training Date picker, Status dropdown. The modal title must be \"Add Conductor\" for create mode and \"Edit Conductor\" for edit mode, and edit mode must pre-fill current row data.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-servicemeetingconductors-table-to-use-these-columns-and-behaviors-conductor-name-default-alphabetical-order-no-user-sorting-ui-required-training-date-formatted-like-feb-7-2026-status-green-badge-for-available-red-badge-for-unavailable-actions-edit-delete-buttons",
-      "title": "Update the ServiceMeetingConductors table to use these columns and behaviors: Conductor Name (default alphabetical order; no user sorting UI required), Training Date (formatted like \"Feb 7, 2026\"), Status (green badge for \"Available\", red badge for \"Unavailable\"), Actions (Edit/Delete buttons).",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-delete-confirmation-dialog-for-conductors-clicking-delete-opens-a-confirmation-dialog-with-the-exact-prompt-text-delete-this-conductor-before-removing-the-record",
-      "title": "Add a delete confirmation dialog for conductors: clicking Delete opens a confirmation dialog with the exact prompt text \"Delete this conductor?\" before removing the record.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-the-necessary-react-query-hooks-mutations-for-servicemeetingconductors-create-update-delete-and-ensure-they-invalidate-refetch-the-existing-servicemeetingconductors-query-so-the-ui-stays-consistent-after-mutations",
-      "title": "Create the necessary React Query hooks/mutations for ServiceMeetingConductors (create, update, delete) and ensure they invalidate/refetch the existing ['serviceMeetingConductors'] query so the UI stays consistent after mutations.",
-      "reqIds": [
-        "REQ-8"
       ],
       "version": 1
     }
@@ -55,36 +45,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Implement ServiceMeetingConductor CRUD UI (modal + table with Edit/Delete, sorting) and connect to backend",
+      "summary": "Update existing /dashboard route to show four overview stat cards (Active Publishers, Checked Out Territories, Upcoming Tasks, Overdue Tasks) by querying existing backends and counting based on specified conditions and colors.",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Update/align the ServiceMeetingConductor backend domain to use this record data model: { id: Text (unique), publisherId: Text, publisherName: Text, trainingDate: Int (timestamp in seconds), status: Text (\"Available\" | \"Unavailable\"), createdAt: Int }.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Implement complete CRUD backend APIs for ServiceMeetingConductor records, protected by the same authorization checks used elsewhere (checkUserPermission(caller, #user)): create, list all, get by id (if needed by UI), update by id, and delete by id.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "If the canister is already deployed with existing state, add conditional migration support so upgrading initializes the new conductor collection without breaking existing state.",
-      "reqIds": [
-        "REQ-3"
-      ],
       "status": "pending"
     }
   ],
-  "projectName": "Service Meeting Conductors: Full CRUD UI (modal + table) connected to backend",
+  "projectName": "Update Dashboard page with overview statistic cards",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

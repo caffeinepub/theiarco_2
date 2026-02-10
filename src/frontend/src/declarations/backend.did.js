@@ -11,6 +11,15 @@ import { IDL } from '@icp-sdk/core/candid';
 export const PublisherId = IDL.Nat;
 export const CreateTrainedConductorInput = IDL.Record({
   'status' : IDL.Text,
+  'availableSaturday' : IDL.Opt(IDL.Bool),
+  'availableThursday' : IDL.Opt(IDL.Bool),
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'trainingDate' : IDL.Int,
+  'availableSunday' : IDL.Opt(IDL.Bool),
+  'availableFriday' : IDL.Opt(IDL.Bool),
+});
+export const CreateTrainedPublisherInput = IDL.Record({
   'publisherId' : IDL.Text,
   'publisherName' : IDL.Text,
   'trainingDate' : IDL.Int,
@@ -118,6 +127,18 @@ export const TerritoryNote = IDL.Record({
 export const TrainedServiceMeetingConductor = IDL.Record({
   'id' : IDL.Text,
   'status' : IDL.Text,
+  'availableSaturday' : IDL.Bool,
+  'availableThursday' : IDL.Bool,
+  'createdAt' : IDL.Int,
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'trainingDate' : IDL.Int,
+  'availableSunday' : IDL.Bool,
+  'availableFriday' : IDL.Bool,
+});
+export const TrainedPublisher = IDL.Record({
+  'id' : IDL.Text,
+  'isAuthorized' : IDL.Bool,
   'createdAt' : IDL.Int,
   'publisherId' : IDL.Text,
   'publisherName' : IDL.Text,
@@ -143,6 +164,16 @@ export const TaskStatus = IDL.Variant({
 });
 export const UpdateTrainedConductorInput = IDL.Record({
   'status' : IDL.Text,
+  'availableSaturday' : IDL.Opt(IDL.Bool),
+  'availableThursday' : IDL.Opt(IDL.Bool),
+  'publisherId' : IDL.Text,
+  'publisherName' : IDL.Text,
+  'trainingDate' : IDL.Int,
+  'availableSunday' : IDL.Opt(IDL.Bool),
+  'availableFriday' : IDL.Opt(IDL.Bool),
+});
+export const UpdateTrainedPublisherInput = IDL.Record({
+  'isAuthorized' : IDL.Bool,
   'publisherId' : IDL.Text,
   'publisherName' : IDL.Text,
   'trainingDate' : IDL.Int,
@@ -168,6 +199,11 @@ export const idlService = IDL.Service({
     ),
   'addTrainedConductor' : IDL.Func(
       [CreateTrainedConductorInput],
+      [IDL.Text],
+      [],
+    ),
+  'addTrainedPublisher' : IDL.Func(
+      [CreateTrainedPublisherInput],
       [IDL.Text],
       [],
     ),
@@ -203,6 +239,7 @@ export const idlService = IDL.Service({
   'deleteTerritory' : IDL.Func([IDL.Text], [], []),
   'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
   'deleteTrainedConductor' : IDL.Func([IDL.Text], [], []),
+  'deleteTrainedPublisher' : IDL.Func([IDL.Text], [], []),
   'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
   'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
   'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
@@ -228,10 +265,16 @@ export const idlService = IDL.Service({
       [IDL.Vec(TrainedServiceMeetingConductor)],
       ['query'],
     ),
+  'getAllTrainedPublishers' : IDL.Func(
+      [],
+      [IDL.Vec(TrainedPublisher)],
+      ['query'],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
   'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
+  'getPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
   'getShepherdingVisit' : IDL.Func(
       [IDL.Text],
       [IDL.Opt(ShepherdingVisit)],
@@ -254,6 +297,11 @@ export const idlService = IDL.Service({
   'getTrainedConductor' : IDL.Func(
       [IDL.Text],
       [IDL.Opt(TrainedServiceMeetingConductor)],
+      ['query'],
+    ),
+  'getTrainedPublisher' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(TrainedPublisher)],
       ['query'],
     ),
   'getUserProfile' : IDL.Func(
@@ -319,6 +367,11 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'updateTrainedPublisher' : IDL.Func(
+      [IDL.Text, UpdateTrainedPublisherInput],
+      [],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -327,6 +380,15 @@ export const idlFactory = ({ IDL }) => {
   const PublisherId = IDL.Nat;
   const CreateTrainedConductorInput = IDL.Record({
     'status' : IDL.Text,
+    'availableSaturday' : IDL.Opt(IDL.Bool),
+    'availableThursday' : IDL.Opt(IDL.Bool),
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'trainingDate' : IDL.Int,
+    'availableSunday' : IDL.Opt(IDL.Bool),
+    'availableFriday' : IDL.Opt(IDL.Bool),
+  });
+  const CreateTrainedPublisherInput = IDL.Record({
     'publisherId' : IDL.Text,
     'publisherName' : IDL.Text,
     'trainingDate' : IDL.Int,
@@ -434,6 +496,18 @@ export const idlFactory = ({ IDL }) => {
   const TrainedServiceMeetingConductor = IDL.Record({
     'id' : IDL.Text,
     'status' : IDL.Text,
+    'availableSaturday' : IDL.Bool,
+    'availableThursday' : IDL.Bool,
+    'createdAt' : IDL.Int,
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'trainingDate' : IDL.Int,
+    'availableSunday' : IDL.Bool,
+    'availableFriday' : IDL.Bool,
+  });
+  const TrainedPublisher = IDL.Record({
+    'id' : IDL.Text,
+    'isAuthorized' : IDL.Bool,
     'createdAt' : IDL.Int,
     'publisherId' : IDL.Text,
     'publisherName' : IDL.Text,
@@ -459,6 +533,16 @@ export const idlFactory = ({ IDL }) => {
   });
   const UpdateTrainedConductorInput = IDL.Record({
     'status' : IDL.Text,
+    'availableSaturday' : IDL.Opt(IDL.Bool),
+    'availableThursday' : IDL.Opt(IDL.Bool),
+    'publisherId' : IDL.Text,
+    'publisherName' : IDL.Text,
+    'trainingDate' : IDL.Int,
+    'availableSunday' : IDL.Opt(IDL.Bool),
+    'availableFriday' : IDL.Opt(IDL.Bool),
+  });
+  const UpdateTrainedPublisherInput = IDL.Record({
+    'isAuthorized' : IDL.Bool,
     'publisherId' : IDL.Text,
     'publisherName' : IDL.Text,
     'trainingDate' : IDL.Int,
@@ -484,6 +568,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'addTrainedConductor' : IDL.Func(
         [CreateTrainedConductorInput],
+        [IDL.Text],
+        [],
+      ),
+    'addTrainedPublisher' : IDL.Func(
+        [CreateTrainedPublisherInput],
         [IDL.Text],
         [],
       ),
@@ -519,6 +608,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteTerritory' : IDL.Func([IDL.Text], [], []),
     'deleteTerritoryNote' : IDL.Func([IDL.Text, IDL.Nat], [], []),
     'deleteTrainedConductor' : IDL.Func([IDL.Text], [], []),
+    'deleteTrainedPublisher' : IDL.Func([IDL.Text], [], []),
     'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
     'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
     'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
@@ -544,10 +634,16 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(TrainedServiceMeetingConductor)],
         ['query'],
       ),
+    'getAllTrainedPublishers' : IDL.Func(
+        [],
+        [IDL.Vec(TrainedPublisher)],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
     'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
+    'getPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
     'getShepherdingVisit' : IDL.Func(
         [IDL.Text],
         [IDL.Opt(ShepherdingVisit)],
@@ -574,6 +670,11 @@ export const idlFactory = ({ IDL }) => {
     'getTrainedConductor' : IDL.Func(
         [IDL.Text],
         [IDL.Opt(TrainedServiceMeetingConductor)],
+        ['query'],
+      ),
+    'getTrainedPublisher' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(TrainedPublisher)],
         ['query'],
       ),
     'getUserProfile' : IDL.Func(
@@ -636,6 +737,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'updateTrainedConductor' : IDL.Func(
         [IDL.Text, UpdateTrainedConductorInput],
+        [],
+        [],
+      ),
+    'updateTrainedPublisher' : IDL.Func(
+        [IDL.Text, UpdateTrainedPublisherInput],
         [],
         [],
       ),

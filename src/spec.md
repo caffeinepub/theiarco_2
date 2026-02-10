@@ -1,16 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Replace the Service Meeting Conductors placeholder with a full CRUD system (backend + UI) for managing trained conductors.
+**Goal:** Enhance the existing /dashboard page by adding a top-row overview of four statistic cards populated from existing publishers, territories, and tasks data.
 
 **Planned changes:**
-- Align the backend ServiceMeetingConductor domain model to: `{ id: Text, publisherId: Text, publisherName: Text, trainingDate: Int (seconds), status: Text ("Available" | "Unavailable"), createdAt: Int }`, including status validation.
-- Add backend CRUD APIs (create, list all, get by id if needed, update by id, delete by id) with existing permission checks and createdAt/id handling rules.
-- Add conditional migration support so upgrades initialize the new conductor collection without breaking existing canister state.
-- Build the /conductors page UI: header + “Add Conductor” button, a table of conductors, and per-row Edit/Delete actions wired to backend.
-- Implement a single Add/Edit modal with fields: Publisher dropdown (from existing publishers query), Training Date picker (seconds-based timestamp), Status dropdown (“Available”/“Unavailable”), with mode-specific titles and edit prefill.
-- Update the conductors table columns/behavior: Conductor Name (default alphabetical order), Training Date (format “MMM d, yyyy”), Status (green/red badge), Actions (Edit/Delete).
-- Add a delete confirmation dialog that asks exactly: “Delete this conductor?” before calling delete.
-- Add React Query mutations (create/update/delete) and invalidate/refetch `['serviceMeetingConductors']` after successful mutations; show English loading/empty/success/error messaging.
+- Update the existing Dashboard page at `/dashboard` to render exactly four statistic cards in a single top row (with responsive stacking on smaller screens), leaving the rest of the page/layout unchanged.
+- Fetch publishers, territories, and tasks via existing frontend actor/query hooks (no new backend endpoints) and compute counts for: Active Publishers, Checked Out Territories, Upcoming Tasks, and Overdue Tasks.
+- Implement runtime client-side Unix timestamp (seconds) comparison logic for task `dueDate` (Int seconds), including safe conversion if `dueDate` arrives as a bigint-like type.
+- Ensure routing/navigation supports accessing the Dashboard at `/dashboard`, including a working sidebar link, without breaking existing routes.
 
-**User-visible outcome:** Users can view all service meeting conductors at `/conductors`, add new conductors, edit existing entries via a modal, and delete entries with confirmation, with the table updating automatically after changes.
+**User-visible outcome:** Visiting `/dashboard` shows four colored stat cards at the top—Active Publishers (green), Checked Out Territories (blue), Upcoming Tasks (orange), and Overdue Tasks (red)—each displaying the correct computed count, with existing navigation and other pages unchanged.

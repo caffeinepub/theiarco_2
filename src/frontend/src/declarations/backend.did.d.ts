@@ -42,6 +42,15 @@ export interface CreateTerritoryNoteInput {
 }
 export interface CreateTrainedConductorInput {
   'status' : string,
+  'availableSaturday' : [] | [boolean],
+  'availableThursday' : [] | [boolean],
+  'publisherId' : string,
+  'publisherName' : string,
+  'trainingDate' : bigint,
+  'availableSunday' : [] | [boolean],
+  'availableFriday' : [] | [boolean],
+}
+export interface CreateTrainedPublisherInput {
   'publisherId' : string,
   'publisherName' : string,
   'trainingDate' : bigint,
@@ -127,16 +136,38 @@ export interface TerritoryNote {
   'content' : string,
   'createdAt' : bigint,
 }
-export interface TrainedServiceMeetingConductor {
+export interface TrainedPublisher {
   'id' : string,
-  'status' : string,
+  'isAuthorized' : boolean,
   'createdAt' : bigint,
   'publisherId' : string,
   'publisherName' : string,
   'trainingDate' : bigint,
 }
+export interface TrainedServiceMeetingConductor {
+  'id' : string,
+  'status' : string,
+  'availableSaturday' : boolean,
+  'availableThursday' : boolean,
+  'createdAt' : bigint,
+  'publisherId' : string,
+  'publisherName' : string,
+  'trainingDate' : bigint,
+  'availableSunday' : boolean,
+  'availableFriday' : boolean,
+}
 export interface UpdateTrainedConductorInput {
   'status' : string,
+  'availableSaturday' : [] | [boolean],
+  'availableThursday' : [] | [boolean],
+  'publisherId' : string,
+  'publisherName' : string,
+  'trainingDate' : bigint,
+  'availableSunday' : [] | [boolean],
+  'availableFriday' : [] | [boolean],
+}
+export interface UpdateTrainedPublisherInput {
+  'isAuthorized' : boolean,
   'publisherId' : string,
   'publisherName' : string,
   'trainingDate' : bigint,
@@ -159,6 +190,7 @@ export interface _SERVICE {
     PublisherId
   >,
   'addTrainedConductor' : ActorMethod<[CreateTrainedConductorInput], string>,
+  'addTrainedPublisher' : ActorMethod<[CreateTrainedPublisherInput], string>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkOutTerritory' : ActorMethod<[string, PublisherId, boolean], undefined>,
   'createGlobalNote' : ActorMethod<
@@ -184,6 +216,7 @@ export interface _SERVICE {
   'deleteTerritory' : ActorMethod<[string], undefined>,
   'deleteTerritoryNote' : ActorMethod<[string, bigint], undefined>,
   'deleteTrainedConductor' : ActorMethod<[string], undefined>,
+  'deleteTrainedPublisher' : ActorMethod<[string], undefined>,
   'editPioneer' : ActorMethod<[string, EditPioneerInput], undefined>,
   'getAllGlobalNotes' : ActorMethod<[], Array<GlobalNote>>,
   'getAllPioneers' : ActorMethod<[], Array<Pioneer>>,
@@ -199,10 +232,12 @@ export interface _SERVICE {
     [],
     Array<TrainedServiceMeetingConductor>
   >,
+  'getAllTrainedPublishers' : ActorMethod<[], Array<TrainedPublisher>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getGlobalNote' : ActorMethod<[bigint], [] | [GlobalNote]>,
   'getPublisher' : ActorMethod<[PublisherId], [] | [Publisher]>,
+  'getPublishers' : ActorMethod<[], Array<Publisher>>,
   'getShepherdingVisit' : ActorMethod<[string], [] | [ShepherdingVisit]>,
   'getShepherdingVisitsByPublisher' : ActorMethod<
     [string],
@@ -217,6 +252,7 @@ export interface _SERVICE {
     [string],
     [] | [TrainedServiceMeetingConductor]
   >,
+  'getTrainedPublisher' : ActorMethod<[string], [] | [TrainedPublisher]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'makeTerritoryAvailable' : ActorMethod<[string], undefined>,
@@ -256,6 +292,10 @@ export interface _SERVICE {
   >,
   'updateTrainedConductor' : ActorMethod<
     [string, UpdateTrainedConductorInput],
+    undefined
+  >,
+  'updateTrainedPublisher' : ActorMethod<
+    [string, UpdateTrainedPublisherInput],
     undefined
   >,
 }

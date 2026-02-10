@@ -89,8 +89,8 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface CreateTrainedConductorInput {
-    status: string;
+export interface UpdateTrainedPublisherInput {
+    isAuthorized: boolean;
     publisherId: string;
     publisherName: string;
     trainingDate: bigint;
@@ -105,12 +105,15 @@ export interface ShepherdingVisit {
     notes: string;
 }
 export type PublisherId = bigint;
-export interface CreateTaskInput {
-    title: string;
-    dueDate: bigint;
-    parentTaskId?: bigint;
-    notes?: string;
-    category: string;
+export interface CreateTrainedConductorInput {
+    status: string;
+    availableSaturday?: boolean;
+    availableThursday?: boolean;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+    availableSunday?: boolean;
+    availableFriday?: boolean;
 }
 export interface Task {
     id: bigint;
@@ -152,14 +155,6 @@ export interface Pioneer {
     publisherName: string;
     isActive: boolean;
 }
-export interface TrainedServiceMeetingConductor {
-    id: string;
-    status: string;
-    createdAt: bigint;
-    publisherId: string;
-    publisherName: string;
-    trainingDate: bigint;
-}
 export interface Territory {
     id: string;
     status: string;
@@ -169,15 +164,32 @@ export interface Territory {
     notes: string;
     number: string;
 }
-export interface UpdateTrainedConductorInput {
+export interface TrainedServiceMeetingConductor {
+    id: string;
     status: string;
+    availableSaturday: boolean;
+    availableThursday: boolean;
+    createdAt: bigint;
     publisherId: string;
     publisherName: string;
     trainingDate: bigint;
+    availableSunday: boolean;
+    availableFriday: boolean;
 }
-export interface CreateTerritoryNoteInput {
-    title: string;
-    content: string;
+export interface UpdateTrainedConductorInput {
+    status: string;
+    availableSaturday?: boolean;
+    availableThursday?: boolean;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+    availableSunday?: boolean;
+    availableFriday?: boolean;
+}
+export interface CreateTrainedPublisherInput {
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
 }
 export interface TerritoryNote {
     id: bigint;
@@ -198,6 +210,17 @@ export interface Publisher {
     isActive: boolean;
     isGroupAssistant: boolean;
 }
+export interface CreateTerritoryNoteInput {
+    title: string;
+    content: string;
+}
+export interface CreateTaskInput {
+    title: string;
+    dueDate: bigint;
+    parentTaskId?: bigint;
+    notes?: string;
+    category: string;
+}
 export interface CreateShepherdingVisitInput {
     eldersPresent: string;
     visitDate: bigint;
@@ -211,6 +234,14 @@ export interface CheckoutRecord {
     dateReturned?: bigint;
     isCampaign: boolean;
     dateCheckedOut: bigint;
+}
+export interface TrainedPublisher {
+    id: string;
+    isAuthorized: boolean;
+    createdAt: bigint;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
 }
 export interface UserProfile {
     name: string;
@@ -238,6 +269,7 @@ export interface backendInterface {
         elder: boolean;
     }, isGroupOverseer: boolean, isGroupAssistant: boolean, isActive: boolean | null): Promise<PublisherId>;
     addTrainedConductor(input: CreateTrainedConductorInput): Promise<string>;
+    addTrainedPublisher(input: CreateTrainedPublisherInput): Promise<string>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkOutTerritory(territoryId: string, publisherId: PublisherId, isCampaign: boolean): Promise<void>;
     createGlobalNote(title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<bigint>;
@@ -254,6 +286,7 @@ export interface backendInterface {
     deleteTerritory(id: string): Promise<void>;
     deleteTerritoryNote(territoryId: string, noteId: bigint): Promise<void>;
     deleteTrainedConductor(id: string): Promise<void>;
+    deleteTrainedPublisher(id: string): Promise<void>;
     editPioneer(id: string, input: EditPioneerInput): Promise<void>;
     getAllGlobalNotes(): Promise<Array<GlobalNote>>;
     getAllPioneers(): Promise<Array<Pioneer>>;
@@ -263,10 +296,12 @@ export interface backendInterface {
     getAllTerritories(): Promise<Array<Territory>>;
     getAllTerritoryNotes(territoryId: string): Promise<Array<TerritoryNote>>;
     getAllTrainedConductors(): Promise<Array<TrainedServiceMeetingConductor>>;
+    getAllTrainedPublishers(): Promise<Array<TrainedPublisher>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getGlobalNote(id: bigint): Promise<GlobalNote | null>;
     getPublisher(id: PublisherId): Promise<Publisher | null>;
+    getPublishers(): Promise<Array<Publisher>>;
     getShepherdingVisit(id: string): Promise<ShepherdingVisit | null>;
     getShepherdingVisitsByPublisher(publisherId: string): Promise<Array<ShepherdingVisit>>;
     getTask(id: bigint): Promise<Task | null>;
@@ -275,6 +310,7 @@ export interface backendInterface {
     getTerritory(id: string): Promise<Territory | null>;
     getTerritoryNote(territoryId: string, noteId: bigint): Promise<TerritoryNote | null>;
     getTrainedConductor(id: string): Promise<TrainedServiceMeetingConductor | null>;
+    getTrainedPublisher(id: string): Promise<TrainedPublisher | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     makeTerritoryAvailable(territoryId: string): Promise<void>;
@@ -294,8 +330,9 @@ export interface backendInterface {
     updateTerritory(id: string, number: string, territoryType: string): Promise<void>;
     updateTerritoryNote(territoryId: string, noteId: bigint, input: CreateTerritoryNoteInput): Promise<void>;
     updateTrainedConductor(id: string, input: UpdateTrainedConductorInput): Promise<void>;
+    updateTrainedPublisher(id: string, input: UpdateTrainedPublisherInput): Promise<void>;
 }
-import type { CheckoutRecord as _CheckoutRecord, CreateTaskInput as _CreateTaskInput, GlobalNote as _GlobalNote, Publisher as _Publisher, PublisherId as _PublisherId, ShepherdingVisit as _ShepherdingVisit, Task as _Task, TaskStatus as _TaskStatus, Territory as _Territory, TerritoryNote as _TerritoryNote, TrainedServiceMeetingConductor as _TrainedServiceMeetingConductor, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { CheckoutRecord as _CheckoutRecord, CreateTaskInput as _CreateTaskInput, CreateTrainedConductorInput as _CreateTrainedConductorInput, GlobalNote as _GlobalNote, Publisher as _Publisher, PublisherId as _PublisherId, ShepherdingVisit as _ShepherdingVisit, Task as _Task, TaskStatus as _TaskStatus, Territory as _Territory, TerritoryNote as _TerritoryNote, TrainedPublisher as _TrainedPublisher, TrainedServiceMeetingConductor as _TrainedServiceMeetingConductor, UpdateTrainedConductorInput as _UpdateTrainedConductorInput, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -333,28 +370,42 @@ export class Backend implements backendInterface {
     async addTrainedConductor(arg0: CreateTrainedConductorInput): Promise<string> {
         if (this.processError) {
             try {
-                const result = await this.actor.addTrainedConductor(arg0);
+                const result = await this.actor.addTrainedConductor(to_candid_CreateTrainedConductorInput_n2(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.addTrainedConductor(arg0);
+            const result = await this.actor.addTrainedConductor(to_candid_CreateTrainedConductorInput_n2(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async addTrainedPublisher(arg0: CreateTrainedPublisherInput): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addTrainedPublisher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addTrainedPublisher(arg0);
             return result;
         }
     }
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n2(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n4(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n2(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n4(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }
@@ -375,14 +426,14 @@ export class Backend implements backendInterface {
     async createGlobalNote(arg0: string, arg1: string, arg2: string, arg3: PublisherId | null): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.createGlobalNote(arg0, arg1, arg2, to_candid_opt_n4(this._uploadFile, this._downloadFile, arg3));
+                const result = await this.actor.createGlobalNote(arg0, arg1, arg2, to_candid_opt_n6(this._uploadFile, this._downloadFile, arg3));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createGlobalNote(arg0, arg1, arg2, to_candid_opt_n4(this._uploadFile, this._downloadFile, arg3));
+            const result = await this.actor.createGlobalNote(arg0, arg1, arg2, to_candid_opt_n6(this._uploadFile, this._downloadFile, arg3));
             return result;
         }
     }
@@ -417,28 +468,28 @@ export class Backend implements backendInterface {
     async createTask(arg0: CreateTaskInput): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.createTask(to_candid_CreateTaskInput_n5(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.createTask(to_candid_CreateTaskInput_n7(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createTask(to_candid_CreateTaskInput_n5(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.createTask(to_candid_CreateTaskInput_n7(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
     async createTerritory(arg0: string, arg1: string, arg2: string, arg3: string | null, arg4: string | null): Promise<string> {
         if (this.processError) {
             try {
-                const result = await this.actor.createTerritory(arg0, arg1, arg2, to_candid_opt_n7(this._uploadFile, this._downloadFile, arg3), to_candid_opt_n7(this._uploadFile, this._downloadFile, arg4));
+                const result = await this.actor.createTerritory(arg0, arg1, arg2, to_candid_opt_n9(this._uploadFile, this._downloadFile, arg3), to_candid_opt_n9(this._uploadFile, this._downloadFile, arg4));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createTerritory(arg0, arg1, arg2, to_candid_opt_n7(this._uploadFile, this._downloadFile, arg3), to_candid_opt_n7(this._uploadFile, this._downloadFile, arg4));
+            const result = await this.actor.createTerritory(arg0, arg1, arg2, to_candid_opt_n9(this._uploadFile, this._downloadFile, arg3), to_candid_opt_n9(this._uploadFile, this._downloadFile, arg4));
             return result;
         }
     }
@@ -568,6 +619,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async deleteTrainedPublisher(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteTrainedPublisher(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteTrainedPublisher(arg0);
+            return result;
+        }
+    }
     async editPioneer(arg0: string, arg1: EditPioneerInput): Promise<void> {
         if (this.processError) {
             try {
@@ -586,14 +651,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllGlobalNotes();
-                return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllGlobalNotes();
-            return from_candid_vec_n8(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllPioneers(): Promise<Array<Pioneer>> {
@@ -656,14 +721,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllTerritories();
-                return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n14(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllTerritories();
-            return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n14(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllTerritoryNotes(arg0: string): Promise<Array<TerritoryNote>> {
@@ -694,74 +759,102 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getAllTrainedPublishers(): Promise<Array<TrainedPublisher>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllTrainedPublishers();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllTrainedPublishers();
+            return result;
+        }
+    }
     async getCallerUserProfile(): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
-                return from_candid_opt_n19(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserProfile();
-            return from_candid_opt_n19(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n20(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n22(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n20(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n22(this._uploadFile, this._downloadFile, result);
         }
     }
     async getGlobalNote(arg0: bigint): Promise<GlobalNote | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getGlobalNote(arg0);
-                return from_candid_opt_n22(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getGlobalNote(arg0);
-            return from_candid_opt_n22(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getPublisher(arg0: PublisherId): Promise<Publisher | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getPublisher(arg0);
-                return from_candid_opt_n23(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getPublisher(arg0);
-            return from_candid_opt_n23(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getShepherdingVisit(arg0: string): Promise<ShepherdingVisit | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getShepherdingVisit(arg0);
                 return from_candid_opt_n24(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getShepherdingVisit(arg0);
+            const result = await this.actor.getGlobalNote(arg0);
             return from_candid_opt_n24(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getPublisher(arg0: PublisherId): Promise<Publisher | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPublisher(arg0);
+                return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPublisher(arg0);
+            return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getPublishers(): Promise<Array<Publisher>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPublishers();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPublishers();
+            return result;
+        }
+    }
+    async getShepherdingVisit(arg0: string): Promise<ShepherdingVisit | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getShepherdingVisit(arg0);
+                return from_candid_opt_n26(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getShepherdingVisit(arg0);
+            return from_candid_opt_n26(this._uploadFile, this._downloadFile, result);
         }
     }
     async getShepherdingVisitsByPublisher(arg0: string): Promise<Array<ShepherdingVisit>> {
@@ -782,98 +875,112 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getTask(arg0);
-                return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n27(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getTask(arg0);
-            return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n27(this._uploadFile, this._downloadFile, result);
         }
     }
     async getTasks(arg0: TaskStatus): Promise<Array<Task>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getTasks(to_candid_TaskStatus_n30(this._uploadFile, this._downloadFile, arg0));
-                return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
+                const result = await this.actor.getTasks(to_candid_TaskStatus_n32(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n34(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getTasks(to_candid_TaskStatus_n30(this._uploadFile, this._downloadFile, arg0));
-            return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
+            const result = await this.actor.getTasks(to_candid_TaskStatus_n32(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n34(this._uploadFile, this._downloadFile, result);
         }
     }
     async getTasksByParent(arg0: bigint | null): Promise<Array<Task>> {
         if (this.processError) {
             try {
-                const result = await this.actor.getTasksByParent(to_candid_opt_n33(this._uploadFile, this._downloadFile, arg0));
-                return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
+                const result = await this.actor.getTasksByParent(to_candid_opt_n35(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n34(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getTasksByParent(to_candid_opt_n33(this._uploadFile, this._downloadFile, arg0));
-            return from_candid_vec_n32(this._uploadFile, this._downloadFile, result);
+            const result = await this.actor.getTasksByParent(to_candid_opt_n35(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n34(this._uploadFile, this._downloadFile, result);
         }
     }
     async getTerritory(arg0: string): Promise<Territory | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getTerritory(arg0);
-                return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getTerritory(arg0);
-            return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getTerritoryNote(arg0: string, arg1: bigint): Promise<TerritoryNote | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getTerritoryNote(arg0, arg1);
-                return from_candid_opt_n35(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getTerritoryNote(arg0, arg1);
-            return from_candid_opt_n35(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async getTrainedConductor(arg0: string): Promise<TrainedServiceMeetingConductor | null> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getTrainedConductor(arg0);
                 return from_candid_opt_n36(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.getTrainedConductor(arg0);
+            const result = await this.actor.getTerritory(arg0);
             return from_candid_opt_n36(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getTerritoryNote(arg0: string, arg1: bigint): Promise<TerritoryNote | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTerritoryNote(arg0, arg1);
+                return from_candid_opt_n37(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTerritoryNote(arg0, arg1);
+            return from_candid_opt_n37(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getTrainedConductor(arg0: string): Promise<TrainedServiceMeetingConductor | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTrainedConductor(arg0);
+                return from_candid_opt_n38(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTrainedConductor(arg0);
+            return from_candid_opt_n38(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getTrainedPublisher(arg0: string): Promise<TrainedPublisher | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTrainedPublisher(arg0);
+                return from_candid_opt_n39(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTrainedPublisher(arg0);
+            return from_candid_opt_n39(this._uploadFile, this._downloadFile, result);
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
-                return from_candid_opt_n19(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUserProfile(arg0);
-            return from_candid_opt_n19(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -949,28 +1056,28 @@ export class Backend implements backendInterface {
     async updateCheckoutRecord(arg0: string, arg1: PublisherId, arg2: bigint, arg3: PublisherId, arg4: bigint, arg5: bigint | null, arg6: boolean): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n37(this._uploadFile, this._downloadFile, arg5), arg6);
+                const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n40(this._uploadFile, this._downloadFile, arg5), arg6);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n37(this._uploadFile, this._downloadFile, arg5), arg6);
+            const result = await this.actor.updateCheckoutRecord(arg0, arg1, arg2, arg3, arg4, to_candid_opt_n40(this._uploadFile, this._downloadFile, arg5), arg6);
             return result;
         }
     }
     async updateGlobalNote(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: PublisherId | null): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateGlobalNote(arg0, arg1, arg2, arg3, to_candid_opt_n4(this._uploadFile, this._downloadFile, arg4));
+                const result = await this.actor.updateGlobalNote(arg0, arg1, arg2, arg3, to_candid_opt_n6(this._uploadFile, this._downloadFile, arg4));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateGlobalNote(arg0, arg1, arg2, arg3, to_candid_opt_n4(this._uploadFile, this._downloadFile, arg4));
+            const result = await this.actor.updateGlobalNote(arg0, arg1, arg2, arg3, to_candid_opt_n6(this._uploadFile, this._downloadFile, arg4));
             return result;
         }
     }
@@ -1009,14 +1116,14 @@ export class Backend implements backendInterface {
     async updateTask(arg0: bigint, arg1: CreateTaskInput): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateTask(arg0, to_candid_CreateTaskInput_n5(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.updateTask(arg0, to_candid_CreateTaskInput_n7(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateTask(arg0, to_candid_CreateTaskInput_n5(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.updateTask(arg0, to_candid_CreateTaskInput_n7(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }
@@ -1065,70 +1172,87 @@ export class Backend implements backendInterface {
     async updateTrainedConductor(arg0: string, arg1: UpdateTrainedConductorInput): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateTrainedConductor(arg0, arg1);
+                const result = await this.actor.updateTrainedConductor(arg0, to_candid_UpdateTrainedConductorInput_n41(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateTrainedConductor(arg0, arg1);
+            const result = await this.actor.updateTrainedConductor(arg0, to_candid_UpdateTrainedConductorInput_n41(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async updateTrainedPublisher(arg0: string, arg1: UpdateTrainedPublisherInput): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateTrainedPublisher(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateTrainedPublisher(arg0, arg1);
             return result;
         }
     }
 }
-function from_candid_CheckoutRecord_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CheckoutRecord): CheckoutRecord {
-    return from_candid_record_n17(_uploadFile, _downloadFile, value);
+function from_candid_CheckoutRecord_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CheckoutRecord): CheckoutRecord {
+    return from_candid_record_n19(_uploadFile, _downloadFile, value);
 }
-function from_candid_GlobalNote_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _GlobalNote): GlobalNote {
-    return from_candid_record_n10(_uploadFile, _downloadFile, value);
+function from_candid_GlobalNote_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _GlobalNote): GlobalNote {
+    return from_candid_record_n12(_uploadFile, _downloadFile, value);
 }
-function from_candid_Task_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Task): Task {
-    return from_candid_record_n27(_uploadFile, _downloadFile, value);
+function from_candid_Task_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Task): Task {
+    return from_candid_record_n29(_uploadFile, _downloadFile, value);
 }
-function from_candid_Territory_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Territory): Territory {
-    return from_candid_record_n14(_uploadFile, _downloadFile, value);
+function from_candid_Territory_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Territory): Territory {
+    return from_candid_record_n16(_uploadFile, _downloadFile, value);
 }
-function from_candid_UserRole_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n21(_uploadFile, _downloadFile, value);
+function from_candid_UserRole_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n23(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PublisherId]): PublisherId | null {
+function from_candid_opt_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PublisherId]): PublisherId | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+function from_candid_opt_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+function from_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_GlobalNote]): GlobalNote | null {
-    return value.length === 0 ? null : from_candid_GlobalNote_n9(_uploadFile, _downloadFile, value[0]);
+function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_GlobalNote]): GlobalNote | null {
+    return value.length === 0 ? null : from_candid_GlobalNote_n11(_uploadFile, _downloadFile, value[0]);
 }
-function from_candid_opt_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Publisher]): Publisher | null {
+function from_candid_opt_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Publisher]): Publisher | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ShepherdingVisit]): ShepherdingVisit | null {
+function from_candid_opt_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_ShepherdingVisit]): ShepherdingVisit | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Task]): Task | null {
-    return value.length === 0 ? null : from_candid_Task_n26(_uploadFile, _downloadFile, value[0]);
+function from_candid_opt_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Task]): Task | null {
+    return value.length === 0 ? null : from_candid_Task_n28(_uploadFile, _downloadFile, value[0]);
 }
-function from_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+function from_candid_opt_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+function from_candid_opt_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Territory]): Territory | null {
-    return value.length === 0 ? null : from_candid_Territory_n13(_uploadFile, _downloadFile, value[0]);
+function from_candid_opt_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Territory]): Territory | null {
+    return value.length === 0 ? null : from_candid_Territory_n15(_uploadFile, _downloadFile, value[0]);
 }
-function from_candid_opt_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TerritoryNote]): TerritoryNote | null {
+function from_candid_opt_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TerritoryNote]): TerritoryNote | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TrainedServiceMeetingConductor]): TrainedServiceMeetingConductor | null {
+function from_candid_opt_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TrainedServiceMeetingConductor]): TrainedServiceMeetingConductor | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_record_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_opt_n39(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TrainedPublisher]): TrainedPublisher | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: bigint;
     title: string;
     content: string;
@@ -1149,10 +1273,10 @@ function from_candid_record_n10(_uploadFile: (file: ExternalBlob) => Promise<Uin
         content: value.content,
         createdAt: value.createdAt,
         category: value.category,
-        attachedPublisher: record_opt_to_undefined(from_candid_opt_n11(_uploadFile, _downloadFile, value.attachedPublisher))
+        attachedPublisher: record_opt_to_undefined(from_candid_opt_n13(_uploadFile, _downloadFile, value.attachedPublisher))
     };
 }
-function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: string;
     status: string;
     createdAt: bigint;
@@ -1173,13 +1297,13 @@ function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promise<Uin
         id: value.id,
         status: value.status,
         createdAt: value.createdAt,
-        checkOutHistory: from_candid_vec_n15(_uploadFile, _downloadFile, value.checkOutHistory),
+        checkOutHistory: from_candid_vec_n17(_uploadFile, _downloadFile, value.checkOutHistory),
         territoryType: value.territoryType,
         notes: value.notes,
         number: value.number
     };
 }
-function from_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     publisherId: _PublisherId;
     publisherName: string;
     dateReturned: [] | [bigint];
@@ -1195,12 +1319,12 @@ function from_candid_record_n17(_uploadFile: (file: ExternalBlob) => Promise<Uin
     return {
         publisherId: value.publisherId,
         publisherName: value.publisherName,
-        dateReturned: record_opt_to_undefined(from_candid_opt_n18(_uploadFile, _downloadFile, value.dateReturned)),
+        dateReturned: record_opt_to_undefined(from_candid_opt_n20(_uploadFile, _downloadFile, value.dateReturned)),
         isCampaign: value.isCampaign,
         dateCheckedOut: value.dateCheckedOut
     };
 }
-function from_candid_record_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: bigint;
     completedAt: [] | [bigint];
     title: string;
@@ -1225,18 +1349,18 @@ function from_candid_record_n27(_uploadFile: (file: ExternalBlob) => Promise<Uin
 } {
     return {
         id: value.id,
-        completedAt: record_opt_to_undefined(from_candid_opt_n18(_uploadFile, _downloadFile, value.completedAt)),
+        completedAt: record_opt_to_undefined(from_candid_opt_n20(_uploadFile, _downloadFile, value.completedAt)),
         title: value.title,
         isCompleted: value.isCompleted,
         createdAt: value.createdAt,
         dueDate: value.dueDate,
-        updatedAt: record_opt_to_undefined(from_candid_opt_n18(_uploadFile, _downloadFile, value.updatedAt)),
-        parentTaskId: record_opt_to_undefined(from_candid_opt_n28(_uploadFile, _downloadFile, value.parentTaskId)),
-        notes: record_opt_to_undefined(from_candid_opt_n29(_uploadFile, _downloadFile, value.notes)),
+        updatedAt: record_opt_to_undefined(from_candid_opt_n20(_uploadFile, _downloadFile, value.updatedAt)),
+        parentTaskId: record_opt_to_undefined(from_candid_opt_n30(_uploadFile, _downloadFile, value.parentTaskId)),
+        notes: record_opt_to_undefined(from_candid_opt_n31(_uploadFile, _downloadFile, value.notes)),
         category: value.category
     };
 }
-function from_candid_variant_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_variant_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -1245,43 +1369,79 @@ function from_candid_variant_n21(_uploadFile: (file: ExternalBlob) => Promise<Ui
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
-function from_candid_vec_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Territory>): Array<Territory> {
-    return value.map((x)=>from_candid_Territory_n13(_uploadFile, _downloadFile, x));
+function from_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_GlobalNote>): Array<GlobalNote> {
+    return value.map((x)=>from_candid_GlobalNote_n11(_uploadFile, _downloadFile, x));
 }
-function from_candid_vec_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_CheckoutRecord>): Array<CheckoutRecord> {
-    return value.map((x)=>from_candid_CheckoutRecord_n16(_uploadFile, _downloadFile, x));
+function from_candid_vec_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Territory>): Array<Territory> {
+    return value.map((x)=>from_candid_Territory_n15(_uploadFile, _downloadFile, x));
 }
-function from_candid_vec_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Task>): Array<Task> {
-    return value.map((x)=>from_candid_Task_n26(_uploadFile, _downloadFile, x));
+function from_candid_vec_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_CheckoutRecord>): Array<CheckoutRecord> {
+    return value.map((x)=>from_candid_CheckoutRecord_n18(_uploadFile, _downloadFile, x));
 }
-function from_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_GlobalNote>): Array<GlobalNote> {
-    return value.map((x)=>from_candid_GlobalNote_n9(_uploadFile, _downloadFile, x));
+function from_candid_vec_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Task>): Array<Task> {
+    return value.map((x)=>from_candid_Task_n28(_uploadFile, _downloadFile, x));
 }
-function to_candid_CreateTaskInput_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: CreateTaskInput): _CreateTaskInput {
-    return to_candid_record_n6(_uploadFile, _downloadFile, value);
+function to_candid_CreateTaskInput_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: CreateTaskInput): _CreateTaskInput {
+    return to_candid_record_n8(_uploadFile, _downloadFile, value);
 }
-function to_candid_TaskStatus_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): _TaskStatus {
-    return to_candid_variant_n31(_uploadFile, _downloadFile, value);
+function to_candid_CreateTrainedConductorInput_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: CreateTrainedConductorInput): _CreateTrainedConductorInput {
+    return to_candid_record_n3(_uploadFile, _downloadFile, value);
 }
-function to_candid_UserRole_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
-    return to_candid_variant_n3(_uploadFile, _downloadFile, value);
+function to_candid_TaskStatus_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): _TaskStatus {
+    return to_candid_variant_n33(_uploadFile, _downloadFile, value);
+}
+function to_candid_UpdateTrainedConductorInput_n41(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UpdateTrainedConductorInput): _UpdateTrainedConductorInput {
+    return to_candid_record_n3(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n5(_uploadFile, _downloadFile, value);
 }
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: boolean | null): [] | [boolean] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
+function to_candid_opt_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
+function to_candid_opt_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PublisherId | null): [] | [_PublisherId] {
+function to_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PublisherId | null): [] | [_PublisherId] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
+function to_candid_opt_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_record_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    status: string;
+    availableSaturday?: boolean;
+    availableThursday?: boolean;
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+    availableSunday?: boolean;
+    availableFriday?: boolean;
+}): {
+    status: string;
+    availableSaturday: [] | [boolean];
+    availableThursday: [] | [boolean];
+    publisherId: string;
+    publisherName: string;
+    trainingDate: bigint;
+    availableSunday: [] | [boolean];
+    availableFriday: [] | [boolean];
+} {
+    return {
+        status: value.status,
+        availableSaturday: value.availableSaturday ? candid_some(value.availableSaturday) : candid_none(),
+        availableThursday: value.availableThursday ? candid_some(value.availableThursday) : candid_none(),
+        publisherId: value.publisherId,
+        publisherName: value.publisherName,
+        trainingDate: value.trainingDate,
+        availableSunday: value.availableSunday ? candid_some(value.availableSunday) : candid_none(),
+        availableFriday: value.availableFriday ? candid_some(value.availableFriday) : candid_none()
+    };
+}
+function to_candid_record_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     title: string;
     dueDate: bigint;
     parentTaskId?: bigint;
@@ -1302,22 +1462,7 @@ function to_candid_record_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         category: value.category
     };
 }
-function to_candid_variant_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
-    admin: null;
-} | {
-    user: null;
-} | {
-    guest: null;
-} {
-    return value == UserRole.admin ? {
-        admin: null
-    } : value == UserRole.user ? {
-        user: null
-    } : value == UserRole.guest ? {
-        guest: null
-    } : value;
-}
-function to_candid_variant_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): {
+function to_candid_variant_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TaskStatus): {
     all: null;
 } | {
     completed: null;
@@ -1330,6 +1475,21 @@ function to_candid_variant_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint
         completed: null
     } : value == TaskStatus.uncompleted ? {
         uncompleted: null
+    } : value;
+}
+function to_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+} {
+    return value == UserRole.admin ? {
+        admin: null
+    } : value == UserRole.user ? {
+        user: null
+    } : value == UserRole.guest ? {
+        guest: null
     } : value;
 }
 export interface CreateActorOptions {
