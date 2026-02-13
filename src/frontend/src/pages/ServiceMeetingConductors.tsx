@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ import DeleteConductorDialog from '../components/conductors/DeleteConductorDialo
 import type { TrainedServiceMeetingConductor } from '../backend';
 
 export default function ServiceMeetingConductors() {
+  const navigate = useNavigate();
   const { data: conductors, isLoading } = useGetAllTrainedConductors();
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -28,14 +30,20 @@ export default function ServiceMeetingConductors() {
     setModalOpen(true);
   };
 
-  const handleEditConductor = (conductor: TrainedServiceMeetingConductor) => {
+  const handleEditConductor = (e: React.MouseEvent, conductor: TrainedServiceMeetingConductor) => {
+    e.stopPropagation();
     setSelectedConductor(conductor);
     setModalOpen(true);
   };
 
-  const handleDeleteConductor = (conductorId: string) => {
+  const handleDeleteConductor = (e: React.MouseEvent, conductorId: string) => {
+    e.stopPropagation();
     setConductorToDelete(conductorId);
     setDeleteDialogOpen(true);
+  };
+
+  const handleConductorClick = (conductorId: string) => {
+    navigate({ to: `/conductors/${conductorId}` });
   };
 
   // Sort conductors alphabetically by name
@@ -98,7 +106,11 @@ export default function ServiceMeetingConductors() {
                 if (conductor.availableSunday) availableDays.push('Sun');
 
                 return (
-                  <TableRow key={conductor.id}>
+                  <TableRow 
+                    key={conductor.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleConductorClick(conductor.id)}
+                  >
                     <TableCell className="font-medium">{conductor.publisherName}</TableCell>
                     <TableCell>{formatTrainingDate(conductor.trainingDate)}</TableCell>
                     <TableCell>
@@ -131,14 +143,14 @@ export default function ServiceMeetingConductors() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEditConductor(conductor)}
+                          onClick={(e) => handleEditConductor(e, conductor)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteConductor(conductor.id)}
+                          onClick={(e) => handleDeleteConductor(e, conductor.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

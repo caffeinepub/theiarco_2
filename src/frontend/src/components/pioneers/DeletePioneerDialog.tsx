@@ -16,12 +16,14 @@ interface DeletePioneerDialogProps {
   isOpen: boolean;
   onClose: () => void;
   pioneer: Pioneer | null;
+  onDeleted?: () => void;
 }
 
 export default function DeletePioneerDialog({
   isOpen,
   onClose,
   pioneer,
+  onDeleted,
 }: DeletePioneerDialogProps) {
   const deletePioneerMutation = useDeletePioneer();
 
@@ -41,6 +43,11 @@ export default function DeletePioneerDialog({
       });
 
       onClose();
+
+      // Call optional callback after successful deletion
+      if (onDeleted) {
+        onDeleted();
+      }
     } catch (error) {
       // Error - show error toast
       console.error('Failed to delete pioneer:', error);

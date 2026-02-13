@@ -3,10 +3,6 @@ import { useActor } from './useActor';
 import type { UpdateTrainedConductorInput } from '../backend';
 import { toast } from 'sonner';
 
-/**
- * React Query mutation hook for updating a trained conductor.
- * Invalidates the trainedConductors query on success.
- */
 export function useUpdateTrainedConductor() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -16,12 +12,17 @@ export function useUpdateTrainedConductor() {
       if (!actor) throw new Error('Actor not available');
       return actor.updateTrainedConductor(id, input);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['trainedConductors'] });
-      toast.success('Conductor updated successfully!', { duration: 3000 });
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to update conductor: ${error.message}`, { duration: 3000 });
+      // Also invalidate the single conductor query
+      queryClient.invalidateQueries({ queryKey: ['trainedConductor', variables.id] });
+      toast.success('Conductor updated successfully!', {
+        duration: 3000,
+        style: {
+          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
+          color: 'white',
+        },
+      });
     },
   });
 }

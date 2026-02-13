@@ -1,38 +1,46 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T23:09:42.616Z",
-  "summary": "The diff shows partial work toward making Publisher dropdowns scrollable by adding a max-height class to SelectContent in at least two modals (AddPioneerModal, RecordVisitModal). However, based on the truncated snippets, it is not verifiable that all four specified modals were updated, nor that overflow/scrollbar behavior and off-screen containment/repositioning are implemented. Additionally, there is an unrelated change in the PublicWitnessing page (sorting) that was not requested.",
+  "generatedAt": "2026-02-12T23:41:12.728Z",
+  "summary": "Territories.tsx adds logic to derive a publisher display value using the most recent checkout record and fetches publishers via useGetAllPublishers, but the diff snippet does not show the actual table header/cell insertion or muted styling, so key UI placement/styling requirements cannot be verified.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "In each of the four specified modals, the Publisher dropdown list has a maximum height of 250px, becomes vertically scrollable with a scrollbar when exceeding that height, and repositions/constrains so it does not render off-screen or visually escape the modal/viewport.",
-      "reason": "Only two modals explicitly show `SelectContent className=\"max-h-[250px]\"` in the provided diff (AddPioneerModal, RecordVisitModal). The TrainedPublisherModal and ConductorModal portions containing the Publisher SelectContent are truncated, so it cannot be confirmed they were updated. Also, `max-h-[250px]` alone does not, by itself, prove overflow scrolling (e.g., `overflow-y-auto`) or off-screen containment/repositioning behavior was implemented.",
+      "requirement": "Update the Territories table to include a new \"Publisher\" column positioned between \"Territory Number\" and \"Status\" (header and row cells), keeping all other behaviors unchanged.",
+      "reason": "The provided diff excerpt for Territories.tsx is truncated before the table JSX, so there is no visible evidence that a \"Publisher\" <TableHead> and corresponding <TableCell> were added or that column order was adjusted.",
       "evidence": [
-        "frontend/src/components/pioneers/AddPioneerModal.tsx (shows `SelectContent className=\"max-h-[250px]\"` but no explicit overflow/reposition props in shown snippet)",
-        "frontend/src/components/shepherding/RecordVisitModal.tsx (shows `SelectContent className=\"max-h-[250px]\"` but no explicit overflow/reposition props in shown snippet)",
-        "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx (publisher dropdown area truncated before SelectContent; cannot verify changes)",
-        "frontend/src/components/conductors/ConductorModal.tsx (modal content truncated before publisher dropdown; cannot verify changes)"
+        "frontend/src/pages/Territories.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "When status is \"Available\", display exactly \"—\" in a muted/gray text style (e.g., text-muted-foreground) in the Publisher cell; fail gracefully with muted \"—\" if checked out but no record is found.",
+      "reason": "The logic returns \"—\" for Available and missing-record cases, but the diff excerpt does not show any JSX/styling applying a muted/gray class to the rendered em dash in the table cell.",
+      "evidence": [
+        "frontend/src/pages/Territories.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Public Witnessing page now sorts trained publishers alphabetically by publisher name.",
-      "reason": "The BuildRequest only asked to adjust Publisher dropdown behavior inside four modal components, and explicitly stated to keep other behavior unchanged; sorting in the page component is outside that scope.",
+      "description": "Introduced an additional helper to compute an \"active\" checkout record (most recent record with dateReturned null/undefined), which may affect duration calculation behavior.",
+      "reason": "The BuildRequest only asks to add a Publisher column derived from the most recent checkout record; adding/altering logic around the active checkout record is not requested and could potentially change existing page behavior.",
       "evidence": [
-        "frontend/src/pages/PublicWitnessing.tsx (adds `sortedPublishers` via `useMemo` and uses it for rendering)"
+        "frontend/src/pages/Territories.tsx (truncated) - getActiveCheckoutRecord helper added"
+      ]
+    },
+    {
+      "description": "Publisher display logic explicitly returns an em dash for statuses other than \"Available\" and \"Checked Out\" (e.g., \"Under Review\").",
+      "reason": "The BuildRequest specifies behavior for \"Checked Out\" and \"Available\" only; handling other statuses this way is additional behavior not explicitly requested (though it may be acceptable).",
+      "evidence": [
+        "frontend/src/pages/Territories.tsx (truncated) - getPublisherName returns '—' for other statuses"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.56,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/conductors/ConductorModal.tsx",
-    "frontend/src/components/pioneers/AddPioneerModal.tsx",
-    "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx",
-    "frontend/src/components/shepherding/RecordVisitModal.tsx",
-    "frontend/src/pages/PublicWitnessing.tsx",
+    "frontend/src/pages/Territories.tsx",
     "project_state.json"
   ]
 }

@@ -38,6 +38,12 @@
         --dashboard-stat-2: 0.42 0.09 240;
         --dashboard-stat-3: 0.36 0.07 240;
         --dashboard-stat-4: 0.30 0.06 240;
+        
+        /* Dashboard stat card color for uncompleted tasks - orange */
+        --dashboard-stat-uncompleted: 0.65 0.18 45;
+        
+        /* Dashboard stat card color for pioneers on track - green */
+        --dashboard-stat-green: 0.60 0.15 145;
     }
 
     .dark {
@@ -74,6 +80,12 @@
         --dashboard-stat-2: 0.46 0.10 240;
         --dashboard-stat-3: 0.40 0.08 240;
         --dashboard-stat-4: 0.34 0.07 240;
+        
+        /* Dashboard stat card color for uncompleted tasks - orange (dark mode) */
+        --dashboard-stat-uncompleted: 0.68 0.16 50;
+        
+        /* Dashboard stat card color for pioneers on track - green (dark mode) */
+        --dashboard-stat-green: 0.65 0.16 145;
     }
 
     * {
@@ -105,5 +117,11 @@
     }
     .bg-dashboard-stat-4 {
         background-color: oklch(var(--dashboard-stat-4));
+    }
+    .bg-dashboard-stat-uncompleted {
+        background-color: oklch(var(--dashboard-stat-uncompleted));
+    }
+    .bg-dashboard-stat-green {
+        background-color: oklch(var(--dashboard-stat-green));
     }
 }

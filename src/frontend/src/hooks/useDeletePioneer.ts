@@ -10,9 +10,11 @@ export function useDeletePioneer() {
       if (!actor) throw new Error('Actor not available');
       await actor.deletePioneer(id);
     },
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       // Invalidate pioneers list query to trigger refetch
       queryClient.invalidateQueries({ queryKey: ['pioneers'] });
+      // Remove single pioneer query from cache
+      queryClient.removeQueries({ queryKey: ['pioneer', id] });
     },
   });
 }

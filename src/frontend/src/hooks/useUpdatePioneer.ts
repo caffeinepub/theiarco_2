@@ -11,9 +11,11 @@ export function useUpdatePioneer() {
       if (!actor) throw new Error('Actor not available');
       await actor.editPioneer(id, input);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       // Invalidate pioneers list query to trigger refetch
       queryClient.invalidateQueries({ queryKey: ['pioneers'] });
+      // Invalidate single pioneer query to refresh profile view
+      queryClient.invalidateQueries({ queryKey: ['pioneer', variables.id] });
     },
   });
 }

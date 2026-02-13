@@ -1,23 +1,22 @@
+// Complete updated Motoko code
 import Map "mo:core/Map";
 import Array "mo:core/Array";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
+import Time "mo:core/Time";
+import Nat "mo:core/Nat";
+import Text "mo:core/Text";
+import Iter "mo:core/Iter";
+import Int "mo:core/Int";
+import Order "mo:core/Order";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Nat "mo:core/Nat";
-import Time "mo:core/Time";
-import Order "mo:core/Order";
-import Int "mo:core/Int";
-import Text "mo:core/Text";
-
-
 
 actor {
   // AccessControl state and authorization system
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Generic Collector application domain
   public type UserProfile = {
     name : Text;
     congregationName : Text;
@@ -63,7 +62,7 @@ actor {
   };
 
   let publishers = Map.empty<PublisherId, Publisher>();
-  var nextPublisherId = 0;
+  var nextPublisherId = 0; // unique id for publishers
 
   public shared ({ caller }) func addPublisher(
     fullName : Text,
@@ -168,7 +167,6 @@ actor {
     publishers.values().toArray();
   };
 
-  // Pioneers domain
   public type Pioneer = {
     id : Text;
     publisherId : Text;
@@ -181,14 +179,12 @@ actor {
   let pioneers = Map.empty<Text, Pioneer>();
   var nextPioneerId = 0;
 
-  // CreatePioneerInput type
   public type CreatePioneerInput = {
     publisherId : Text;
     publisherName : Text;
     serviceYear : Text;
   };
 
-  // EditPioneerInput type - now with explicit type
   public type EditPioneerInput = {
     publisherId : Text;
     publisherName : Text;
@@ -244,6 +240,98 @@ actor {
   public query ({ caller }) func getAllPioneers() : async [Pioneer] {
     checkUserPermission(caller, #user);
     pioneers.values().toArray();
+  };
+
+  // New function to get a single pioneer by ID with user permission check
+  public query ({ caller }) func getPioneer(id : Text) : async ?Pioneer {
+    checkUserPermission(caller, #user);
+    pioneers.get(id);
+  };
+
+  // Pioneer Monthly Hours Domain
+  public type PioneerMonthlyHours = {
+    id : Text;
+    pioneerId : Text;
+    month : Text;
+    hours : Nat;
+    serviceYear : Text;
+    createdAt : Int;
+  };
+
+  let pioneerMonthlyHours = Map.empty<Text, PioneerMonthlyHours>();
+  var nextHoursId = 0;
+
+  public type CreatePioneerMonthlyHoursInput = {
+    pioneerId : Text;
+    month : Text;
+    hours : Nat;
+    serviceYear : Text;
+  };
+
+  public shared ({ caller }) func addPioneerHours(input : CreatePioneerMonthlyHoursInput) : async Text {
+    checkUserPermission(caller, #user);
+
+    let hoursId = nextHoursId.toText();
+    nextHoursId += 1;
+
+    let newHours : PioneerMonthlyHours = {
+      id = hoursId;
+      pioneerId = input.pioneerId;
+      month = input.month;
+      hours = input.hours;
+      serviceYear = input.serviceYear;
+      createdAt = Time.now();
+    };
+
+    pioneerMonthlyHours.add(hoursId, newHours);
+    hoursId;
+  };
+
+  public query ({ caller }) func getPioneerHours(id : Text) : async ?PioneerMonthlyHours {
+    checkUserPermission(caller, #user);
+    pioneerMonthlyHours.get(id);
+  };
+
+  public shared ({ caller }) func updatePioneerHours(
+    id : Text,
+    pioneerId : Text,
+    month : Text,
+    hours : Nat,
+    serviceYear : Text,
+  ) : async () {
+    checkUserPermission(caller, #user);
+
+    switch (pioneerMonthlyHours.get(id)) {
+      case (null) { Runtime.trap("PioneerMonthlyHours not found: " # id) };
+      case (?existing) {
+        let updatedHours : PioneerMonthlyHours = {
+          existing with
+          pioneerId;
+          month;
+          hours;
+          serviceYear;
+        };
+        pioneerMonthlyHours.add(id, updatedHours);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deletePioneerHours(id : Text) : async () {
+    checkUserPermission(caller, #user);
+
+    if (not pioneerMonthlyHours.containsKey(id)) {
+      Runtime.trap("Delete failed. PioneerMonthlyHours with that id does not exist: " # id);
+    };
+
+    pioneerMonthlyHours.remove(id);
+  };
+
+  public query ({ caller }) func getPioneerHoursForServiceYear(pioneerId : Text, serviceYear : Text) : async [PioneerMonthlyHours] {
+    checkUserPermission(caller, #user);
+
+    pioneerMonthlyHours.values().toArray().filter(
+      func(record) { record.pioneerId == pioneerId and record.serviceYear == serviceYear }
+    );
   };
 
   public type GlobalNote = {
@@ -478,9 +566,9 @@ actor {
   };
 
   public type Territory = {
-    id : Text; // Must be unique but can contain any characters
-    number : Text; // Free-form text
-    territoryType : Text; // "Business" | "Residential" | "Rural" | "Letter Writing"
+    id : Text;
+    number : Text;
+    territoryType : Text;
     status : Text;
     notes : Text;
     checkOutHistory : [CheckoutRecord];
@@ -488,6 +576,34 @@ actor {
   };
 
   let territories = Map.empty<Text, Territory>();
+
+  public shared ({ caller }) func deleteCheckoutRecord(
+    territoryId : Text,
+    publisherId : PublisherId,
+    dateCheckedOut : Int,
+  ) : async () {
+    checkUserPermission(caller, #user);
+
+    let territory = switch (territories.get(territoryId)) {
+      case (null) { Runtime.trap("Territory not found. Delete failed."); };
+      case (?t) { t };
+    };
+
+    let updatedHistory = territory.checkOutHistory.filter(
+      func(record) {
+        not (
+          record.publisherId == publisherId and
+          record.dateCheckedOut == dateCheckedOut
+        );
+      }
+    );
+
+    let updatedTerritory : Territory = {
+      territory with checkOutHistory = updatedHistory
+    };
+
+    territories.add(territoryId, updatedTerritory);
+  };
 
   public shared ({ caller }) func checkOutTerritory(
     territoryId : Text,
@@ -874,24 +990,22 @@ actor {
   ) : async () {
     checkUserPermission(caller, #user);
 
-    // Pull the existing visit (if present -> use, if not -> trap)
-    let existing = switch (shepherdingVisits.get(id)) {
+    switch (shepherdingVisits.get(id)) {
       case (null) { Runtime.trap("ShepherdingVisit not found: " # id) };
-      case (?existing) { existing };
+      case (?existing) {
+        let updatedVisit : ShepherdingVisit = {
+          existing with
+          publisherId;
+          publisherName;
+          visitDate;
+          eldersPresent;
+          notes = notes # "\n";
+        };
+        shepherdingVisits.add(id, updatedVisit);
+      };
     };
-
-    // Create modified visit on top of the (unmodified) existing one
-    let modified : ShepherdingVisit = {
-      existing with
-      publisherId;
-      publisherName;
-      visitDate;
-      eldersPresent;
-      notes = notes # "\n";
-    };
-
-    shepherdingVisits.add(id, modified);
   };
+
   // Editing single fields from the frontend must not be implemented here!
   // Update functions work with the full record.
 
@@ -934,6 +1048,7 @@ actor {
     availableFriday : Bool;
     availableSaturday : Bool;
     availableSunday : Bool;
+    notes : ?Text;
   };
 
   let trainedConductors = Map.empty<Text, TrainedServiceMeetingConductor>();
@@ -948,6 +1063,7 @@ actor {
     availableFriday : ?Bool;
     availableSaturday : ?Bool;
     availableSunday : ?Bool;
+    notes : ?Text;
   };
 
   // Update input type
@@ -960,6 +1076,7 @@ actor {
     availableFriday : ?Bool;
     availableSaturday : ?Bool;
     availableSunday : ?Bool;
+    notes : ?Text;
   };
 
   public shared ({ caller }) func addTrainedConductor(input : CreateTrainedConductorInput) : async Text {
@@ -976,6 +1093,7 @@ actor {
       availableFriday = switch (input.availableFriday) { case (null) { false }; case (?v) { v } };
       availableSaturday = switch (input.availableSaturday) { case (null) { false }; case (?v) { v } };
       availableSunday = switch (input.availableSunday) { case (null) { false }; case (?v) { v } };
+      notes = input.notes;
     };
 
     trainedConductors.add(input.publisherId, newConductor);
@@ -998,6 +1116,7 @@ actor {
           availableFriday = switch (input.availableFriday) { case (null) { existing.availableFriday }; case (?v) { v } };
           availableSaturday = switch (input.availableSaturday) { case (null) { existing.availableSaturday }; case (?v) { v } };
           availableSunday = switch (input.availableSunday) { case (null) { existing.availableSunday }; case (?v) { v } };
+          notes = input.notes;
         };
         trainedConductors.add(id, updatedConductor);
       };
@@ -1025,16 +1144,28 @@ actor {
   };
 
   // Persistent Trained Publishers Domain
-  public type TrainedPublisher = {
+  public type TrainedPublisherPersistent = {
     id : Text;
     publisherId : Text;
     publisherName : Text;
     trainingDate : Int;
     isAuthorized : Bool; // Default false
     createdAt : Int;
+    hasS148Received : Bool; // New field to indicate if S-148 form has been received
   };
 
-  let trainedPublishers = Map.empty<Text, TrainedPublisher>();
+  // Externally exposed type (backward compatibility)
+  public type TrainedPublisher = {
+    id : Text;
+    publisherId : Text;
+    publisherName : Text;
+    trainingDate : Int;
+    isAuthorized : Bool;
+    createdAt : Int;
+    hasS148Received : Bool;
+  };
+
+  let trainedPublishers = Map.empty<Text, TrainedPublisherPersistent>();
 
   // Create input type
   public type CreateTrainedPublisherInput = {
@@ -1055,13 +1186,14 @@ actor {
   public shared ({ caller }) func addTrainedPublisher(input : CreateTrainedPublisherInput) : async Text {
     checkUserPermission(caller, #user);
 
-    let newPublisher : TrainedPublisher = {
+    let newPublisher : TrainedPublisherPersistent = {
       id = input.publisherId;
       publisherId = input.publisherId;
       publisherName = input.publisherName;
       trainingDate = input.trainingDate;
       isAuthorized = false; // Default to false
       createdAt = Time.now();
+      hasS148Received = false; // Default to false
     };
 
     trainedPublishers.add(input.publisherId, newPublisher);
@@ -1075,7 +1207,7 @@ actor {
     switch (trainedPublishers.get(id)) {
       case (null) { Runtime.trap("TrainedPublisher not found: " # id) };
       case (?existing) {
-        let updatedPublisher : TrainedPublisher = {
+        let updatedPublisher : TrainedPublisherPersistent = {
           existing with
           publisherId = input.publisherId;
           publisherName = input.publisherName;
@@ -1098,15 +1230,153 @@ actor {
     trainedPublishers.remove(id);
   };
 
-  // Query Trained Publisher (internal type)
+  // Update S-148 form received status
+  public shared ({ caller }) func setS148Received(id : Text, received : Bool) : async () {
+    checkUserPermission(caller, #user);
+
+    switch (trainedPublishers.get(id)) {
+      case (null) { Runtime.trap("TrainedPublisher not found: " # id) };
+      case (?existing) {
+        let updated : TrainedPublisherPersistent = {
+          existing with
+          hasS148Received = received;
+        };
+        trainedPublishers.add(id, updated);
+      };
+    };
+  };
+
+  // Query Trained Publisher (persistent type)
   public query ({ caller }) func getTrainedPublisher(id : Text) : async ?TrainedPublisher {
     checkUserPermission(caller, #user);
     trainedPublishers.get(id);
   };
 
-  // Query all Trained Publishers (internal type)
+  // Query all Trained Publishers (persistent type)
   public query ({ caller }) func getAllTrainedPublishers() : async [TrainedPublisher] {
     checkUserPermission(caller, #user);
     trainedPublishers.values().toArray();
   };
+
+  // Return fields of a conductor in the backend
+  public query ({ caller }) func getTrainedConductorProfile(id : Text) : async ?TrainedServiceMeetingConductor {
+    checkUserPermission(caller, #user);
+    trainedConductors.get(id);
+  };
+
+  public type GroupVisit = {
+    id : Text;
+    groupNumber : Nat;
+    visitDate : Int;
+    discussionTopics : Text;
+    publishersPresent : [Text];
+    publisherNamesPresent : [Text];
+    notesForOverseer : Text;
+    notesForAssistant : Text;
+    nextPlannedVisitDate : ?Int;
+    createdAt : Int;
+  };
+
+  let groupVisits = Map.empty<Text, GroupVisit>();
+  var nextGroupVisitId = 1;
+
+  // AddGroupVisitInput type
+  public type AddGroupVisitInput = {
+    groupNumber : Nat;
+    visitDate : Int;
+    discussionTopics : Text;
+    publishersPresent : [Text];
+    publisherNamesPresent : [Text];
+    notesForOverseer : Text;
+    notesForAssistant : Text;
+    nextPlannedVisitDate : ?Int;
+  };
+
+  // New backend query method: addGroupVisit
+  public shared ({ caller }) func addGroupVisit(input : AddGroupVisitInput) : async Text {
+    checkUserPermission(caller, #user);
+
+    let id = "gv-" # nextGroupVisitId.toText();
+    nextGroupVisitId += 1;
+
+    let newVisit : GroupVisit = {
+      id;
+      groupNumber = input.groupNumber;
+      visitDate = input.visitDate;
+      discussionTopics = input.discussionTopics;
+      publishersPresent = input.publishersPresent;
+      publisherNamesPresent = input.publisherNamesPresent;
+      notesForOverseer = input.notesForOverseer;
+      notesForAssistant = input.notesForAssistant;
+      nextPlannedVisitDate = input.nextPlannedVisitDate;
+      createdAt = Time.now();
+    };
+
+    groupVisits.add(id, newVisit);
+    id;
+  };
+
+  public shared ({ caller }) func updateGroupVisit(
+    id : Text,
+    groupNumber : Nat,
+    visitDate : Int,
+    discussionTopics : Text,
+    publishersPresent : [Text],
+    publisherNamesPresent : [Text],
+    notesForOverseer : Text,
+    notesForAssistant : Text,
+    nextPlannedVisitDate : ?Int,
+  ) : async () {
+    checkUserPermission(caller, #user);
+
+    switch (groupVisits.get(id)) {
+      case (null) { Runtime.trap("GroupVisit not found: " # id) };
+      case (?existing) {
+        let updatedVisit : GroupVisit = {
+          existing with
+          groupNumber;
+          visitDate;
+          discussionTopics;
+          publishersPresent;
+          publisherNamesPresent;
+          notesForOverseer;
+          notesForAssistant;
+          nextPlannedVisitDate;
+        };
+        groupVisits.add(id, updatedVisit);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteGroupVisit(id : Text) : async () {
+    checkUserPermission(caller, #user);
+
+    if (not groupVisits.containsKey(id)) {
+      Runtime.trap("Delete failed. GroupVisit with that id does not exist: " # id);
+    };
+
+    groupVisits.remove(id);
+  };
+
+  public query ({ caller }) func getGroupVisit(id : Text) : async ?GroupVisit {
+    checkUserPermission(caller, #user);
+    groupVisits.get(id);
+  };
+
+  public query ({ caller }) func getAllGroupVisits() : async [GroupVisit] {
+    checkUserPermission(caller, #user);
+    groupVisits.values().toArray();
+  };
+
+  public query ({ caller }) func getGroupVisitsByGroupNumber(groupNumber : Nat) : async [GroupVisit] {
+    checkUserPermission(caller, #user);
+    groupVisits.values().toArray().filter(func(visit) { visit.groupNumber == groupNumber });
+  };
+
+  // Added new query method to get group visits for a specific group
+  public query ({ caller }) func getGroupVisitsForGroup(group : Nat) : async [GroupVisit] {
+    checkUserPermission(caller, #user);
+    groupVisits.values().toArray().filter(func(visit) { visit.groupNumber == group });
+  };
 };
+

@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCreateShepherdingVisit } from '../../hooks/useCreateShepherdingVisit';
 import { toast } from 'sonner';
@@ -18,6 +19,7 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
   const [publisherId, setPublisherId] = useState('');
   const [visitDate, setVisitDate] = useState('');
   const [eldersPresent, setEldersPresent] = useState('');
+  const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const createVisit = useCreateShepherdingVisit();
@@ -28,6 +30,7 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
       setPublisherId('');
       setVisitDate('');
       setEldersPresent('');
+      setNotes('');
       setErrors({});
     }
   }, [open]);
@@ -71,7 +74,7 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
         publisherName: selectedPublisher.fullName,
         visitDate: visitDateSeconds,
         eldersPresent: eldersPresent.trim(),
-        notes: '', // Always empty string as per requirements
+        notes: notes.trim(),
       });
 
       toast.success('Visit recorded successfully!', {
@@ -156,6 +159,19 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
             {errors.eldersPresent && (
               <p className="text-sm text-destructive">{errors.eldersPresent}</p>
             )}
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              placeholder="Add any notes about the visit..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={4}
+              className="resize-none"
+            />
           </div>
         </div>
 

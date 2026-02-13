@@ -1,7 +1,7 @@
 import type { CheckoutRecord } from '../../backend';
 import { formatCheckoutDate } from '../../utils/formatters';
 import { Button } from '@/components/ui/button';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -14,9 +14,10 @@ import {
 interface CheckoutHistoryTableProps {
   checkOutHistory: CheckoutRecord[];
   onEdit?: (record: CheckoutRecord) => void;
+  onDelete?: (record: CheckoutRecord) => void;
 }
 
-export function CheckoutHistoryTable({ checkOutHistory, onEdit }: CheckoutHistoryTableProps) {
+export function CheckoutHistoryTable({ checkOutHistory, onEdit, onDelete }: CheckoutHistoryTableProps) {
   // Sort by dateCheckedOut descending (most recent first)
   const sortedHistory = [...checkOutHistory].sort((a, b) => {
     return Number(b.dateCheckedOut - a.dateCheckedOut);
@@ -58,17 +59,30 @@ export function CheckoutHistoryTable({ checkOutHistory, onEdit }: CheckoutHistor
               </TableCell>
               <TableCell>{record.isCampaign ? 'Yes' : 'No'}</TableCell>
               <TableCell className="text-right">
-                {onEdit && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEdit(record)}
-                    className="gap-2"
-                  >
-                    <Pencil className="h-4 w-4" />
-                    Edit
-                  </Button>
-                )}
+                <div className="flex items-center justify-end gap-2">
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(record)}
+                      className="gap-2"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onDelete(record)}
+                      className="gap-2 text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}

@@ -3,11 +3,13 @@ import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useGetAllTerritories } from '../hooks/useTerritories';
+import { useGetAllPublishers } from '../hooks/useQueries';
 import { AddTerritoryModal } from '../components/territories/AddTerritoryModal';
 import type { Territory, CheckoutRecord } from '../backend';
 
 export default function Territories() {
   const { data: territories, isLoading } = useGetAllTerritories();
+  const { data: publishers } = useGetAllPublishers();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -28,6 +30,18 @@ export default function Territories() {
     navigate({ to: '/territories/$id', params: { id: territoryId } });
   };
 
+  // Helper to get the most recent checkout record (largest dateCheckedOut)
+  const getMostRecentCheckoutRecord = (territory: Territory): CheckoutRecord | null => {
+    if (!territory.checkOutHistory || territory.checkOutHistory.length === 0) {
+      return null;
+    }
+
+    // Return the record with the largest dateCheckedOut
+    return territory.checkOutHistory.reduce((latest, current) => {
+      return Number(current.dateCheckedOut) > Number(latest.dateCheckedOut) ? current : latest;
+    });
+  };
+
   // Helper to get the active checkout record (most recent with dateReturned = null)
   const getActiveCheckoutRecord = (territory: Territory): CheckoutRecord | null => {
     const activeRecords = territory.checkOutHistory.filter(
@@ -40,6 +54,39 @@ export default function Territories() {
     return activeRecords.reduce((latest, current) => {
       return Number(current.dateCheckedOut) > Number(latest.dateCheckedOut) ? current : latest;
     });
+  };
+
+  // Helper to get publisher name for display
+  const getPublisherName = (territory: Territory): string => {
+    if (territory.status === 'Available') {
+      return '—';
+    }
+
+    if (territory.status === 'Checked Out') {
+      const mostRecentRecord = getMostRecentCheckoutRecord(territory);
+      
+      if (!mostRecentRecord) {
+        return '—';
+      }
+
+      // Use the publisher name from the checkout record
+      if (mostRecentRecord.publisherName) {
+        return mostRecentRecord.publisherName;
+      }
+
+      // Fallback: try to look up publisher by ID if name is missing
+      if (publishers && mostRecentRecord.publisherId !== undefined) {
+        const publisher = publishers.find(p => Number(p.id) === Number(mostRecentRecord.publisherId));
+        if (publisher) {
+          return publisher.fullName;
+        }
+      }
+
+      return '—';
+    }
+
+    // For "Under Review" or other statuses, show em dash
+    return '—';
   };
 
   // Helper to calculate checked out duration in months
@@ -113,8 +160,9 @@ export default function Territories() {
             <TableHeader>
               <TableRow>
                 <TableHead>Territory Number</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Publisher</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead>Checked Out Duration</TableHead>
               </TableRow>
             </TableHeader>
@@ -122,6 +170,8 @@ export default function Territories() {
               {territories.map((territory) => {
                 const duration = getCheckedOutDuration(territory);
                 const highlight = shouldHighlightRow(territory);
+                const publisherName = getPublisherName(territory);
+                const isAvailable = territory.status === 'Available';
 
                 return (
                   <TableRow key={territory.id} className={highlight ? 'bg-red-100' : ''}>
@@ -133,10 +183,13 @@ export default function Territories() {
                         {territory.number}
                       </button>
                     </TableCell>
-                    <TableCell>{territory.territoryType}</TableCell>
+                    <TableCell className={isAvailable ? 'text-muted-foreground' : ''}>
+                      {publisherName}
+                    </TableCell>
                     <TableCell className={getStatusColor(territory.status)}>
                       {territory.status}
                     </TableCell>
+                    <TableCell>{territory.territoryType}</TableCell>
                     <TableCell>
                       {duration ? duration.display : '—'}
                     </TableCell>

@@ -2,13 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-publisher-dropdown-menus-in-the-following-modals-so-the-dropdown-list-is-scrollable-with-a-maximum-height-of-250px-shows-a-scrollbar-when-the-list-exceeds-that-height-and-stays-visually-contained-within-the-modal-viewport-i-e-does-not-extend-beyond-the-modal-or-off-screen-add-pioneer-modal-on-the-pioneers-page-frontend-src-components-pioneers-addpioneermodal-tsx-record-visit-modal-on-the-shepherding-page-frontend-src-components-shepherding-recordvisitmodal-tsx-add-conductor-modal-on-the-service-meeting-conductors-page-frontend-src-components-conductors-conductormodal-tsx-add-trained-publisher-modal-on-the-public-witnessing-page-frontend-src-components-publicwitnessing-trainedpublishermodal-tsx-keep-all-other-behavior-styling-validation-and-text-unchanged",
-      "featureTitle": "Update the Publisher dropdown menus in the following modals so the dropdown list is scrollable with a maximum height of 250px, shows a scrollbar when the list exceeds that height, and stays visually contained within the modal/viewport (i.e., does not extend beyond the modal or off-screen):\n- Add Pioneer modal on the Pioneers page (frontend/src/components/pioneers/AddPioneerModal.tsx)\n- Record Visit modal on the Shepherding page (frontend/src/components/shepherding/RecordVisitModal.tsx)\n- Add Conductor modal on the Service Meeting Conductors page (frontend/src/components/conductors/ConductorModal.tsx)\n- Add Trained Publisher modal on the Public Witnessing page (frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx)\n\nKeep all other behavior, styling, validation, and text unchanged.",
+      "featureId": "feature-update-the-territories-table-on-the-territories-page-frontend-src-pages-territories-tsx-to-include-a-new-column-titled-publisher-positioned-between-the-territory-number-column-and-the-status-column-adjusting-the-column-order-as-needed-to-satisfy-this-placement-while-keeping-all-other-functionality-unchanged",
+      "featureTitle": "Update the Territories table on the Territories page (frontend/src/pages/Territories.tsx) to include a new column titled \"Publisher\" positioned between the \"Territory Number\" column and the \"Status\" column, adjusting the column order as needed to satisfy this placement while keeping all other functionality unchanged.",
       "files": [
-        "frontend/src/components/conductors/ConductorModal.tsx",
-        "frontend/src/components/pioneers/AddPioneerModal.tsx",
-        "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx",
-        "frontend/src/components/shepherding/RecordVisitModal.tsx"
+        "frontend/src/pages/Territories.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,6 +17,44 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-for-each-territory-row-on-the-territories-page-render-the-publisher-cell-value-based-on-the-territory-s-most-recent-checkout-record-if-territory-status-is-checked-out-show-the-publisher-name-from-the-most-recent-checkout-record-for-that-territory-if-territory-status-is-available-show-an-em-dash-styled-in-gray-muted",
+      "featureTitle": "For each territory row on the Territories page, render the \"Publisher\" cell value based on the territory’s most recent checkout record: if territory.status is \"Checked Out\", show the publisher name from the most recent checkout record for that territory; if territory.status is \"Available\", show an em dash (\"—\") styled in gray (muted).",
+      "files": [
+        "frontend/src/pages/Territories.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-use-the-existing-publishers-query-hook-from-frontend-src-hooks-usequeries-ts-usegetallpublishers-in-territories-tsx-to-ensure-the-displayed-publisher-name-is-correct-and-consistent-with-the-rest-of-the-app-prefer-the-publisher-name-on-the-checkout-record-when-available-otherwise-resolve-the-name-via-the-publishers-list-by-publisher-id-if-present-in-the-checkout-record-model",
+      "featureTitle": "Use the existing publishers query hook from frontend/src/hooks/useQueries.ts (useGetAllPublishers) in Territories.tsx to ensure the displayed publisher name is correct and consistent with the rest of the app; prefer the publisher name on the checkout record when available, otherwise resolve the name via the publishers list by publisher ID if present in the checkout record model.",
+      "files": [
+        "frontend/src/pages/Territories.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

@@ -4,6 +4,7 @@ import { ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,45 +15,41 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useGetShepherdingVisit, useUpdateShepherdingVisitNotes, useDeleteShepherdingVisit } from '../hooks/useShepherdingVisit';
-import { useGetAllPublishers } from '../hooks/useQueries';
-import { formatVisitDate } from '../utils/formatters';
-import { EditShepherdingVisitModal } from '../components/shepherding/EditShepherdingVisitModal';
+import { useGetTrainedConductor, useUpdateTrainedConductorNotes, useDeleteTrainedConductor } from '../hooks/useTrainedConductor';
+import { formatTrainingDate } from '../utils/formatters';
+import ConductorModal from '../components/conductors/ConductorModal';
 import { toast } from 'sonner';
 
-export default function ShepherdingVisitProfile() {
+export default function ConductorProfile() {
   const { id } = useParams({ strict: false });
   const navigate = useNavigate();
-  const visitId = id || '';
+  const conductorId = id || '';
 
-  const { data: visit, isLoading } = useGetShepherdingVisit(visitId);
-  const { data: allPublishers } = useGetAllPublishers();
-  const updateNotes = useUpdateShepherdingVisitNotes();
-  const deleteVisit = useDeleteShepherdingVisit();
+  const { data: conductor, isLoading } = useGetTrainedConductor(conductorId);
+  const updateNotes = useUpdateTrainedConductorNotes();
+  const deleteConductor = useDeleteTrainedConductor();
 
   const [draftNotes, setDraftNotes] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Initialize draft notes when visit loads
+  // Initialize draft notes when conductor loads
   useEffect(() => {
-    if (visit) {
-      setDraftNotes(visit.notes);
+    if (conductor) {
+      setDraftNotes(conductor.notes || '');
     }
-  }, [visit?.id, visit?.notes]);
-
-  const activePublishers = allPublishers?.filter((p) => p.isActive).sort((a, b) => a.fullName.localeCompare(b.fullName)) || [];
+  }, [conductor?.id, conductor?.notes]);
 
   const handleBackClick = () => {
-    navigate({ to: '/shepherding' });
+    navigate({ to: '/conductors' });
   };
 
   const handleSaveNotes = async () => {
-    if (!visit) return;
+    if (!conductor) return;
 
     try {
       await updateNotes.mutateAsync({
-        id: visit.id,
+        id: conductor.id,
         notes: draftNotes,
       });
 
@@ -70,8 +67,8 @@ export default function ShepherdingVisitProfile() {
   };
 
   const handleCancelNotes = () => {
-    if (visit) {
-      setDraftNotes(visit.notes);
+    if (conductor) {
+      setDraftNotes(conductor.notes || '');
     }
   };
 
@@ -84,21 +81,21 @@ export default function ShepherdingVisitProfile() {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!visit) return;
+    if (!conductor) return;
 
     try {
-      await deleteVisit.mutateAsync(visit.id);
-      toast.success('Visit deleted successfully!', {
+      await deleteConductor.mutateAsync(conductor.id);
+      toast.success('Conductor deleted successfully!', {
         duration: 3000,
         style: {
           backgroundColor: 'hsl(142.1 76.2% 36.3%)',
           color: 'white',
         },
       });
-      navigate({ to: '/shepherding' });
+      navigate({ to: '/conductors' });
     } catch (error) {
-      console.error('Failed to delete visit:', error);
-      toast.error('Failed to delete visit');
+      console.error('Failed to delete conductor:', error);
+      toast.error('Failed to delete conductor');
       setShowDeleteDialog(false);
     }
   };
@@ -112,21 +109,27 @@ export default function ShepherdingVisitProfile() {
       <div className="p-6">
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mr-3" />
-          <p className="text-muted-foreground">Loading visit details...</p>
+          <p className="text-muted-foreground">Loading conductor details...</p>
         </div>
       </div>
     );
   }
 
-  if (!visit) {
+  if (!conductor) {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">Visit not found</p>
+          <p className="text-muted-foreground">Conductor not found</p>
         </div>
       </div>
     );
   }
+
+  const availableDays: string[] = [];
+  if (conductor.availableThursday) availableDays.push('Thursday');
+  if (conductor.availableFriday) availableDays.push('Friday');
+  if (conductor.availableSaturday) availableDays.push('Saturday');
+  if (conductor.availableSunday) availableDays.push('Sunday');
 
   return (
     <div className="p-6 space-y-6">
@@ -142,7 +145,7 @@ export default function ShepherdingVisitProfile() {
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold text-foreground">Visit Details</h1>
+          <h1 className="text-3xl font-bold text-foreground">{conductor.publisherName}</h1>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -166,20 +169,43 @@ export default function ShepherdingVisitProfile() {
         </div>
       </div>
 
-      {/* Visit Details Card */}
+      {/* Conductor Details Card */}
       <div className="rounded-lg border bg-card p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Publisher Name</Label>
-            <p className="text-lg font-medium mt-1">{visit.publisherName}</p>
+            <Label className="text-sm font-medium text-muted-foreground">Training Date</Label>
+            <p className="text-lg font-medium mt-1">{formatTrainingDate(conductor.trainingDate)}</p>
           </div>
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Visit Date</Label>
-            <p className="text-lg font-medium mt-1">{formatVisitDate(visit.visitDate)}</p>
+            <Label className="text-sm font-medium text-muted-foreground">Status</Label>
+            <div className="mt-1">
+              <Badge
+                variant={conductor.status === 'Available' ? 'default' : 'destructive'}
+                className={
+                  conductor.status === 'Available'
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                }
+              >
+                {conductor.status}
+              </Badge>
+            </div>
           </div>
           <div className="md:col-span-2">
-            <Label className="text-sm font-medium text-muted-foreground">Elders Present</Label>
-            <p className="text-lg font-medium mt-1">{visit.eldersPresent}</p>
+            <Label className="text-sm font-medium text-muted-foreground">Available Days</Label>
+            <div className="mt-1">
+              {availableDays.length > 0 ? (
+                <div className="flex gap-2 flex-wrap">
+                  {availableDays.map((day) => (
+                    <Badge key={day} variant="outline">
+                      {day}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-muted-foreground">—</span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -190,7 +216,7 @@ export default function ShepherdingVisitProfile() {
         <Textarea
           value={draftNotes}
           onChange={(e) => setDraftNotes(e.target.value)}
-          placeholder="Add notes about this visit..."
+          placeholder="Add notes about this conductor..."
           rows={8}
           className="resize-none"
         />
@@ -213,13 +239,12 @@ export default function ShepherdingVisitProfile() {
         </div>
       </div>
 
-      {/* Edit Visit Modal */}
-      {visit && (
-        <EditShepherdingVisitModal
+      {/* Edit Conductor Modal */}
+      {conductor && (
+        <ConductorModal
           open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
-          visit={visit}
-          publishers={activePublishers}
+          conductor={conductor}
         />
       )}
 
@@ -227,7 +252,7 @@ export default function ShepherdingVisitProfile() {
       <AlertDialog open={showDeleteDialog} onOpenChange={(open) => !open && handleDeleteCancel()}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this visit?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this conductor?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone.
             </AlertDialogDescription>

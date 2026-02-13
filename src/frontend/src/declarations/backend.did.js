@@ -8,6 +8,22 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const AddGroupVisitInput = IDL.Record({
+  'groupNumber' : IDL.Nat,
+  'notesForOverseer' : IDL.Text,
+  'notesForAssistant' : IDL.Text,
+  'visitDate' : IDL.Int,
+  'publisherNamesPresent' : IDL.Vec(IDL.Text),
+  'publishersPresent' : IDL.Vec(IDL.Text),
+  'discussionTopics' : IDL.Text,
+  'nextPlannedVisitDate' : IDL.Opt(IDL.Int),
+});
+export const CreatePioneerMonthlyHoursInput = IDL.Record({
+  'month' : IDL.Text,
+  'serviceYear' : IDL.Text,
+  'hours' : IDL.Nat,
+  'pioneerId' : IDL.Text,
+});
 export const PublisherId = IDL.Nat;
 export const CreateTrainedConductorInput = IDL.Record({
   'status' : IDL.Text,
@@ -15,6 +31,7 @@ export const CreateTrainedConductorInput = IDL.Record({
   'availableThursday' : IDL.Opt(IDL.Bool),
   'publisherId' : IDL.Text,
   'publisherName' : IDL.Text,
+  'notes' : IDL.Opt(IDL.Text),
   'trainingDate' : IDL.Int,
   'availableSunday' : IDL.Opt(IDL.Bool),
   'availableFriday' : IDL.Opt(IDL.Bool),
@@ -64,6 +81,18 @@ export const GlobalNote = IDL.Record({
   'createdAt' : IDL.Int,
   'category' : IDL.Text,
   'attachedPublisher' : IDL.Opt(PublisherId),
+});
+export const GroupVisit = IDL.Record({
+  'id' : IDL.Text,
+  'groupNumber' : IDL.Nat,
+  'notesForOverseer' : IDL.Text,
+  'notesForAssistant' : IDL.Text,
+  'createdAt' : IDL.Int,
+  'visitDate' : IDL.Int,
+  'publisherNamesPresent' : IDL.Vec(IDL.Text),
+  'publishersPresent' : IDL.Vec(IDL.Text),
+  'discussionTopics' : IDL.Text,
+  'nextPlannedVisitDate' : IDL.Opt(IDL.Int),
 });
 export const Pioneer = IDL.Record({
   'id' : IDL.Text,
@@ -132,6 +161,7 @@ export const TrainedServiceMeetingConductor = IDL.Record({
   'createdAt' : IDL.Int,
   'publisherId' : IDL.Text,
   'publisherName' : IDL.Text,
+  'notes' : IDL.Opt(IDL.Text),
   'trainingDate' : IDL.Int,
   'availableSunday' : IDL.Bool,
   'availableFriday' : IDL.Bool,
@@ -142,11 +172,20 @@ export const TrainedPublisher = IDL.Record({
   'createdAt' : IDL.Int,
   'publisherId' : IDL.Text,
   'publisherName' : IDL.Text,
+  'hasS148Received' : IDL.Bool,
   'trainingDate' : IDL.Int,
 });
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'congregationName' : IDL.Text,
+});
+export const PioneerMonthlyHours = IDL.Record({
+  'id' : IDL.Text,
+  'month' : IDL.Text,
+  'serviceYear' : IDL.Text,
+  'hours' : IDL.Nat,
+  'pioneerId' : IDL.Text,
+  'createdAt' : IDL.Int,
 });
 export const Task = IDL.Record({
   'id' : IDL.Nat,
@@ -171,6 +210,7 @@ export const UpdateTrainedConductorInput = IDL.Record({
   'availableThursday' : IDL.Opt(IDL.Bool),
   'publisherId' : IDL.Text,
   'publisherName' : IDL.Text,
+  'notes' : IDL.Opt(IDL.Text),
   'trainingDate' : IDL.Int,
   'availableSunday' : IDL.Opt(IDL.Bool),
   'availableFriday' : IDL.Opt(IDL.Bool),
@@ -184,6 +224,12 @@ export const UpdateTrainedPublisherInput = IDL.Record({
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'addGroupVisit' : IDL.Func([AddGroupVisitInput], [IDL.Text], []),
+  'addPioneerHours' : IDL.Func(
+      [CreatePioneerMonthlyHoursInput],
+      [IDL.Text],
+      [],
+    ),
   'addPublisher' : IDL.Func(
       [
         IDL.Text,
@@ -234,8 +280,11 @@ export const idlService = IDL.Service({
       [IDL.Nat],
       [],
     ),
+  'deleteCheckoutRecord' : IDL.Func([IDL.Text, PublisherId, IDL.Int], [], []),
   'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
+  'deleteGroupVisit' : IDL.Func([IDL.Text], [], []),
   'deletePioneer' : IDL.Func([IDL.Text], [], []),
+  'deletePioneerHours' : IDL.Func([IDL.Text], [], []),
   'deletePublisher' : IDL.Func([PublisherId], [], []),
   'deleteShepherdingVisit' : IDL.Func([IDL.Text], [], []),
   'deleteTask' : IDL.Func([IDL.Nat], [], []),
@@ -245,6 +294,7 @@ export const idlService = IDL.Service({
   'deleteTrainedPublisher' : IDL.Func([IDL.Text], [], []),
   'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
   'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
+  'getAllGroupVisits' : IDL.Func([], [IDL.Vec(GroupVisit)], ['query']),
   'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
   'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
   'getAllServiceMeetingConductors' : IDL.Func(
@@ -276,6 +326,28 @@ export const idlService = IDL.Service({
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
+  'getGroupVisit' : IDL.Func([IDL.Text], [IDL.Opt(GroupVisit)], ['query']),
+  'getGroupVisitsByGroupNumber' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Vec(GroupVisit)],
+      ['query'],
+    ),
+  'getGroupVisitsForGroup' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Vec(GroupVisit)],
+      ['query'],
+    ),
+  'getPioneer' : IDL.Func([IDL.Text], [IDL.Opt(Pioneer)], ['query']),
+  'getPioneerHours' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(PioneerMonthlyHours)],
+      ['query'],
+    ),
+  'getPioneerHoursForServiceYear' : IDL.Func(
+      [IDL.Text, IDL.Text],
+      [IDL.Vec(PioneerMonthlyHours)],
+      ['query'],
+    ),
   'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
   'getPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
   'getShepherdingVisit' : IDL.Func(
@@ -302,6 +374,11 @@ export const idlService = IDL.Service({
       [IDL.Opt(TrainedServiceMeetingConductor)],
       ['query'],
     ),
+  'getTrainedConductorProfile' : IDL.Func(
+      [IDL.Text],
+      [IDL.Opt(TrainedServiceMeetingConductor)],
+      ['query'],
+    ),
   'getTrainedPublisher' : IDL.Func(
       [IDL.Text],
       [IDL.Opt(TrainedPublisher)],
@@ -316,6 +393,7 @@ export const idlService = IDL.Service({
   'makeTerritoryAvailable' : IDL.Func([IDL.Text], [], []),
   'markTerritoryReturned' : IDL.Func([IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'setS148Received' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
   'updateCheckoutRecord' : IDL.Func(
       [
@@ -332,6 +410,26 @@ export const idlService = IDL.Service({
     ),
   'updateGlobalNote' : IDL.Func(
       [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
+      [],
+      [],
+    ),
+  'updateGroupVisit' : IDL.Func(
+      [
+        IDL.Text,
+        IDL.Nat,
+        IDL.Int,
+        IDL.Text,
+        IDL.Vec(IDL.Text),
+        IDL.Vec(IDL.Text),
+        IDL.Text,
+        IDL.Text,
+        IDL.Opt(IDL.Int),
+      ],
+      [],
+      [],
+    ),
+  'updatePioneerHours' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Text],
       [],
       [],
     ),
@@ -380,6 +478,22 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const AddGroupVisitInput = IDL.Record({
+    'groupNumber' : IDL.Nat,
+    'notesForOverseer' : IDL.Text,
+    'notesForAssistant' : IDL.Text,
+    'visitDate' : IDL.Int,
+    'publisherNamesPresent' : IDL.Vec(IDL.Text),
+    'publishersPresent' : IDL.Vec(IDL.Text),
+    'discussionTopics' : IDL.Text,
+    'nextPlannedVisitDate' : IDL.Opt(IDL.Int),
+  });
+  const CreatePioneerMonthlyHoursInput = IDL.Record({
+    'month' : IDL.Text,
+    'serviceYear' : IDL.Text,
+    'hours' : IDL.Nat,
+    'pioneerId' : IDL.Text,
+  });
   const PublisherId = IDL.Nat;
   const CreateTrainedConductorInput = IDL.Record({
     'status' : IDL.Text,
@@ -387,6 +501,7 @@ export const idlFactory = ({ IDL }) => {
     'availableThursday' : IDL.Opt(IDL.Bool),
     'publisherId' : IDL.Text,
     'publisherName' : IDL.Text,
+    'notes' : IDL.Opt(IDL.Text),
     'trainingDate' : IDL.Int,
     'availableSunday' : IDL.Opt(IDL.Bool),
     'availableFriday' : IDL.Opt(IDL.Bool),
@@ -436,6 +551,18 @@ export const idlFactory = ({ IDL }) => {
     'createdAt' : IDL.Int,
     'category' : IDL.Text,
     'attachedPublisher' : IDL.Opt(PublisherId),
+  });
+  const GroupVisit = IDL.Record({
+    'id' : IDL.Text,
+    'groupNumber' : IDL.Nat,
+    'notesForOverseer' : IDL.Text,
+    'notesForAssistant' : IDL.Text,
+    'createdAt' : IDL.Int,
+    'visitDate' : IDL.Int,
+    'publisherNamesPresent' : IDL.Vec(IDL.Text),
+    'publishersPresent' : IDL.Vec(IDL.Text),
+    'discussionTopics' : IDL.Text,
+    'nextPlannedVisitDate' : IDL.Opt(IDL.Int),
   });
   const Pioneer = IDL.Record({
     'id' : IDL.Text,
@@ -504,6 +631,7 @@ export const idlFactory = ({ IDL }) => {
     'createdAt' : IDL.Int,
     'publisherId' : IDL.Text,
     'publisherName' : IDL.Text,
+    'notes' : IDL.Opt(IDL.Text),
     'trainingDate' : IDL.Int,
     'availableSunday' : IDL.Bool,
     'availableFriday' : IDL.Bool,
@@ -514,11 +642,20 @@ export const idlFactory = ({ IDL }) => {
     'createdAt' : IDL.Int,
     'publisherId' : IDL.Text,
     'publisherName' : IDL.Text,
+    'hasS148Received' : IDL.Bool,
     'trainingDate' : IDL.Int,
   });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
     'congregationName' : IDL.Text,
+  });
+  const PioneerMonthlyHours = IDL.Record({
+    'id' : IDL.Text,
+    'month' : IDL.Text,
+    'serviceYear' : IDL.Text,
+    'hours' : IDL.Nat,
+    'pioneerId' : IDL.Text,
+    'createdAt' : IDL.Int,
   });
   const Task = IDL.Record({
     'id' : IDL.Nat,
@@ -543,6 +680,7 @@ export const idlFactory = ({ IDL }) => {
     'availableThursday' : IDL.Opt(IDL.Bool),
     'publisherId' : IDL.Text,
     'publisherName' : IDL.Text,
+    'notes' : IDL.Opt(IDL.Text),
     'trainingDate' : IDL.Int,
     'availableSunday' : IDL.Opt(IDL.Bool),
     'availableFriday' : IDL.Opt(IDL.Bool),
@@ -556,6 +694,12 @@ export const idlFactory = ({ IDL }) => {
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'addGroupVisit' : IDL.Func([AddGroupVisitInput], [IDL.Text], []),
+    'addPioneerHours' : IDL.Func(
+        [CreatePioneerMonthlyHoursInput],
+        [IDL.Text],
+        [],
+      ),
     'addPublisher' : IDL.Func(
         [
           IDL.Text,
@@ -606,8 +750,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'deleteCheckoutRecord' : IDL.Func([IDL.Text, PublisherId, IDL.Int], [], []),
     'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
+    'deleteGroupVisit' : IDL.Func([IDL.Text], [], []),
     'deletePioneer' : IDL.Func([IDL.Text], [], []),
+    'deletePioneerHours' : IDL.Func([IDL.Text], [], []),
     'deletePublisher' : IDL.Func([PublisherId], [], []),
     'deleteShepherdingVisit' : IDL.Func([IDL.Text], [], []),
     'deleteTask' : IDL.Func([IDL.Nat], [], []),
@@ -617,6 +764,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteTrainedPublisher' : IDL.Func([IDL.Text], [], []),
     'editPioneer' : IDL.Func([IDL.Text, EditPioneerInput], [], []),
     'getAllGlobalNotes' : IDL.Func([], [IDL.Vec(GlobalNote)], ['query']),
+    'getAllGroupVisits' : IDL.Func([], [IDL.Vec(GroupVisit)], ['query']),
     'getAllPioneers' : IDL.Func([], [IDL.Vec(Pioneer)], ['query']),
     'getAllPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
     'getAllServiceMeetingConductors' : IDL.Func(
@@ -648,6 +796,28 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getGlobalNote' : IDL.Func([IDL.Nat], [IDL.Opt(GlobalNote)], ['query']),
+    'getGroupVisit' : IDL.Func([IDL.Text], [IDL.Opt(GroupVisit)], ['query']),
+    'getGroupVisitsByGroupNumber' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(GroupVisit)],
+        ['query'],
+      ),
+    'getGroupVisitsForGroup' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(GroupVisit)],
+        ['query'],
+      ),
+    'getPioneer' : IDL.Func([IDL.Text], [IDL.Opt(Pioneer)], ['query']),
+    'getPioneerHours' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(PioneerMonthlyHours)],
+        ['query'],
+      ),
+    'getPioneerHoursForServiceYear' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Vec(PioneerMonthlyHours)],
+        ['query'],
+      ),
     'getPublisher' : IDL.Func([PublisherId], [IDL.Opt(Publisher)], ['query']),
     'getPublishers' : IDL.Func([], [IDL.Vec(Publisher)], ['query']),
     'getShepherdingVisit' : IDL.Func(
@@ -678,6 +848,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(TrainedServiceMeetingConductor)],
         ['query'],
       ),
+    'getTrainedConductorProfile' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(TrainedServiceMeetingConductor)],
+        ['query'],
+      ),
     'getTrainedPublisher' : IDL.Func(
         [IDL.Text],
         [IDL.Opt(TrainedPublisher)],
@@ -692,6 +867,7 @@ export const idlFactory = ({ IDL }) => {
     'makeTerritoryAvailable' : IDL.Func([IDL.Text], [], []),
     'markTerritoryReturned' : IDL.Func([IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'setS148Received' : IDL.Func([IDL.Text, IDL.Bool], [], []),
     'togglePublisherActiveState' : IDL.Func([PublisherId], [], []),
     'updateCheckoutRecord' : IDL.Func(
         [
@@ -708,6 +884,26 @@ export const idlFactory = ({ IDL }) => {
       ),
     'updateGlobalNote' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
+        [],
+        [],
+      ),
+    'updateGroupVisit' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Nat,
+          IDL.Int,
+          IDL.Text,
+          IDL.Vec(IDL.Text),
+          IDL.Vec(IDL.Text),
+          IDL.Text,
+          IDL.Text,
+          IDL.Opt(IDL.Int),
+        ],
+        [],
+        [],
+      ),
+    'updatePioneerHours' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Text],
         [],
         [],
       ),

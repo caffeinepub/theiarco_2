@@ -1,14 +1,17 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useGetAllPioneers } from '../hooks/usePioneers';
 import { useGetAllPublishers } from '../hooks/useQueries';
 import AddPioneerModal from '../components/pioneers/AddPioneerModal';
 import EditPioneerModal from '../components/pioneers/EditPioneerModal';
 import DeletePioneerDialog from '../components/pioneers/DeletePioneerDialog';
+import PioneerTableRow from '../components/pioneers/PioneerTableRow';
 import type { Pioneer } from '../backend';
 
 export default function Pioneers() {
+  const navigate = useNavigate();
   const { data: pioneers, isLoading } = useGetAllPioneers();
   const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -28,6 +31,10 @@ export default function Pioneers() {
   const handleDeletePioneer = (pioneer: Pioneer) => {
     setSelectedPioneer(pioneer);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handlePioneerClick = (pioneerId: string) => {
+    navigate({ to: '/pioneers/$id', params: { id: pioneerId } });
   };
 
   // Sort pioneers alphabetically by publisher name
@@ -100,48 +107,27 @@ export default function Pioneers() {
 
       {/* Pioneers Table */}
       {!isLoading && sortedPioneers.length > 0 && (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Service Year</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>Total Hours</TableHead>
+                <TableHead>Average Hours</TableHead>
+                <TableHead>Current Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedPioneers.map((pioneer) => (
-                <TableRow key={pioneer.id}>
-                  <TableCell className="font-medium">
-                    <button
-                      className="text-primary hover:underline cursor-pointer"
-                      onClick={() => {
-                        // Placeholder - will link to profile later
-                      }}
-                    >
-                      {pioneer.publisherName}
-                    </button>
-                  </TableCell>
-                  <TableCell>{pioneer.serviceYear}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditPioneer(pioneer)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeletePioneer(pioneer)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <PioneerTableRow
+                  key={pioneer.id}
+                  pioneer={pioneer}
+                  onPioneerClick={handlePioneerClick}
+                  onEdit={handleEditPioneer}
+                  onDelete={handleDeletePioneer}
+                />
               ))}
             </TableBody>
           </Table>

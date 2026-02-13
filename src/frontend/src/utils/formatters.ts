@@ -122,3 +122,22 @@ export function formatTrainingDate(timestamp: bigint): string {
     year: 'numeric',
   });
 }
+
+/**
+ * Converts a backend timestamp (bigint) to a long-format date string.
+ * Backend timestamps are in seconds; this function converts to milliseconds.
+ * @param timestamp - Backend timestamp as bigint (seconds)
+ * @returns Formatted date string like "February 11, 2026"
+ */
+export function formatLongDate(timestamp: bigint): string {
+  // Convert seconds to milliseconds
+  const milliseconds = Number(timestamp) * 1000;
+  const date = new Date(milliseconds);
+  
+  // Format as "MMMM d, yyyy"
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}

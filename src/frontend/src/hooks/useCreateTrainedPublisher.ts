@@ -1,7 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { toast } from 'sonner';
-import type { CreateTrainedPublisherInput } from '../backend';
+
+interface CreateTrainedPublisherInput {
+  publisherId: string;
+  publisherName: string;
+  trainingDate: bigint;
+  hasS148Received: boolean;
+}
 
 export function useCreateTrainedPublisher() {
   const { actor } = useActor();
@@ -10,7 +16,20 @@ export function useCreateTrainedPublisher() {
   return useMutation({
     mutationFn: async (input: CreateTrainedPublisherInput) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.addTrainedPublisher(input);
+      
+      // Create the trained publisher first
+      const id = await actor.addTrainedPublisher({
+        publisherId: input.publisherId,
+        publisherName: input.publisherName,
+        trainingDate: input.trainingDate,
+      });
+      
+      // Then update the S-148 status if needed
+      if (input.hasS148Received) {
+        await actor.setS148Received(id, true);
+      }
+      
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trainedPublishers'] });

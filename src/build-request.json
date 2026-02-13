@@ -1,36 +1,74 @@
 {
   "kind": "build_request",
-  "title": "Make publisher dropdowns scrollable within modals (max height 250px)",
+  "title": "Add Publisher column to Territories table (from most recent checkout)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the Publisher dropdown menus in the following modals so the dropdown list is scrollable with a maximum height of 250px, shows a scrollbar when the list exceeds that height, and stays visually contained within the modal/viewport (i.e., does not extend beyond the modal or off-screen):\n- Add Pioneer modal on the Pioneers page (frontend/src/components/pioneers/AddPioneerModal.tsx)\n- Record Visit modal on the Shepherding page (frontend/src/components/shepherding/RecordVisitModal.tsx)\n- Add Conductor modal on the Service Meeting Conductors page (frontend/src/components/conductors/ConductorModal.tsx)\n- Add Trained Publisher modal on the Public Witnessing page (frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx)\n\nKeep all other behavior, styling, validation, and text unchanged.",
+      "text": "Update the Territories table on the Territories page (frontend/src/pages/Territories.tsx) to include a new column titled \"Publisher\" positioned between the \"Territory Number\" column and the \"Status\" column, adjusting the column order as needed to satisfy this placement while keeping all other functionality unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Update the publisher dropdown menus in four specific modals to support scrolling:\n\n1. Add Pioneer modal on the Pioneers page - make the publisher dropdown scrollable.\n\n2. Record Visit modal on the Shepherding page - make the publisher dropdown scrollable.\n\n3. Add Conductor modal on the Service Meeting Conductors page - make the publisher dropdown scrollable.\n\n4. Add Trained Publisher modal on the Public Witnessing page - make the publisher dropdown scrollable.\n\nFor each dropdown:\n- Set a maximum height of 250 pixels\n- Add a scrollbar when there are more publishers than fit in that height\n- Make sure the dropdown stays inside the modal and doesn't extend beyond the screen\n\nKeep everything else unchanged."
+          "Add a \"Publisher\" column to the Territories table:\n\n1. On the Territories page, add a new column titled \"Publisher\" between the \"Number\" column and the \"Status\" column.\n\n4. Make sure the column fits well with the existing table layout.\n\nKeep everything else unchanged."
         ]
       },
       "acceptanceCriteria": [
-        "In each of the four specified modals, the Publisher dropdown list has a maximum height of 250px.",
-        "When the Publisher list exceeds 250px in height, the dropdown list becomes vertically scrollable and a scrollbar is available.",
-        "When opened near the bottom/top of the modal/viewport, the dropdown list repositions and/or constrains itself so it does not render off-screen and does not visually escape the modal experience.",
-        "No other fields, dropdowns (e.g., service year, status), form validation, submission behavior, or user-facing text is changed."
+        "The Territories table header includes a \"Publisher\" column.",
+        "The \"Publisher\" column is rendered between \"Territory Number\" and \"Status\" in the table header and corresponding row cells.",
+        "No other table features/regressions are introduced (row click navigation, highlighting, duration display, loading/empty states remain unchanged).",
+        "The new column width/alignment fits the existing table layout (no overflow or broken layout at typical viewport sizes)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "For each territory row on the Territories page, render the \"Publisher\" cell value based on the territory’s most recent checkout record: if territory.status is \"Checked Out\", show the publisher name from the most recent checkout record for that territory; if territory.status is \"Available\", show an em dash (\"—\") styled in gray (muted).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "2. For each territory:\n   - If the territory status is \"Checked Out\", show the name of the publisher who has it checked out\n   - If the territory status is \"Available\", show \"—\" in gray\n\n3. Get the publisher name from the most recent checkout record for that territory."
+        ]
+      },
+      "acceptanceCriteria": [
+        "When a territory row has status \"Checked Out\", the Publisher cell displays the publisher name associated with the most recent checkout record for that territory.",
+        "When a territory row has status \"Available\", the Publisher cell displays exactly \"—\" and uses a muted/gray text style (e.g., Tailwind text-muted-foreground or equivalent).",
+        "The logic for \"most recent checkout record\" is based on the largest dateCheckedOut value in the territory’s checkout history (and is not dependent on UI sort order).",
+        "If a territory is \"Checked Out\" but no checkout record can be found, the UI fails gracefully (shows \"—\" in muted text) without breaking the table rendering."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Use the existing publishers query hook from frontend/src/hooks/useQueries.ts (useGetAllPublishers) in Territories.tsx to ensure the displayed publisher name is correct and consistent with the rest of the app; prefer the publisher name on the checkout record when available, otherwise resolve the name via the publishers list by publisher ID if present in the checkout record model.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "It's called usePublishers and it's located at:\n\nfrontend/src/hooks/useQueries.ts\n\nThis hook fetches all publishers and returns an array with publisher data including id and name.\n\nUse it the same way here."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Territories.tsx fetches publishers using the existing hook in frontend/src/hooks/useQueries.ts (useGetAllPublishers) following the established patterns in the codebase.",
+        "The Publisher column value uses checkout-record publisher name when present; otherwise it attempts to look up the publisher’s current full name from the publishers list using the checkout record’s publisher identifier (if available).",
+        "No backend changes are required to display the Publisher column."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/components/ui (read-only / immutable UI component sources). Achieve the behavior by adjusting how the existing Select/SelectContent components are used in the four specified modal components.",
-    "No backend changes are required for this request."
+    "Do not modify any files under frontend/src/components/ui (read-only Shadcn components).",
+    "Keep all existing Territories page behaviors unchanged aside from adding the new Publisher column and any minimal column reordering required to place it between Number and Status.",
+    "Use English for all user-facing text."
   ],
   "nonGoals": [
-    "Custom scrollbar styling beyond ensuring a scrollbar appears when needed.",
-    "Changing option ordering, filtering logic, or which publishers appear in the lists.",
-    "Modifying modal sizes/layouts beyond what is necessary to keep the dropdown contained and scrollable."
+    "Adding new backend endpoints or changing backend data models for territories/checkout records.",
+    "Changing territory checkout/return behavior or altering territory status logic.",
+    "Adding new filters, sorting controls, or search to the Territories table."
   ],
   "imageRequirements": {
     "required": [],

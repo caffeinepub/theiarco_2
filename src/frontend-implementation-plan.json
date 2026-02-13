@@ -1,37 +1,55 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Make Publisher dropdowns scrollable and constrained within modals (max height 250px)",
+  "title": "Add Publisher column to Territories table using most recent checkout",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Constrain the Publisher Select dropdown lists in the four specified modals to a max height of 250px with vertical scrolling and collision-aware positioning so they remain visually contained within the modal/viewport, without changing any other behavior or text.",
+      "summary": "Add a Publisher column to the Territories table and reorder columns so Publisher sits between Territory Number and Status without changing other behaviors.",
       "acceptanceCriteria": [
-        "In each of the four specified modals, the Publisher dropdown list has a maximum height of 250px.",
-        "When the Publisher list exceeds 250px in height, the dropdown list becomes vertically scrollable and a scrollbar is available.",
-        "When opened near the bottom/top of the modal/viewport, the dropdown list repositions and/or constrains itself so it does not render off-screen and does not visually escape the modal experience.",
-        "No other fields, dropdowns (e.g., service year, status), form validation, submission behavior, or user-facing text is changed."
+        "The Territories table header includes a \"Publisher\" column.",
+        "The \"Publisher\" column is rendered between \"Territory Number\" and \"Status\" in the table header and corresponding row cells.",
+        "No other table features/regressions are introduced (row click navigation, highlighting, duration display, loading/empty states remain unchanged).",
+        "The new column width/alignment fits the existing table layout (no overflow or broken layout at typical viewport sizes)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/pioneers/AddPioneerModal.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Update ONLY the Publisher Select dropdown usage to make the list scrollable with max height 250px (e.g., applying max-height and overflow-y styles to SelectContent) and enable collision-aware/contained rendering within the modal/viewport using supported SelectContent positioning props. Use the existing shadcn-ui Select/SelectContent components (do not modify any files under frontend/src/components/ui). Verify the component's usage instructions before implementing."
-        },
+          "description": "Update the Territories table column definitions/rendering to insert a new \"Publisher\" header and cell between \"Territory Number\" and \"Status\", reordering the existing \"Type\" column as needed while preserving all existing interactions, loading/empty states, highlighting, and duration display."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Compute and render per-row Publisher display from the most recent checkout record, with graceful fallback and muted em dash for Available.",
+      "acceptanceCriteria": [
+        "When a territory row has status \"Checked Out\", the Publisher cell displays the publisher name associated with the most recent checkout record for that territory.",
+        "When a territory row has status \"Available\", the Publisher cell displays exactly \"—\" and uses a muted/gray text style (e.g., Tailwind text-muted-foreground or equivalent).",
+        "The logic for \"most recent checkout record\" is based on the largest dateCheckedOut value in the territory’s checkout history (and is not dependent on UI sort order).",
+        "If a territory is \"Checked Out\" but no checkout record can be found, the UI fails gracefully (shows \"—\" in muted text) without breaking the table rendering."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/shepherding/RecordVisitModal.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Update ONLY the Publisher Select dropdown usage to enforce max height 250px with vertical scrolling on the SelectContent, and ensure the dropdown is constrained/repositioned to remain within the modal/viewport when opened near edges (using supported SelectContent positioning/collision props). Keep all other styling, validation, and text unchanged. Do not modify any files under frontend/src/components/ui. Verify the component's usage instructions before implementing."
-        },
+          "description": "Add helper logic to select the most recent checkout record by largest dateCheckedOut from territory.checkOutHistory and render the Publisher cell: for status \"Available\" show a muted gray \"—\"; for status \"Checked Out\" show the resolved publisher name or fall back to muted \"—\" if missing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Use the existing useGetAllPublishers hook to resolve publisher names consistently when checkout record name is missing.",
+      "acceptanceCriteria": [
+        "Territories.tsx fetches publishers using the existing hook in frontend/src/hooks/useQueries.ts (useGetAllPublishers) following the established patterns in the codebase.",
+        "The Publisher column value uses checkout-record publisher name when present; otherwise it attempts to look up the publisher’s current full name from the publishers list using the checkout record’s publisher identifier (if available).",
+        "No backend changes are required to display the Publisher column."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/conductors/ConductorModal.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Update ONLY the Publisher Select dropdown usage (not Status or other controls) so SelectContent has max height 250px with overflow-y scrolling and remains contained within the modal/viewport via supported positioning/collision settings. Preserve all existing behavior, validation, and text. Do not modify any files under frontend/src/components/ui. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/publicWitnessing/TrainedPublisherModal.tsx",
-          "operation": "modify",
-          "description": "Update ONLY the Publisher Select dropdown usage to apply a 250px max height with vertical scrolling to SelectContent and ensure the dropdown stays within the modal/viewport using supported collision-aware positioning options. Keep all other behavior, styling, and text unchanged. Do not modify any files under frontend/src/components/ui. Verify the component's usage instructions before implementing."
+          "description": "Import and use the existing publishers query hook (useGetAllPublishers) from frontend/src/hooks/useQueries.ts, then resolve the Publisher display by preferring checkoutRecord.publisherName when present, otherwise mapping checkoutRecord.publisherId to the publishers list fullName; keep the UI resilient if publishers data is still loading or missing."
         }
       ]
     }

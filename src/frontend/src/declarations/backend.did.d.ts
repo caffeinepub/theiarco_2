@@ -10,6 +10,16 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface AddGroupVisitInput {
+  'groupNumber' : bigint,
+  'notesForOverseer' : string,
+  'notesForAssistant' : string,
+  'visitDate' : bigint,
+  'publisherNamesPresent' : Array<string>,
+  'publishersPresent' : Array<string>,
+  'discussionTopics' : string,
+  'nextPlannedVisitDate' : [] | [bigint],
+}
 export interface CheckoutRecord {
   'publisherId' : PublisherId,
   'publisherName' : string,
@@ -21,6 +31,12 @@ export interface CreatePioneerInput {
   'serviceYear' : string,
   'publisherId' : string,
   'publisherName' : string,
+}
+export interface CreatePioneerMonthlyHoursInput {
+  'month' : string,
+  'serviceYear' : string,
+  'hours' : bigint,
+  'pioneerId' : string,
 }
 export interface CreateShepherdingVisitInput {
   'eldersPresent' : string,
@@ -46,6 +62,7 @@ export interface CreateTrainedConductorInput {
   'availableThursday' : [] | [boolean],
   'publisherId' : string,
   'publisherName' : string,
+  'notes' : [] | [string],
   'trainingDate' : bigint,
   'availableSunday' : [] | [boolean],
   'availableFriday' : [] | [boolean],
@@ -68,6 +85,18 @@ export interface GlobalNote {
   'category' : string,
   'attachedPublisher' : [] | [PublisherId],
 }
+export interface GroupVisit {
+  'id' : string,
+  'groupNumber' : bigint,
+  'notesForOverseer' : string,
+  'notesForAssistant' : string,
+  'createdAt' : bigint,
+  'visitDate' : bigint,
+  'publisherNamesPresent' : Array<string>,
+  'publishersPresent' : Array<string>,
+  'discussionTopics' : string,
+  'nextPlannedVisitDate' : [] | [bigint],
+}
 export interface Pioneer {
   'id' : string,
   'serviceYear' : string,
@@ -75,6 +104,14 @@ export interface Pioneer {
   'publisherId' : string,
   'publisherName' : string,
   'isActive' : boolean,
+}
+export interface PioneerMonthlyHours {
+  'id' : string,
+  'month' : string,
+  'serviceYear' : string,
+  'hours' : bigint,
+  'pioneerId' : string,
+  'createdAt' : bigint,
 }
 export interface Publisher {
   'id' : PublisherId,
@@ -142,6 +179,7 @@ export interface TrainedPublisher {
   'createdAt' : bigint,
   'publisherId' : string,
   'publisherName' : string,
+  'hasS148Received' : boolean,
   'trainingDate' : bigint,
 }
 export interface TrainedServiceMeetingConductor {
@@ -152,6 +190,7 @@ export interface TrainedServiceMeetingConductor {
   'createdAt' : bigint,
   'publisherId' : string,
   'publisherName' : string,
+  'notes' : [] | [string],
   'trainingDate' : bigint,
   'availableSunday' : boolean,
   'availableFriday' : boolean,
@@ -162,6 +201,7 @@ export interface UpdateTrainedConductorInput {
   'availableThursday' : [] | [boolean],
   'publisherId' : string,
   'publisherName' : string,
+  'notes' : [] | [string],
   'trainingDate' : bigint,
   'availableSunday' : [] | [boolean],
   'availableFriday' : [] | [boolean],
@@ -178,6 +218,8 @@ export type UserRole = { 'admin' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'addGroupVisit' : ActorMethod<[AddGroupVisitInput], string>,
+  'addPioneerHours' : ActorMethod<[CreatePioneerMonthlyHoursInput], string>,
   'addPublisher' : ActorMethod<
     [
       string,
@@ -208,8 +250,14 @@ export interface _SERVICE {
     [string, CreateTerritoryNoteInput],
     bigint
   >,
+  'deleteCheckoutRecord' : ActorMethod<
+    [string, PublisherId, bigint],
+    undefined
+  >,
   'deleteGlobalNote' : ActorMethod<[bigint], undefined>,
+  'deleteGroupVisit' : ActorMethod<[string], undefined>,
   'deletePioneer' : ActorMethod<[string], undefined>,
+  'deletePioneerHours' : ActorMethod<[string], undefined>,
   'deletePublisher' : ActorMethod<[PublisherId], undefined>,
   'deleteShepherdingVisit' : ActorMethod<[string], undefined>,
   'deleteTask' : ActorMethod<[bigint], undefined>,
@@ -219,6 +267,7 @@ export interface _SERVICE {
   'deleteTrainedPublisher' : ActorMethod<[string], undefined>,
   'editPioneer' : ActorMethod<[string, EditPioneerInput], undefined>,
   'getAllGlobalNotes' : ActorMethod<[], Array<GlobalNote>>,
+  'getAllGroupVisits' : ActorMethod<[], Array<GroupVisit>>,
   'getAllPioneers' : ActorMethod<[], Array<Pioneer>>,
   'getAllPublishers' : ActorMethod<[], Array<Publisher>>,
   'getAllServiceMeetingConductors' : ActorMethod<
@@ -236,6 +285,15 @@ export interface _SERVICE {
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getGlobalNote' : ActorMethod<[bigint], [] | [GlobalNote]>,
+  'getGroupVisit' : ActorMethod<[string], [] | [GroupVisit]>,
+  'getGroupVisitsByGroupNumber' : ActorMethod<[bigint], Array<GroupVisit>>,
+  'getGroupVisitsForGroup' : ActorMethod<[bigint], Array<GroupVisit>>,
+  'getPioneer' : ActorMethod<[string], [] | [Pioneer]>,
+  'getPioneerHours' : ActorMethod<[string], [] | [PioneerMonthlyHours]>,
+  'getPioneerHoursForServiceYear' : ActorMethod<
+    [string, string],
+    Array<PioneerMonthlyHours>
+  >,
   'getPublisher' : ActorMethod<[PublisherId], [] | [Publisher]>,
   'getPublishers' : ActorMethod<[], Array<Publisher>>,
   'getShepherdingVisit' : ActorMethod<[string], [] | [ShepherdingVisit]>,
@@ -252,12 +310,17 @@ export interface _SERVICE {
     [string],
     [] | [TrainedServiceMeetingConductor]
   >,
+  'getTrainedConductorProfile' : ActorMethod<
+    [string],
+    [] | [TrainedServiceMeetingConductor]
+  >,
   'getTrainedPublisher' : ActorMethod<[string], [] | [TrainedPublisher]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'makeTerritoryAvailable' : ActorMethod<[string], undefined>,
   'markTerritoryReturned' : ActorMethod<[string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'setS148Received' : ActorMethod<[string, boolean], undefined>,
   'togglePublisherActiveState' : ActorMethod<[PublisherId], undefined>,
   'updateCheckoutRecord' : ActorMethod<
     [string, PublisherId, bigint, PublisherId, bigint, [] | [bigint], boolean],
@@ -265,6 +328,24 @@ export interface _SERVICE {
   >,
   'updateGlobalNote' : ActorMethod<
     [bigint, string, string, string, [] | [PublisherId]],
+    undefined
+  >,
+  'updateGroupVisit' : ActorMethod<
+    [
+      string,
+      bigint,
+      bigint,
+      string,
+      Array<string>,
+      Array<string>,
+      string,
+      string,
+      [] | [bigint],
+    ],
+    undefined
+  >,
+  'updatePioneerHours' : ActorMethod<
+    [string, string, string, bigint, string],
     undefined
   >,
   'updatePublisher' : ActorMethod<

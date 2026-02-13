@@ -41,6 +41,7 @@ export default function TrainedPublisherModal({
   const [publisherId, setPublisherId] = useState('');
   const [trainingDate, setTrainingDate] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [hasS148Received, setHasS148Received] = useState(false);
 
   // Pre-fill form in edit mode and reset in create mode
   useEffect(() => {
@@ -50,11 +51,13 @@ export default function TrainedPublisherModal({
       const date = new Date(Number(publisher.trainingDate) * 1000);
       setTrainingDate(date.toISOString().split('T')[0]);
       setIsAuthorized(publisher.isAuthorized);
+      setHasS148Received(publisher.hasS148Received);
     } else {
       // Reset form in create mode
       setPublisherId('');
       setTrainingDate('');
       setIsAuthorized(false);
+      setHasS148Received(false);
     }
   }, [publisher, open]);
 
@@ -80,6 +83,7 @@ export default function TrainedPublisherModal({
           publisherName: selectedPublisher.fullName,
           trainingDate: timestampSeconds,
           isAuthorized,
+          hasS148Received,
         },
       });
     } else {
@@ -87,6 +91,7 @@ export default function TrainedPublisherModal({
         publisherId,
         publisherName: selectedPublisher.fullName,
         trainingDate: timestampSeconds,
+        hasS148Received,
       });
     }
 
@@ -162,6 +167,21 @@ export default function TrainedPublisherModal({
               </label>
             </div>
           )}
+
+          {/* S-148 Form Checkbox */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="hasS148"
+              checked={hasS148Received}
+              onCheckedChange={(checked) => setHasS148Received(checked === true)}
+            />
+            <label
+              htmlFor="hasS148"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Has received form S-148
+            </label>
+          </div>
 
           <DialogFooter>
             <Button

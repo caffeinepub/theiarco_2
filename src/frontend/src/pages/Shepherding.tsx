@@ -72,12 +72,14 @@ export default function Shepherding() {
     navigate({ to: `/shepherding/${visitId}` });
   };
 
-  const handleEditClick = (visit: ShepherdingVisit) => {
+  const handleEditClick = (visit: ShepherdingVisit, e: React.MouseEvent) => {
+    e.stopPropagation();
     setSelectedVisit(visit);
     setIsEditModalOpen(true);
   };
 
-  const handleDeleteClick = (visitId: string) => {
+  const handleDeleteClick = (visitId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setVisitToDelete(visitId);
     setShowDeleteDialog(true);
   };
@@ -185,14 +187,21 @@ export default function Shepherding() {
                       {visit.publisherName}
                     </button>
                   </TableCell>
-                  <TableCell>{formatVisitDate(visit.visitDate)}</TableCell>
+                  <TableCell>
+                    <button
+                      className="text-primary hover:underline cursor-pointer"
+                      onClick={() => handleVisitClick(visit.id)}
+                    >
+                      {formatVisitDate(visit.visitDate)}
+                    </button>
+                  </TableCell>
                   <TableCell>{visit.eldersPresent}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleEditClick(visit)}
+                        onClick={(e) => handleEditClick(visit, e)}
                         className="h-8 w-8 p-0"
                       >
                         <Pencil className="h-4 w-4" />
@@ -200,7 +209,7 @@ export default function Shepherding() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDeleteClick(visit.id)}
+                        onClick={(e) => handleDeleteClick(visit.id, e)}
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />

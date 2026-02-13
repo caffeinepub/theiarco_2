@@ -2,9 +2,11 @@ import { useGetAllPublishers } from '../hooks/useQueries';
 import { useGetAllTerritories } from '../hooks/useTerritories';
 import { useGetTasks } from '../hooks/useTasks';
 import { useGetAllShepherdingVisits } from '../hooks/useShepherdingVisits';
+import { usePioneersOnTrack } from '../hooks/usePioneersOnTrack';
 import { TaskStatus, Territory, CheckoutRecord } from '../backend';
-import { Users, Map, Clock, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Users, Map, ListTodo, AlertCircle, AlertTriangle, TrendingUp } from 'lucide-react';
 import { formatVisitDate } from '../utils/formatters';
+import { getCurrentServiceYear } from '../utils/serviceYear';
 import { Link } from '@tanstack/react-router';
 
 export default function Dashboard() {
@@ -12,6 +14,10 @@ export default function Dashboard() {
   const { data: territories = [], isLoading: territoriesLoading } = useGetAllTerritories();
   const { data: tasks = [], isLoading: tasksLoading } = useGetTasks(TaskStatus.all);
   const { data: shepherdingVisits = [], isLoading: visitsLoading } = useGetAllShepherdingVisits();
+  
+  // Get current service year and pioneers on track count
+  const currentServiceYear = getCurrentServiceYear();
+  const { data: pioneersOnTrackCount = 0, isLoading: pioneersOnTrackLoading } = usePioneersOnTrack(currentServiceYear);
 
   // Calculate current timestamp in seconds
   const nowSeconds = Math.floor(Date.now() / 1000);
@@ -20,14 +26,10 @@ export default function Dashboard() {
   const activePublishersCount = publishers.filter(p => p.isActive).length;
   const checkedOutTerritoriesCount = territories.filter(t => t.status === 'Checked Out').length;
   
-  // Upcoming tasks: not completed and dueDate is in the future
-  const upcomingTasksCount = tasks.filter(task => {
-    if (task.isCompleted) return false;
-    const dueDate = typeof task.dueDate === 'bigint' ? Number(task.dueDate) : task.dueDate;
-    return dueDate > nowSeconds;
-  }).length;
+  // Uncompleted tasks: all tasks where isCompleted = false
+  const uncompletedTasksCount = tasks.filter(task => !task.isCompleted).length;
 
-  // Overdue tasks: not completed and dueDate has passed
+  // Overdue tasks: not completed and dueDate has passed (still needed for Alerts section)
   const overdueTasksCount = tasks.filter(task => {
     if (task.isCompleted) return false;
     const dueDate = typeof task.dueDate === 'bigint' ? Number(task.dueDate) : task.dueDate;
@@ -81,7 +83,7 @@ export default function Dashboard() {
     })
     .slice(0, 5);
 
-  const isLoading = publishersLoading || territoriesLoading || tasksLoading || visitsLoading;
+  const isLoading = publishersLoading || territoriesLoading || tasksLoading || visitsLoading || pioneersOnTrackLoading;
 
   if (isLoading) {
     return (
@@ -105,7 +107,10 @@ export default function Dashboard() {
       {/* Stats Cards */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Active Publishers Card */}
-        <div className="rounded-lg bg-dashboard-stat-1 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
+        <Link
+          to="/publishers"
+          className="block rounded-lg bg-dashboard-stat-1 p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+        >
           <div className="flex items-center justify-between mb-4">
             <Users className="h-8 w-8 opacity-80" />
           </div>
@@ -113,10 +118,13 @@ export default function Dashboard() {
             <p className="text-5xl font-bold">{activePublishersCount}</p>
             <p className="text-lg font-medium opacity-90">Active Publishers</p>
           </div>
-        </div>
+        </Link>
 
         {/* Checked Out Territories Card */}
-        <div className="rounded-lg bg-dashboard-stat-2 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
+        <Link
+          to="/territories"
+          className="block rounded-lg bg-dashboard-stat-2 p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+        >
           <div className="flex items-center justify-between mb-4">
             <Map className="h-8 w-8 opacity-80" />
           </div>
@@ -124,29 +132,35 @@ export default function Dashboard() {
             <p className="text-5xl font-bold">{checkedOutTerritoriesCount}</p>
             <p className="text-lg font-medium opacity-90">Checked Out Territories</p>
           </div>
-        </div>
+        </Link>
 
-        {/* Upcoming Tasks Card */}
-        <div className="rounded-lg bg-dashboard-stat-3 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
+        {/* Uncompleted Tasks Card */}
+        <Link
+          to="/tasks"
+          className="block rounded-lg bg-dashboard-stat-uncompleted p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+        >
           <div className="flex items-center justify-between mb-4">
-            <Clock className="h-8 w-8 opacity-80" />
+            <ListTodo className="h-8 w-8 opacity-80" />
           </div>
           <div className="space-y-1">
-            <p className="text-5xl font-bold">{upcomingTasksCount}</p>
-            <p className="text-lg font-medium opacity-90">Upcoming Tasks</p>
+            <p className="text-5xl font-bold">{uncompletedTasksCount}</p>
+            <p className="text-lg font-medium opacity-90">Uncompleted Tasks</p>
           </div>
-        </div>
+        </Link>
 
-        {/* Overdue Tasks Card */}
-        <div className="rounded-lg bg-dashboard-stat-4 p-6 text-white shadow-md transition-shadow hover:shadow-lg">
+        {/* Pioneers On Track Card */}
+        <Link
+          to="/pioneers"
+          className="block rounded-lg bg-dashboard-stat-green p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+        >
           <div className="flex items-center justify-between mb-4">
-            <AlertCircle className="h-8 w-8 opacity-80" />
+            <TrendingUp className="h-8 w-8 opacity-80" />
           </div>
           <div className="space-y-1">
-            <p className="text-5xl font-bold">{overdueTasksCount}</p>
-            <p className="text-lg font-medium opacity-90">Overdue Tasks</p>
+            <p className="text-5xl font-bold">{pioneersOnTrackCount}</p>
+            <p className="text-lg font-medium opacity-90">Pioneers On Track</p>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Recent Activity Section */}

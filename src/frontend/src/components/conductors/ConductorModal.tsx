@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -45,6 +46,7 @@ export default function ConductorModal({
   const [availableFriday, setAvailableFriday] = useState(false);
   const [availableSaturday, setAvailableSaturday] = useState(false);
   const [availableSunday, setAvailableSunday] = useState(false);
+  const [notes, setNotes] = useState('');
 
   // Pre-fill form in edit mode and reset in create mode
   useEffect(() => {
@@ -58,6 +60,7 @@ export default function ConductorModal({
       setAvailableFriday(conductor.availableFriday || false);
       setAvailableSaturday(conductor.availableSaturday || false);
       setAvailableSunday(conductor.availableSunday || false);
+      setNotes(conductor.notes || '');
     } else {
       // Reset form in create mode
       setPublisherId('');
@@ -67,6 +70,7 @@ export default function ConductorModal({
       setAvailableFriday(false);
       setAvailableSaturday(false);
       setAvailableSunday(false);
+      setNotes('');
     }
   }, [conductor, open]);
 
@@ -84,6 +88,8 @@ export default function ConductorModal({
     const dateObj = new Date(trainingDate);
     const timestampSeconds = BigInt(Math.floor(dateObj.getTime() / 1000));
 
+    const trimmedNotes = notes.trim();
+
     const input = {
       publisherId,
       publisherName: selectedPublisher.fullName,
@@ -93,6 +99,7 @@ export default function ConductorModal({
       availableFriday,
       availableSaturday,
       availableSunday,
+      notes: trimmedNotes || undefined,
     };
 
     if (isEditMode) {
@@ -226,6 +233,19 @@ export default function ConductorModal({
                 </label>
               </div>
             </div>
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes</Label>
+            <Textarea
+              id="notes"
+              placeholder="Add any notes about this conductor..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={4}
+              className="resize-none"
+            />
           </div>
 
           <DialogFooter>

@@ -6,6 +6,7 @@ import { EditTerritoryModal } from '../components/territories/EditTerritoryModal
 import { TerritoryNotesSection } from '../components/territories/TerritoryNotesSection';
 import { CheckOutTerritoryModal } from '../components/territories/CheckOutTerritoryModal';
 import { EditCheckoutRecordModal } from '../components/territories/EditCheckoutRecordModal';
+import { DeleteCheckoutRecordDialog } from '../components/territories/DeleteCheckoutRecordDialog';
 import { CheckoutHistoryTable } from '../components/territories/CheckoutHistoryTable';
 import type { CheckoutRecord } from '../backend';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ export default function TerritoryProfile() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isCheckOutModalOpen, setIsCheckOutModalOpen] = useState(false);
   const [isEditCheckoutModalOpen, setIsEditCheckoutModalOpen] = useState(false);
+  const [isDeleteCheckoutDialogOpen, setIsDeleteCheckoutDialogOpen] = useState(false);
   const [selectedCheckoutRecord, setSelectedCheckoutRecord] = useState<CheckoutRecord | null>(null);
 
   const territoryId = id || '';
@@ -95,6 +97,11 @@ export default function TerritoryProfile() {
   const handleEditCheckoutRecord = (record: CheckoutRecord) => {
     setSelectedCheckoutRecord(record);
     setIsEditCheckoutModalOpen(true);
+  };
+
+  const handleDeleteCheckoutRecord = (record: CheckoutRecord) => {
+    setSelectedCheckoutRecord(record);
+    setIsDeleteCheckoutDialogOpen(true);
   };
 
   const handleEditCheckoutSuccess = () => {
@@ -277,6 +284,7 @@ export default function TerritoryProfile() {
         <CheckoutHistoryTable 
           checkOutHistory={territory.checkOutHistory}
           onEdit={handleEditCheckoutRecord}
+          onDelete={handleDeleteCheckoutRecord}
         />
       </div>
 
@@ -303,6 +311,14 @@ export default function TerritoryProfile() {
         territoryId={territoryId}
         record={selectedCheckoutRecord}
         onSuccess={handleEditCheckoutSuccess}
+      />
+
+      {/* Delete Checkout Record Dialog */}
+      <DeleteCheckoutRecordDialog
+        open={isDeleteCheckoutDialogOpen}
+        onOpenChange={setIsDeleteCheckoutDialogOpen}
+        territoryId={territoryId}
+        record={selectedCheckoutRecord}
       />
 
       {/* Delete Confirmation Dialog */}
