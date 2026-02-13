@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T23:41:12.732Z",
+  "generatedAt": "2026-02-13T00:15:05.306Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,35 +12,37 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the Territories table on the Territories page (frontend/src/pages/Territories.tsx) to include a new column titled \"Publisher\" positioned between the \"Territory Number\" column and the \"Status\" column, adjusting the column order as needed to satisfy this placement while keeping all other functionality unchanged.",
+        "summary": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/Pioneers.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/Pioneers.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "For each territory row on the Territories page, render the \"Publisher\" cell value based on the territory’s most recent checkout record: if territory.status is \"Checked Out\", show the publisher name from the most recent checkout record for that territory; if territory.status is \"Available\", show an em dash (\"—\") styled in gray (muted).",
+        "summary": "Implement client-side CSV generation and download when the \"Export to CSV\" button is clicked. The exported CSV must include one row per pioneer and the following columns in this exact order: Pioneer Name, Service Year, Total Hours, Average Hours, Current Status, September Hours, October Hours, November Hours, December Hours, January Hours, February Hours, March Hours, April Hours, May Hours, June Hours, July Hours, August Hours.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/utils/pioneersCsvExport.ts",
+          "frontend/src/pages/Pioneers.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/utils/pioneersCsvExport.ts",
+          "frontend/src/pages/Pioneers.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Use the existing publishers query hook from frontend/src/hooks/useQueries.ts (useGetAllPublishers) in Territories.tsx to ensure the displayed publisher name is correct and consistent with the rest of the app; prefer the publisher name on the checkout record when available, otherwise resolve the name via the publishers list by publisher ID if present in the checkout record model.",
+        "summary": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling on the Pioneers page, but differentiate it using a secondary visual treatment and/or a download icon, while keeping all other UI unchanged.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/Pioneers.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Territories.tsx"
+          "frontend/src/pages/Pioneers.tsx"
         ]
       }
     ]
@@ -50,7 +52,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/Territories.tsx",
+    "frontend/src/pages/Pioneers.tsx",
+    "frontend/src/utils/pioneersCsvExport.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

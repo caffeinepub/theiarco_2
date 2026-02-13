@@ -1,77 +1,95 @@
 {
   "kind": "build_request",
-  "title": "Add Publisher column to Territories table (from most recent checkout)",
+  "title": "Add Export to CSV button on Pioneers page",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the Territories table on the Territories page (frontend/src/pages/Territories.tsx) to include a new column titled \"Publisher\" positioned between the \"Territory Number\" column and the \"Status\" column, adjusting the column order as needed to satisfy this placement while keeping all other functionality unchanged.",
+      "text": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "Add a \"Publisher\" column to the Territories table:\n\n1. On the Territories page, add a new column titled \"Publisher\" between the \"Number\" column and the \"Status\" column.\n\n4. Make sure the column fits well with the existing table layout.\n\nKeep everything else unchanged."
+          "Add an \"Export to CSV\" button in the top-right corner of the Pioneers page (next to the \"Add Pioneer\" button)."
         ]
       },
       "acceptanceCriteria": [
-        "The Territories table header includes a \"Publisher\" column.",
-        "The \"Publisher\" column is rendered between \"Territory Number\" and \"Status\" in the table header and corresponding row cells.",
-        "No other table features/regressions are introduced (row click navigation, highlighting, duration display, loading/empty states remain unchanged).",
-        "The new column width/alignment fits the existing table layout (no overflow or broken layout at typical viewport sizes)."
+        "On the Pioneers page, the header area shows two buttons on the right side: \"Export to CSV\" and \"Add Pioneer\".",
+        "The \"Add Pioneer\" button retains its current styling and behavior.",
+        "The \"Export to CSV\" button is visible only on the Pioneers page and does not affect other pages."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "For each territory row on the Territories page, render the \"Publisher\" cell value based on the territory’s most recent checkout record: if territory.status is \"Checked Out\", show the publisher name from the most recent checkout record for that territory; if territory.status is \"Available\", show an em dash (\"—\") styled in gray (muted).",
+      "text": "Implement client-side CSV generation and download when the \"Export to CSV\" button is clicked. The exported CSV must include one row per pioneer and the following columns in this exact order: Pioneer Name, Service Year, Total Hours, Average Hours, Current Status, September Hours, October Hours, November Hours, December Hours, January Hours, February Hours, March Hours, April Hours, May Hours, June Hours, July Hours, August Hours.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6"
         ],
         "quotes": [
-          "2. For each territory:\n   - If the territory status is \"Checked Out\", show the name of the publisher who has it checked out\n   - If the territory status is \"Available\", show \"—\" in gray\n\n3. Get the publisher name from the most recent checkout record for that territory."
+          "When clicked, create a CSV file with these columns:",
+          "Include data for all pioneers, with their monthly hours filled in where they exist (show \"0\" or blank for months with no data).",
+          "Download the file as \"pioneers-export.csv\"."
         ]
       },
       "acceptanceCriteria": [
-        "When a territory row has status \"Checked Out\", the Publisher cell displays the publisher name associated with the most recent checkout record for that territory.",
-        "When a territory row has status \"Available\", the Publisher cell displays exactly \"—\" and uses a muted/gray text style (e.g., Tailwind text-muted-foreground or equivalent).",
-        "The logic for \"most recent checkout record\" is based on the largest dateCheckedOut value in the territory’s checkout history (and is not dependent on UI sort order).",
-        "If a territory is \"Checked Out\" but no checkout record can be found, the UI fails gracefully (shows \"—\" in muted text) without breaking the table rendering."
+        "Clicking \"Export to CSV\" downloads a file named exactly \"pioneers-export.csv\".",
+        "The first row of the CSV is a header row with the exact column names and order specified.",
+        "The CSV contains all pioneers shown in the Pioneers list (not just currently visible rows).",
+        "For each pioneer, \"Pioneer Name\" uses the pioneer's display name (publisherName), and \"Service Year\" uses the pioneer's serviceYear.",
+        "For each pioneer, monthly hour columns are filled from that pioneer's monthly hours for the same serviceYear; months with no entry are exported as \"0\" (or blank, consistently).",
+        "\"Total Hours\" equals the sum of all recorded monthly hours for that pioneer’s serviceYear.",
+        "\"Average Hours\" equals Total Hours divided by the number of recorded monthly entries for that serviceYear (not divided by 12), matching the Pioneers table logic; when there are no entries, Average Hours exports as 0 or blank consistently.",
+        "\"Current Status\" matches the same logic and labels as the UI badge: \"No Entries\" when there are no hours, \"On Track\" when average >= 50, otherwise \"Behind\".",
+        "CSV fields are properly escaped/quoted so names containing commas/quotes/newlines export correctly."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Use the existing publishers query hook from frontend/src/hooks/useQueries.ts (useGetAllPublishers) in Territories.tsx to ensure the displayed publisher name is correct and consistent with the rest of the app; prefer the publisher name on the checkout record when available, otherwise resolve the name via the publishers list by publisher ID if present in the checkout record model.",
+      "text": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling on the Pioneers page, but differentiate it using a secondary visual treatment and/or a download icon, while keeping all other UI unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-6"
         ],
         "quotes": [
-          "It's called usePublishers and it's located at:\n\nfrontend/src/hooks/useQueries.ts\n\nThis hook fetches all publishers and returns an array with publisher data including id and name.\n\nUse it the same way here."
+          "Use the same button styling as the \"Add Pioneer\" button but maybe use a secondary color or add a download icon.",
+          "Keep everything else unchanged."
         ]
       },
       "acceptanceCriteria": [
-        "Territories.tsx fetches publishers using the existing hook in frontend/src/hooks/useQueries.ts (useGetAllPublishers) following the established patterns in the codebase.",
-        "The Publisher column value uses checkout-record publisher name when present; otherwise it attempts to look up the publisher’s current full name from the publishers list using the checkout record’s publisher identifier (if available).",
-        "No backend changes are required to display the Publisher column."
+        "The \"Export to CSV\" button uses the same general size, typography, and hover behavior as the \"Add Pioneer\" button.",
+        "The \"Export to CSV\" button is visually distinct from \"Add Pioneer\" (e.g., a secondary color treatment and/or a download icon).",
+        "No other styling changes occur outside of adding this new button."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/components/ui (read-only Shadcn components).",
-    "Keep all existing Territories page behaviors unchanged aside from adding the new Publisher column and any minimal column reordering required to place it between Number and Status.",
-    "Use English for all user-facing text."
+    "Do not modify files under frontend/src/components/ui (compose existing UI components instead).",
+    "Keep all existing Pioneers page behaviors (sorting, modals, navigation, table rendering) unchanged except for adding CSV export.",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Adding new backend endpoints or changing backend data models for territories/checkout records.",
-    "Changing territory checkout/return behavior or altering territory status logic.",
-    "Adding new filters, sorting controls, or search to the Territories table."
+    "Adding backend endpoints specifically for CSV export.",
+    "Adding filtering options or exporting only a subset of pioneers.",
+    "Exporting to formats other than CSV (e.g., XLSX, PDF).",
+    "Changing how averages/status are calculated in the UI."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

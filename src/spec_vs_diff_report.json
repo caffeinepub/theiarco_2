@@ -1,46 +1,47 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T23:41:12.728Z",
-  "summary": "Territories.tsx adds logic to derive a publisher display value using the most recent checkout record and fetches publishers via useGetAllPublishers, but the diff snippet does not show the actual table header/cell insertion or muted styling, so key UI placement/styling requirements cannot be verified.",
+  "generatedAt": "2026-02-13T00:15:05.303Z",
+  "summary": "CSV export utility and export handler logic were added, including client-side CSV generation, escaping, and download as pioneers-export.csv. However, the diff excerpt does not show the Pioneers page header JSX changes, so the presence/placement/styling of the new \"Export to CSV\" button cannot be confirmed from the provided diff summary. Some additional behaviors (e.g., sorting export rows alphabetically and toast notifications) were implemented but not explicitly requested.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Update the Territories table to include a new \"Publisher\" column positioned between \"Territory Number\" and \"Status\" (header and row cells), keeping all other behaviors unchanged.",
-      "reason": "The provided diff excerpt for Territories.tsx is truncated before the table JSX, so there is no visible evidence that a \"Publisher\" <TableHead> and corresponding <TableCell> were added or that column order was adjusted.",
+      "requirement": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
+      "reason": "The modified Pioneers page file is truncated before the rendered header/JSX, so there is no evidence in the diff summary that a new button is actually rendered in the header next to \"Add Pioneer\" (or that it is only present on this page).",
       "evidence": [
-        "frontend/src/pages/Territories.tsx (truncated)"
+        "frontend/src/pages/Pioneers.tsx (truncated)"
       ]
     },
     {
-      "id": "REQ-2",
-      "requirement": "When status is \"Available\", display exactly \"—\" in a muted/gray text style (e.g., text-muted-foreground) in the Publisher cell; fail gracefully with muted \"—\" if checked out but no record is found.",
-      "reason": "The logic returns \"—\" for Available and missing-record cases, but the diff excerpt does not show any JSX/styling applying a muted/gray class to the rendered em dash in the table cell.",
+      "id": "REQ-3",
+      "requirement": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling but be visually distinct (secondary treatment and/or download icon), with no other styling changes.",
+      "reason": "While a download icon import is shown, the diff summary does not include the JSX where the button is rendered nor any className/variant props demonstrating styling parity/distinction; therefore this requirement cannot be verified from the provided diff excerpt.",
       "evidence": [
-        "frontend/src/pages/Territories.tsx (truncated)"
+        "frontend/src/pages/Pioneers.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Introduced an additional helper to compute an \"active\" checkout record (most recent record with dateReturned null/undefined), which may affect duration calculation behavior.",
-      "reason": "The BuildRequest only asks to add a Publisher column derived from the most recent checkout record; adding/altering logic around the active checkout record is not requested and could potentially change existing page behavior.",
+      "description": "Sort exported CSV rows alphabetically by pioneer name before generating/downloading the CSV.",
+      "reason": "The requirements specify exporting all pioneers with specific columns and calculations, but do not request re-ordering/sorting the export output; the diff explicitly adds sorting.",
       "evidence": [
-        "frontend/src/pages/Territories.tsx (truncated) - getActiveCheckoutRecord helper added"
+        "frontend/src/pages/Pioneers.tsx (pioneersData.sort((a, b) => a.pioneerName.localeCompare(b.pioneerName));)"
       ]
     },
     {
-      "description": "Publisher display logic explicitly returns an em dash for statuses other than \"Available\" and \"Checked Out\" (e.g., \"Under Review\").",
-      "reason": "The BuildRequest specifies behavior for \"Checked Out\" and \"Available\" only; handling other statuses this way is additional behavior not explicitly requested (though it may be acceptable).",
+      "description": "Toast notifications for export success/failure and \"No data to export\".",
+      "reason": "User-facing toast messaging is not mentioned in the requirements/acceptance criteria for the CSV export feature, but was added as part of the export flow.",
       "evidence": [
-        "frontend/src/pages/Territories.tsx (truncated) - getPublisherName returns '—' for other statuses"
+        "frontend/src/pages/Pioneers.tsx (imports toast from 'sonner' and calls toast.error/toast.success)"
       ]
     }
   ],
-  "confidence": 0.56,
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/Territories.tsx",
+    "frontend/src/pages/Pioneers.tsx",
+    "frontend/src/utils/pioneersCsvExport.ts",
     "project_state.json"
   ]
 }

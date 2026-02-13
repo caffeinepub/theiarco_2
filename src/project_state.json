@@ -1,34 +1,30 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Add a Publisher column to the Territories table, showing the publisher from the most recent checkout when Checked Out and a gray em dash when Available.",
-  "architectural_notes": [
-    "Territories table is rendered directly in frontend/src/pages/Territories.tsx (not a separate component).",
-    "Publishers data is fetched via usePublishers hook in frontend/src/hooks/useQueries.ts (returns publisher array with id and name).",
-    "Publisher shown for a territory should be derived from that territory’s most recent checkout record."
-  ],
+  "summary": "Add CSV export capability to the Pioneers page.",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-territories-table-on-the-territories-page-frontend-src-pages-territories-tsx-to-include-a-new-column-titled-publisher-positioned-between-the-territory-number-column-and-the-status-column-adjusting-the-column-order-as-needed-to-satisfy-this-placement-while-keeping-all-other-functionality-unchanged",
-      "title": "Update the Territories table on the Territories page (frontend/src/pages/Territories.tsx) to include a new column titled \"Publisher\" positioned between the \"Territory Number\" column and the \"Status\" column, adjusting the column order as needed to satisfy this placement while keeping all other functionality unchanged.",
+      "id": "feature-add-an-export-to-csv-button-to-the-pioneers-page-header-positioned-in-the-top-right-next-to-the-existing-add-pioneer-button",
+      "title": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-for-each-territory-row-on-the-territories-page-render-the-publisher-cell-value-based-on-the-territory-s-most-recent-checkout-record-if-territory-status-is-checked-out-show-the-publisher-name-from-the-most-recent-checkout-record-for-that-territory-if-territory-status-is-available-show-an-em-dash-styled-in-gray-muted",
-      "title": "For each territory row on the Territories page, render the \"Publisher\" cell value based on the territory’s most recent checkout record: if territory.status is \"Checked Out\", show the publisher name from the most recent checkout record for that territory; if territory.status is \"Available\", show an em dash (\"—\") styled in gray (muted).",
+      "id": "feature-implement-client-side-csv-generation-and-download-when-the-export-to-csv-button-is-clicked-the-exported-csv-must-include-one-row-per-pioneer-and-the-following-columns-in-this-exact-order-pioneer-name-service-year-total-hours-average-hours-current-status-september-hours-october-hours-november-hours-december-hours-january-hours-february-hours-march-hours-april-hours-may-hours-june-hours-july-hours-august-hours",
+      "title": "Implement client-side CSV generation and download when the \"Export to CSV\" button is clicked. The exported CSV must include one row per pioneer and the following columns in this exact order: Pioneer Name, Service Year, Total Hours, Average Hours, Current Status, September Hours, October Hours, November Hours, December Hours, January Hours, February Hours, March Hours, April Hours, May Hours, June Hours, July Hours, August Hours.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-use-the-existing-publishers-query-hook-from-frontend-src-hooks-usequeries-ts-usegetallpublishers-in-territories-tsx-to-ensure-the-displayed-publisher-name-is-correct-and-consistent-with-the-rest-of-the-app-prefer-the-publisher-name-on-the-checkout-record-when-available-otherwise-resolve-the-name-via-the-publishers-list-by-publisher-id-if-present-in-the-checkout-record-model",
-      "title": "Use the existing publishers query hook from frontend/src/hooks/useQueries.ts (useGetAllPublishers) in Territories.tsx to ensure the displayed publisher name is correct and consistent with the rest of the app; prefer the publisher name on the checkout record when available, otherwise resolve the name via the publishers list by publisher ID if present in the checkout record model.",
+      "id": "feature-style-the-new-export-to-csv-button-to-match-the-existing-add-pioneer-button-styling-on-the-pioneers-page-but-differentiate-it-using-a-secondary-visual-treatment-and-or-a-download-icon-while-keeping-all-other-ui-unchanged",
+      "title": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling on the Pioneers page, but differentiate it using a secondary visual treatment and/or a download icon, while keeping all other UI unchanged.",
       "reqIds": [
         "REQ-3"
       ],
@@ -38,12 +34,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add 'Publisher' column to Territories table (between Number and Status) showing publisher from most recent checkout when Checked Out, otherwise gray '—'",
+      "summary": "Add an \"Export to CSV\" button on the Pioneers page that downloads \"pioneers-export.csv\" containing all pioneers with specified columns including monthly hours (0/blank when missing), styled similarly to \"Add Pioneer\" (secondary color and/or download icon).",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Add Publisher column to Territories table (from most recent checkout)",
+  "projectName": "Add Export to CSV button on Pioneers page",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

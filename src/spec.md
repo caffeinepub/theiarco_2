@@ -1,14 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add a “Publisher” column to the Territories table that displays the publisher from the territory’s most recent checkout, without changing any other Territories page behavior.
+**Goal:** Add a client-side CSV export action to the Pioneers page.
 
 **Planned changes:**
-- Update the Territories table column order in `frontend/src/pages/Territories.tsx` to insert a new “Publisher” column between “Territory Number” and “Status”.
-- Use `useGetAllPublishers` from `frontend/src/hooks/useQueries.ts` within `Territories.tsx` to support consistent publisher name display.
-- For each territory row, compute the most recent checkout record by `dateCheckedOut` and display:
-  - Publisher name when status is “Checked Out” (prefer checkout record publisher name; otherwise resolve via publishers list by publisher ID when available).
-  - A muted/gray em dash (“—”) when status is “Available”, and also as a graceful fallback when checked out but no checkout record/name can be resolved.
-- Ensure the new column fits the existing table layout without overflow at typical viewport sizes.
+- Add an "Export to CSV" button to the Pioneers page header, positioned top-right next to the existing "Add Pioneer" button, without affecting other pages.
+- Implement client-side CSV generation and download as `pioneers-export.csv`, exporting all pioneers in the list with the required columns and correct calculations/labels matching the current UI logic.
+- Style the "Export to CSV" button to match the existing "Add Pioneer" button’s general styling while visually differentiating it (e.g., secondary treatment and/or download icon), leaving the rest of the UI unchanged.
 
-**User-visible outcome:** The Territories table includes a new “Publisher” column (between Territory Number and Status) showing who currently has a territory checked out, or a muted “—” when it’s available.
+**User-visible outcome:** On the Pioneers page, users can click "Export to CSV" to download `pioneers-export.csv` containing all pioneers and their service-year hours/status data in the specified column order.
