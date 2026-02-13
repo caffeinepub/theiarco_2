@@ -1,26 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [
-    "Global pending canister-call state should drive a persistent 'connecting' toast; toast auto-dismisses on successful reconnect/connection."
-  ],
+  "summary": "Add sorting functionality to the Territories page table (clickable column headers with tri-state sorting and styling consistent with other sortable tables).",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-a-global-toast-notification-that-appears-whenever-any-canister-call-is-pending-and-the-backend-actor-is-not-available-and-keep-the-toast-visible-until-the-actor-reconnects-then-auto-dismiss-it",
-      "title": "Add a global toast notification that appears whenever any canister call is pending and the backend actor is not available, and keep the toast visible until the actor reconnects, then auto-dismiss it.",
+      "id": "feature-implement-tri-state-sorting-on-the-territories-page-table-frontend-src-pages-territories-tsx-make-each-table-column-header-clickable-and-on-click-cycle-sort-state-for-that-column-in-the-order-default-no-sort-ascending-descending-default-only-one-column-may-be-actively-sorted-at-a-time-clicking-a-different-column-must-clear-the-previous-column-s-sort-state",
+      "title": "Implement tri-state sorting on the Territories page table (frontend/src/pages/Territories.tsx): make each table column header clickable, and on click cycle sort state for that column in the order default (no sort) → ascending → descending → default. Only one column may be actively sorted at a time; clicking a different column must clear the previous column’s sort state.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-detect-and-treat-the-actor-not-available-failure-state-as-a-reconnect-condition-by-showing-the-same-persistent-reconnect-toast-when-react-query-operations-fail-with-an-error-whose-message-includes-actor-not-available-and-keep-it-visible-until-the-actor-is-available-again",
-      "title": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
+      "id": "feature-add-sort-indicators-and-header-hover-affordance-on-the-territories-table-headers-when-a-column-is-sorted-ascending-render-an-up-arrow-character-immediately-next-to-the-column-label-when-sorted-descending-render-a-down-arrow-character-when-not-sorted-render-no-arrow-add-a-subtle-hover-effect-to-indicate-the-headers-are-clickable-e-g-pointer-cursor-and-slightly-darker-header-background-on-hover-and-match-existing-table-styling-patterns-in-the-app-use-tailwind-utility-classes-on-the-header-content-without-modifying-shared-ui-components",
+      "title": "Add sort indicators and header hover affordance on the Territories table headers: when a column is sorted ascending, render an up arrow character (↑) immediately next to the column label; when sorted descending, render a down arrow character (↓). When not sorted, render no arrow. Add a subtle hover effect to indicate the headers are clickable (e.g., pointer cursor and slightly darker header background on hover), and match existing table styling patterns in the app (use Tailwind utility classes on the header content without modifying shared UI components).",
       "reqIds": [
         "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-territories-table-supports-sorting-for-the-existing-displayed-columns-using-appropriate-comparison-logic-territory-number-numeric-if-possible-otherwise-lexicographic-publisher-alphabetical-by-the-displayed-publisher-name-where-sorts-consistently-status-alphabetical-type-alphabetical-and-checked-out-duration-numeric-by-months-where-territories-without-a-duration-display-and-sort-consistently",
+      "title": "Ensure the Territories table supports sorting for the existing displayed columns using appropriate comparison logic: Territory Number (numeric if possible, otherwise lexicographic), Publisher (alphabetical by the displayed publisher name, where '—' sorts consistently), Status (alphabetical), Type (alphabetical), and Checked Out Duration (numeric by months, where territories without a duration display '—' and sort consistently).",
+      "reqIds": [
+        "REQ-3"
       ],
       "version": 1
     }
@@ -28,12 +34,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Show a toast notification whenever any canister call is pending; keep it visible until the connection/reconnect succeeds, then auto-dismiss.",
+      "summary": "Implement sortable Territories page table: clickable headers with tri-state sort (asc/desc/default), single active sorted column, sort indicators, and subtle hover styling consistent with other app tables.",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Persistent reconnect toast while canister calls are pending",
+  "projectName": "Add tri-state column sorting to Territories table",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

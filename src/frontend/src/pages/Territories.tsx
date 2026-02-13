@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,10 +9,15 @@ import { AddTerritoryModal } from '../components/territories/AddTerritoryModal';
 import { exportTerritoryAssignmentRecord } from '../utils/territoryAssignmentRecordCsvExport';
 import type { Territory, CheckoutRecord } from '../backend';
 
+type SortColumn = 'number' | 'publisher' | 'status' | 'type' | 'duration' | null;
+type SortDirection = 'default' | 'asc' | 'desc';
+
 export default function Territories() {
   const { data: territories, isLoading } = useGetAllTerritories();
   const { data: publishers } = useGetAllPublishers();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [sortColumn, setSortColumn] = useState<SortColumn>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('default');
   const navigate = useNavigate();
 
   const getStatusColor = (status: string) => {
@@ -128,6 +133,95 @@ export default function Territories() {
     return duration !== null && duration.months >= 4;
   };
 
+  // Handle column header click for sorting
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      // Cycle through: asc -> desc -> default
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection('default');
+        setSortColumn(null);
+      } else {
+        setSortDirection('asc');
+      }
+    } else {
+      // New column clicked, start with ascending
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  // Get sort indicator for a column
+  const getSortIndicator = (column: SortColumn) => {
+    if (sortColumn !== column) return null;
+    if (sortDirection === 'asc') return ' ↑';
+    if (sortDirection === 'desc') return ' ↓';
+    return null;
+  };
+
+  // Compute displayed territories with sorting applied
+  const displayedTerritories = useMemo(() => {
+    if (!territories || territories.length === 0) return [];
+    if (sortColumn === null || sortDirection === 'default') {
+      return territories;
+    }
+
+    const sorted = [...territories].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortColumn) {
+        case 'number': {
+          // Try numeric comparison first
+          const aNum = parseFloat(a.number);
+          const bNum = parseFloat(b.number);
+          if (!isNaN(aNum) && !isNaN(bNum)) {
+            comparison = aNum - bNum;
+          } else {
+            comparison = a.number.localeCompare(b.number);
+          }
+          break;
+        }
+
+        case 'publisher': {
+          const aName = getPublisherName(a);
+          const bName = getPublisherName(b);
+          // Sort em-dash consistently (put at end)
+          if (aName === '—' && bName !== '—') return 1;
+          if (aName !== '—' && bName === '—') return -1;
+          comparison = aName.localeCompare(bName);
+          break;
+        }
+
+        case 'status': {
+          comparison = a.status.localeCompare(b.status);
+          break;
+        }
+
+        case 'type': {
+          comparison = a.territoryType.localeCompare(b.territoryType);
+          break;
+        }
+
+        case 'duration': {
+          const aDuration = getCheckedOutDuration(a);
+          const bDuration = getCheckedOutDuration(b);
+          const aMonths = aDuration?.months ?? -1;
+          const bMonths = bDuration?.months ?? -1;
+          // Sort missing duration (em-dash) consistently (put at end)
+          if (aMonths === -1 && bMonths !== -1) return 1;
+          if (aMonths !== -1 && bMonths === -1) return -1;
+          comparison = aMonths - bMonths;
+          break;
+        }
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    return sorted;
+  }, [territories, sortColumn, sortDirection, publishers]);
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -178,15 +272,50 @@ export default function Territories() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Territory Number</TableHead>
-                <TableHead>Publisher</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Checked Out Duration</TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('number')}
+                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                  >
+                    Territory Number{getSortIndicator('number')}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('publisher')}
+                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                  >
+                    Publisher{getSortIndicator('publisher')}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('status')}
+                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                  >
+                    Status{getSortIndicator('status')}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('type')}
+                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                  >
+                    Type{getSortIndicator('type')}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('duration')}
+                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                  >
+                    Checked Out Duration{getSortIndicator('duration')}
+                  </button>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {territories.map((territory) => {
+              {displayedTerritories.map((territory) => {
                 const duration = getCheckedOutDuration(territory);
                 const highlight = shouldHighlightRow(territory);
                 const publisherName = getPublisherName(territory);

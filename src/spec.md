@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Show a single, persistent global “reconnecting” toast when canister calls are pending or fail due to “Actor not available”, and automatically dismiss it once the backend actor reconnects.
+**Goal:** Add tri-state (none/asc/desc) single-column sorting to the Territories table without changing other page behaviors.
 
 **Planned changes:**
-- Add global logic that detects when at least one React Query query/mutation is in-flight while the backend actor is not available, and display a top-right Sonner toast that stays visible until reconnection.
-- Detect React Query failures whose error message includes "Actor not available" and trigger the same persistent reconnect toast.
-- Ensure the reconnect toast never duplicates (single stable toast id) and auto-dismisses when the actor becomes available again, without breaking existing success/error toasts.
+- Make each Territories table column header clickable and cycle its sort state: default (no sort) → ascending → descending → default.
+- Ensure only one column is actively sorted at a time; clicking a different header clears the previous sort and indicator.
+- Add inline sort indicators (↑/↓) next to the active column label and add subtle hover affordance (pointer cursor + slight hover background) using Tailwind utility classes within the Territories page.
+- Implement appropriate compare logic per column: Territory Number (numeric when parsable), Publisher (alphabetical by displayed value with '—' handled consistently), Status (alphabetical), Type (alphabetical), Checked Out Duration (numeric months with '—' handled consistently), and restore the original fetched order when returning to default.
 
-**User-visible outcome:** When the app loses actor connectivity during pending or failing canister calls, users see one persistent “Reconnecting…” toast that disappears automatically once the actor is available again.
+**User-visible outcome:** Users can click any Territories table header to sort ascending/descending and click a third time to return to the original default row order, with a clear arrow indicator on the currently sorted column.

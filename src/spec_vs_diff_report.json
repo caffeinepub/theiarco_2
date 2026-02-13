@@ -1,35 +1,54 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T06:29:51.928Z",
-  "summary": "Implemented a global ReconnectToastManager mounted in AppLayout that shows a persistent Sonner loading toast when there are in-flight React Query operations and the actor is unavailable, and dismisses it on reconnection. However, the diff does not show any wiring that detects React Query failures with error messages containing \"Actor not available\" to trigger the same reconnect toast, so REQ-2 is not fully implemented.",
+  "generatedAt": "2026-02-13T21:56:47.940Z",
+  "summary": "Diff shows initial scaffolding in Territories.tsx (sort state types/state variables and helper functions), but the provided truncated snippet does not contain evidence of clickable headers, tri-state sort cycling, sort indicators, hover affordance, or the actual sorting/comparison logic being applied to displayed rows. Also includes modifications to project_state.json and a generated frontend-file-summaries.txt that were not requested by the BuildRequest.",
   "missing_requirements": [
     {
-      "id": "REQ-2",
-      "requirement": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
-      "reason": "The diff introduces a shared reconnectState and the ReconnectToastManager subscribes to it, but there is no evidence in the provided changes that any React Query query/mutation error handler (or hooks) sets reconnectState based on errors whose message includes \"Actor not available\". Without that wiring, failures will not trigger the reconnect toast as required.",
+      "id": "REQ-1",
+      "requirement": "Implement tri-state sorting on the Territories table: all headers clickable; click cycles default → asc → desc → default; only one active sorted column; switching columns clears prior sort; sorting only affects displayed rows and preserves existing behaviors (navigation/export/highlighting/loading/empty states/values).",
+      "reason": "In the visible (truncated) Territories.tsx diff, only sort state is introduced (sortColumn/sortDirection). There is no shown implementation of header click handlers, cycling logic, or application of sorting to the rendered rows. Because the file is truncated, this may exist outside the snippet, but it is not evidenced in the provided diff summary.",
       "evidence": [
-        "frontend/src/components/system/ReconnectToastManager.tsx",
-        "frontend/src/utils/reconnectState.ts",
-        "frontend-file-summaries.txt (shows many hooks exist, but no diff evidence of modifications to set reconnectState on errors)"
+        "frontend/src/pages/Territories.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "Add sort indicators (↑/↓) next to the active sorted column label only, and add hover affordance (pointer cursor + subtle hover background) using Tailwind utility classes without modifying shared UI components.",
+      "reason": "The provided snippet does not show any header rendering changes (e.g., conditional arrows next to labels) or Tailwind hover/cursor classes applied to header content. Due to truncation it might exist later, but it is not evidenced here.",
+      "evidence": [
+        "frontend/src/pages/Territories.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Support sorting for Territory Number (numeric if possible), Publisher (by displayed name with '—' consistent), Status, Type (alphabetical), and Checked Out Duration (numeric months with '—' consistent), and restoring default order matching initial fetched list order.",
+      "reason": "No comparator functions, computed sorted array (e.g., useMemo sorting), or logic tying sorting to the displayed rows is visible in the provided diff excerpt. While helper functions for publisher display and duration calculation are present, there is no shown sort-application logic using them.",
+      "evidence": [
+        "frontend/src/pages/Territories.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Shows an additional \"Connection restored\" success toast automatically whenever the reconnect condition ends.",
-      "reason": "The request/AC require the reconnect toast to auto-dismiss when connectivity is restored and mention English text examples, but do not explicitly request emitting a separate success toast on restoration. This is added behavior beyond the stated requirement.",
+      "description": "Project metadata/tracking updates in project_state.json (new feature request entries AR-1..AR-4 and summary).",
+      "reason": "BuildRequest only asks for functional UI changes in Territories sorting; it does not request updating any project state/metadata files.",
       "evidence": [
-        "frontend/src/components/system/ReconnectToastManager.tsx"
+        "project_state.json"
+      ]
+    },
+    {
+      "description": "Update to autogenerated/summary file frontend-file-summaries.txt describing many parts of the app unrelated to Territories sorting.",
+      "reason": "BuildRequest does not mention generating or updating repository summary files; this change is not part of the requested feature behavior.",
+      "evidence": [
+        "frontend-file-summaries.txt (truncated)"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/layout/AppLayout.tsx",
-    "frontend/src/components/system/ReconnectToastManager.tsx",
-    "frontend/src/utils/reconnectState.ts",
+    "frontend/src/pages/Territories.tsx",
     "project_state.json"
   ]
 }

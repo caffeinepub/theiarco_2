@@ -1,54 +1,58 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Global persistent reconnect toast for actor unavailability during React Query activity",
+  "title": "Add tri-state column sorting to Territories table",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Show a global persistent Sonner toast in the top-right while any React Query operation is pending and the backend actor is unavailable; auto-dismiss when the actor reconnects.",
+      "summary": "Add tri-state (default/asc/desc) single-column sorting behavior to the Territories table headers, preserving the initial fetched order when unsorted.",
       "acceptanceCriteria": [
-        "When at least one React Query query or mutation is in-flight (pending) and the backend actor is not available, a toast is shown in the top-right (using the existing Sonner <Toaster /> in AppLayout).",
-        "The toast remains visible (is not auto-timed-out) until connectivity is restored (actor becomes available again).",
-        "Once the actor becomes available again, the toast is dismissed automatically without user interaction.",
-        "The toast uses English user-facing text (e.g., \"Reconnecting…\" / \"Connection restored\").",
-        "The solution is global (no need to add per-button/per-modal loading UI) and applies across all pages/routes."
+        "All Territories table headers (Territory Number, Publisher, Status, Type, Checked Out Duration) are clickable.",
+        "Clicking a header applies ascending sort for that column; clicking again applies descending sort; clicking a third time returns to the default ordering (the same ordering as when the page first rendered with the fetched territories list).",
+        "When a new column header is clicked, any prior column’s sort indicator is removed and only the new column is sorted.",
+        "Sorting only affects the displayed rows; row click behavior, CSV export behavior, and highlight styling for long checkouts remain unchanged."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/system/ReconnectToastManager.tsx",
-          "operation": "create",
-          "description": "Create a global manager component that (1) observes React Query in-flight state (queries/mutations) and (2) reads actor availability via the existing useActor hook (do not modify immutable hook), then shows a single persistent Sonner toast with a stable id while conditions indicate reconnection is needed; dismiss and optionally show a short \"Connection restored\" toast when actor becomes available again. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/layout/AppLayout.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Wire the new ReconnectToastManager into the global layout so it runs across all pages/routes without changing the existing Sonner <Toaster /> placement (compose around it, do not replace it). Verify the component's usage instructions before implementing."
+          "description": "Implement table sorting state (active column + tri-state direction), header click handlers that cycle default→asc→desc→default, and compute a derived displayedTerritories list (useMemo) that sorts a copy while preserving the original fetched array order when in default state and as a tiebreaker for stable sorting. Ensure only the rendered rows change; keep navigation, exportTerritoryAssignmentRecord usage, and long-checkout row highlighting logic unchanged."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Treat React Query failures with message containing \"Actor not available\" as a reconnect condition, showing the same single persistent reconnect toast until the actor is available again (no duplicate spam).",
+      "summary": "Show per-column sort arrows and add header hover affordances using Tailwind utility classes within Territories page (no shared UI component changes).",
       "acceptanceCriteria": [
-        "If a mutation or query throws an error with message containing \"Actor not available\" (as seen in existing hooks), the reconnect toast appears and stays visible until the actor becomes available again.",
-        "The reconnect toast does not spam duplicates; at most one reconnect toast is visible at a time (use a stable toast id or equivalent).",
-        "After reconnection, the reconnect toast is dismissed and normal success/error toasts continue to work as before."
+        "When a column is sorted ascending, the header shows \"Column Name ↑\"; when descending, it shows \"Column Name ↓\"; when default, no arrow is shown.",
+        "Hovering over any header visibly indicates interactivity (at minimum: cursor becomes pointer; header shows a subtle hover background change).",
+        "Only the active sorted column shows an arrow at any time.",
+        "No user-facing text is introduced other than the arrow characters."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/reconnectState.ts",
-          "operation": "create",
-          "description": "Add a small shared frontend-only state utility (e.g., subscribe/notify) to record when an \"Actor not available\" error has been observed so the reconnect toast can be triggered globally without adding per-hook UI handling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/main.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Configure the React Query QueryClient to globally observe query/mutation errors and, when an Error message includes \"Actor not available\", signal reconnectState (without changing existing per-feature success/error toasts). Verify the component's usage instructions before implementing."
-        },
+          "description": "Wrap each TableHead label content in a clickable element (e.g., a button) that renders the sort indicator character (↑/↓) immediately next to the label only for the active sorted column, and apply subtle Tailwind hover/cursor styles (e.g., cursor-pointer + slight hover background) on the header content without modifying anything under frontend/src/components/ui."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add appropriate comparison logic for each Territories table column, including consistent handling of em-dash placeholders and numeric parsing for number/duration.",
+      "acceptanceCriteria": [
+        "Sorting by Territory Number orders rows by the territory.number value in ascending/descending order (numeric when parsable).",
+        "Sorting by Publisher orders rows alphabetically by the value shown in the Publisher column.",
+        "Sorting by Status orders rows alphabetically by territory.status.",
+        "Sorting by Type orders rows alphabetically by territory.territoryType.",
+        "Sorting by Checked Out Duration orders rows numerically by the computed months value used to render the duration display.",
+        "Returning to default sorting restores the original row order from the fetched territories list."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/system/ReconnectToastManager.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Integrate reconnectState so the manager also shows the persistent reconnect toast when an \"Actor not available\" error is detected (even if no in-flight operations remain), ensuring only one toast instance via a stable id and dismissing automatically when the actor becomes available again. Verify the component's usage instructions before implementing."
+          "description": "Implement column-specific comparator helpers for Territory Number (numeric when possible, else localeCompare), Publisher (use the same getPublisherName display value; sort '—' consistently), Status (alphabetical), Type (alphabetical), and Checked Out Duration (use the same computed months used for display; sort missing duration '—' consistently). Ensure switching back to default uses the original fetched ordering."
         }
       ]
     }

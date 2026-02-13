@@ -1,40 +1,46 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T06:29:51.932Z",
+  "generatedAt": "2026-02-13T21:56:47.943Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add a global toast notification that appears whenever any canister call is pending and the backend actor is not available, and keep the toast visible until the actor reconnects, then auto-dismiss it.",
+        "summary": "Implement tri-state sorting on the Territories page table (frontend/src/pages/Territories.tsx): make each table column header clickable, and on click cycle sort state for that column in the order default (no sort) → ascending → descending → default. Only one column may be actively sorted at a time; clicking a different column must clear the previous column’s sort state.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/system/ReconnectToastManager.tsx",
-          "frontend/src/components/layout/AppLayout.tsx"
+          "frontend/src/pages/Territories.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/system/ReconnectToastManager.tsx",
-          "frontend/src/components/layout/AppLayout.tsx"
+          "frontend/src/pages/Territories.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
+        "summary": "Add sort indicators and header hover affordance on the Territories table headers: when a column is sorted ascending, render an up arrow character (↑) immediately next to the column label; when sorted descending, render a down arrow character (↓). When not sorted, render no arrow. Add a subtle hover effect to indicate the headers are clickable (e.g., pointer cursor and slightly darker header background on hover), and match existing table styling patterns in the app (use Tailwind utility classes on the header content without modifying shared UI components).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/reconnectState.ts",
-          "frontend/src/main.tsx",
-          "frontend/src/components/system/ReconnectToastManager.tsx"
+          "frontend/src/pages/Territories.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/reconnectState.ts",
-          "frontend/src/components/system/ReconnectToastManager.tsx"
+          "frontend/src/pages/Territories.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Ensure the Territories table supports sorting for the existing displayed columns using appropriate comparison logic: Territory Number (numeric if possible, otherwise lexicographic), Publisher (alphabetical by the displayed publisher name, where '—' sorts consistently), Status (alphabetical), Type (alphabetical), and Checked Out Duration (numeric by months, where territories without a duration display '—' and sort consistently).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/Territories.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/Territories.tsx"
         ]
       }
     ]
@@ -44,9 +50,7 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/layout/AppLayout.tsx",
-    "frontend/src/components/system/ReconnectToastManager.tsx",
-    "frontend/src/utils/reconnectState.ts",
+    "frontend/src/pages/Territories.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

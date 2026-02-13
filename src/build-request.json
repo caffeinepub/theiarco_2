@@ -1,57 +1,78 @@
 {
   "kind": "build_request",
-  "title": "Persistent reconnect toast while canister calls are pending",
+  "title": "Add tri-state column sorting to Territories table",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a global toast notification that appears whenever any canister call is pending and the backend actor is not available, and keep the toast visible until the actor reconnects, then auto-dismiss it.",
+      "text": "Implement tri-state sorting on the Territories page table (frontend/src/pages/Territories.tsx): make each table column header clickable, and on click cycle sort state for that column in the order default (no sort) → ascending → descending → default. Only one column may be actively sorted at a time; clicking a different column must clear the previous column’s sort state.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-15"
+          "msg-7"
         ],
         "quotes": [
-          "1. When the canister call is pending.\n2. Make it a toast notification that shows until it is connected. \n3. Yes i would like it to automatically disappear one it reconnects."
+          "Add sorting functionality to the Territories page table:\n\n1. Make all column headers clickable for sorting.\n\n2. When a column header is clicked:\n   - Sort the table data by that column in ascending order\n   - Show an up arrow (↑) next to the column name\n   - If clicked again, sort in descending order and show a down arrow (↓)\n   - If clicked a third time, return to default sorting\n\n4. Only one column should be sorted at a time - clicking a new column removes the sort from the previous column."
         ]
       },
       "acceptanceCriteria": [
-        "When at least one React Query query or mutation is in-flight (pending) and the backend actor is not available, a toast is shown in the top-right (using the existing Sonner <Toaster /> in AppLayout).",
-        "The toast remains visible (is not auto-timed-out) until connectivity is restored (actor becomes available again).",
-        "Once the actor becomes available again, the toast is dismissed automatically without user interaction.",
-        "The toast uses English user-facing text (e.g., \"Reconnecting…\" / \"Connection restored\").",
-        "The solution is global (no need to add per-button/per-modal loading UI) and applies across all pages/routes."
+        "All Territories table headers (Territory Number, Publisher, Status, Type, Checked Out Duration) are clickable.",
+        "Clicking a header applies ascending sort for that column; clicking again applies descending sort; clicking a third time returns to the default ordering (the same ordering as when the page first rendered with the fetched territories list).",
+        "When a new column header is clicked, any prior column’s sort indicator is removed and only the new column is sorted.",
+        "Sorting only affects the displayed rows; row click behavior, CSV export behavior, and highlight styling for long checkouts remain unchanged."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
+      "text": "Add sort indicators and header hover affordance on the Territories table headers: when a column is sorted ascending, render an up arrow character (↑) immediately next to the column label; when sorted descending, render a down arrow character (↓). When not sorted, render no arrow. Add a subtle hover effect to indicate the headers are clickable (e.g., pointer cursor and slightly darker header background on hover), and match existing table styling patterns in the app (use Tailwind utility classes on the header content without modifying shared UI components).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-12",
-          "msg-15"
+          "msg-7"
         ],
         "quotes": [
-          "What happens when the actor not available error comes on and i have already pushed the version live?",
-          "Make it a toast notification that shows until it is connected."
+          "- Show an up arrow (↑) next to the column name\n- If clicked again, sort in descending order and show a down arrow (↓)\n- If clicked a third time, return to default sorting\n\n5. Add a subtle hover effect to column headers to show they're clickable (like a slightly darker background or pointer cursor).\n\n6. Use the same styling as other sortable tables in the app (if any exist).\n\nKeep everything else unchanged."
         ]
       },
       "acceptanceCriteria": [
-        "If a mutation or query throws an error with message containing \"Actor not available\" (as seen in existing hooks), the reconnect toast appears and stays visible until the actor becomes available again.",
-        "The reconnect toast does not spam duplicates; at most one reconnect toast is visible at a time (use a stable toast id or equivalent).",
-        "After reconnection, the reconnect toast is dismissed and normal success/error toasts continue to work as before."
+        "When a column is sorted ascending, the header shows \"Column Name ↑\"; when descending, it shows \"Column Name ↓\"; when default, no arrow is shown.",
+        "Hovering over any header visibly indicates interactivity (at minimum: cursor becomes pointer; header shows a subtle hover background change).",
+        "Only the active sorted column shows an arrow at any time.",
+        "No user-facing text is introduced other than the arrow characters."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Ensure the Territories table supports sorting for the existing displayed columns using appropriate comparison logic: Territory Number (numeric if possible, otherwise lexicographic), Publisher (alphabetical by the displayed publisher name, where '—' sorts consistently), Status (alphabetical), Type (alphabetical), and Checked Out Duration (numeric by months, where territories without a duration display '—' and sort consistently).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "3. Add sorting for these columns:\n   - [List the specific columns, e.g., \"Name (alphabetically)\", \"Date (chronologically)\", \"Hours (numerically)\", \"Status (alphabetically)\"]"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Sorting by Territory Number orders rows by the territory.number value in ascending/descending order (numeric when parsable).",
+        "Sorting by Publisher orders rows alphabetically by the value shown in the Publisher column.",
+        "Sorting by Status orders rows alphabetically by territory.status.",
+        "Sorting by Type orders rows alphabetically by territory.territoryType.",
+        "Sorting by Checked Out Duration orders rows numerically by the computed months value used to render the duration display.",
+        "Returning to default sorting restores the original row order from the fetched territories list."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files in frontend/immutablePaths (including frontend/src/hooks/useActor.ts and frontend/src/hooks/useInternetIdentity.ts).",
-    "Keep the existing toast system (Sonner) and its placement in frontend/src/components/layout/AppLayout.tsx intact; compose additional logic around it rather than replacing it."
+    "Do not modify files under frontend/src/components/ui (compose with them only).",
+    "Keep all existing Territories page behavior unchanged aside from adding sorting (navigation, export, row highlighting, loading/empty states, and displayed values must remain the same).",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Adding a full-screen blocking overlay or waiting screen (user requested a toast notification).",
-    "Backend changes to Motoko canisters or canister deployment configuration.",
-    "Implementing real-time connectivity via WebSockets or push mechanisms."
+    "Adding backend sorting or changing backend APIs.",
+    "Adding multi-column sorting.",
+    "Adding filtering/search to the Territories table.",
+    "Changing which columns are displayed or altering CSV export logic."
   ],
   "imageRequirements": {
     "required": [],
