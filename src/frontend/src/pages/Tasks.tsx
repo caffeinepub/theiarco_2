@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Trash2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -28,6 +28,7 @@ import type { Task } from '../backend';
 import AddTaskModal from '../components/tasks/AddTaskModal';
 import EditTaskModal from '../components/tasks/EditTaskModal';
 import { toast } from 'sonner';
+import { buildTasksCsv, downloadCsv } from '../utils/tasksCsvExport';
 
 type FilterType = 'all' | 'completed' | 'uncompleted';
 
@@ -51,6 +52,8 @@ export default function Tasks() {
   };
 
   const { data: tasks = [], isLoading, isFetching } = useGetTasks(getTaskStatus(activeFilter));
+  // Fetch all tasks for export (ignoring current filter)
+  const { data: allTasks = [] } = useGetTasks(TaskStatus.all);
   const updateCompletionMutation = useUpdateTaskCompletion();
   const deleteTaskMutation = useDeleteTask();
 
@@ -108,6 +111,20 @@ export default function Tasks() {
     setTaskToDelete(null);
   };
 
+  const handleExportCsv = () => {
+    try {
+      const csvContent = buildTasksCsv(allTasks);
+      downloadCsv(csvContent, 'tasks-export.csv');
+      toast.success('Tasks exported successfully!', {
+        duration: 3000,
+        className: 'bg-green-600 text-white',
+      });
+    } catch (error) {
+      console.error('Failed to export tasks:', error);
+      toast.error('Failed to export tasks. Please try again.');
+    }
+  };
+
   // Show loading state during initial load or refetch
   const showLoading = isLoading || isFetching;
 
@@ -116,17 +133,23 @@ export default function Tasks() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Tasks</h1>
-      </div>
-
-      {/* Add Task Button */}
-      <div>
-        <Button
-          style={{ backgroundColor: '#43587A' }}
-          className="text-white hover:opacity-90 transition-opacity"
-          onClick={handleAddTaskClick}
-        >
-          Add Task
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={handleExportCsv}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export to CSV
+          </Button>
+          <Button
+            style={{ backgroundColor: '#43587A' }}
+            className="text-white hover:opacity-90 transition-opacity"
+            onClick={handleAddTaskClick}
+          >
+            Add Task
+          </Button>
+        </div>
       </div>
 
       {/* Filter Buttons */}

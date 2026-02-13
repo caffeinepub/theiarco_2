@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add a client-side CSV export action to the Pioneers page.
+**Goal:** Show a single, persistent global “reconnecting” toast when canister calls are pending or fail due to “Actor not available”, and automatically dismiss it once the backend actor reconnects.
 
 **Planned changes:**
-- Add an "Export to CSV" button to the Pioneers page header, positioned top-right next to the existing "Add Pioneer" button, without affecting other pages.
-- Implement client-side CSV generation and download as `pioneers-export.csv`, exporting all pioneers in the list with the required columns and correct calculations/labels matching the current UI logic.
-- Style the "Export to CSV" button to match the existing "Add Pioneer" button’s general styling while visually differentiating it (e.g., secondary treatment and/or download icon), leaving the rest of the UI unchanged.
+- Add global logic that detects when at least one React Query query/mutation is in-flight while the backend actor is not available, and display a top-right Sonner toast that stays visible until reconnection.
+- Detect React Query failures whose error message includes "Actor not available" and trigger the same persistent reconnect toast.
+- Ensure the reconnect toast never duplicates (single stable toast id) and auto-dismisses when the actor becomes available again, without breaking existing success/error toasts.
 
-**User-visible outcome:** On the Pioneers page, users can click "Export to CSV" to download `pioneers-export.csv` containing all pioneers and their service-year hours/status data in the specified column order.
+**User-visible outcome:** When the app loses actor connectivity during pending or failing canister calls, users see one persistent “Reconnecting…” toast that disappears automatically once the actor is available again.

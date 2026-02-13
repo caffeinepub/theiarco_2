@@ -3,6 +3,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
+import ReconnectToastManager from '../system/ReconnectToastManager';
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -25,6 +26,9 @@ export default function AppLayout() {
 
       {/* Toast notifications */}
       <Toaster position="top-right" />
+      
+      {/* Global reconnect toast manager */}
+      <ReconnectToastManager />
     </div>
   );
 }

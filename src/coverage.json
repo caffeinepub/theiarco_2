@@ -1,48 +1,40 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T00:15:05.306Z",
+  "generatedAt": "2026-02-13T06:29:51.932Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
+        "summary": "Add a global toast notification that appears whenever any canister call is pending and the backend actor is not available, and keep the toast visible until the actor reconnects, then auto-dismiss it.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Pioneers.tsx"
+          "frontend/src/components/system/ReconnectToastManager.tsx",
+          "frontend/src/components/layout/AppLayout.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Pioneers.tsx"
+          "frontend/src/components/system/ReconnectToastManager.tsx",
+          "frontend/src/components/layout/AppLayout.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Implement client-side CSV generation and download when the \"Export to CSV\" button is clicked. The exported CSV must include one row per pioneer and the following columns in this exact order: Pioneer Name, Service Year, Total Hours, Average Hours, Current Status, September Hours, October Hours, November Hours, December Hours, January Hours, February Hours, March Hours, April Hours, May Hours, June Hours, July Hours, August Hours.",
+        "summary": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/pioneersCsvExport.ts",
-          "frontend/src/pages/Pioneers.tsx"
+          "frontend/src/utils/reconnectState.ts",
+          "frontend/src/main.tsx",
+          "frontend/src/components/system/ReconnectToastManager.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/pioneersCsvExport.ts",
-          "frontend/src/pages/Pioneers.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling on the Pioneers page, but differentiate it using a secondary visual treatment and/or a download icon, while keeping all other UI unchanged.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Pioneers.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Pioneers.tsx"
+          "frontend/src/utils/reconnectState.ts",
+          "frontend/src/components/system/ReconnectToastManager.tsx"
         ]
       }
     ]
@@ -52,8 +44,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/Pioneers.tsx",
-    "frontend/src/utils/pioneersCsvExport.ts",
+    "frontend/src/components/layout/AppLayout.tsx",
+    "frontend/src/components/system/ReconnectToastManager.tsx",
+    "frontend/src/utils/reconnectState.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

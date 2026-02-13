@@ -1,64 +1,54 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Export Pioneers list to CSV from Pioneers page",
+  "title": "Global persistent reconnect toast for actor unavailability during React Query activity",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add an \"Export to CSV\" button to the Pioneers page header next to the existing \"Add Pioneer\" button.",
+      "summary": "Show a global persistent Sonner toast in the top-right while any React Query operation is pending and the backend actor is unavailable; auto-dismiss when the actor reconnects.",
       "acceptanceCriteria": [
-        "On the Pioneers page, the header area shows two buttons on the right side: \"Export to CSV\" and \"Add Pioneer\".",
-        "The \"Add Pioneer\" button retains its current styling and behavior.",
-        "The \"Export to CSV\" button is visible only on the Pioneers page and does not affect other pages."
+        "When at least one React Query query or mutation is in-flight (pending) and the backend actor is not available, a toast is shown in the top-right (using the existing Sonner <Toaster /> in AppLayout).",
+        "The toast remains visible (is not auto-timed-out) until connectivity is restored (actor becomes available again).",
+        "Once the actor becomes available again, the toast is dismissed automatically without user interaction.",
+        "The toast uses English user-facing text (e.g., \"Reconnecting…\" / \"Connection restored\").",
+        "The solution is global (no need to add per-button/per-modal loading UI) and applies across all pages/routes."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Pioneers.tsx",
+          "path": "frontend/src/components/system/ReconnectToastManager.tsx",
+          "operation": "create",
+          "description": "Create a global manager component that (1) observes React Query in-flight state (queries/mutations) and (2) reads actor availability via the existing useActor hook (do not modify immutable hook), then shows a single persistent Sonner toast with a stable id while conditions indicate reconnection is needed; dismiss and optionally show a short \"Connection restored\" toast when actor becomes available again. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/layout/AppLayout.tsx",
           "operation": "modify",
-          "description": "Update the Pioneers page header layout to render a right-aligned button group containing the new \"Export to CSV\" button alongside the existing \"Add Pioneer\" button, keeping the existing \"Add Pioneer\" button styling/behavior unchanged and limiting the new button to this page only."
+          "description": "Wire the new ReconnectToastManager into the global layout so it runs across all pages/routes without changing the existing Sonner <Toaster /> placement (compose around it, do not replace it). Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Generate and download a correctly formatted CSV on the client when \"Export to CSV\" is clicked, matching the Pioneers table logic for totals/averages/status and including monthly hours Sep–Aug.",
+      "summary": "Treat React Query failures with message containing \"Actor not available\" as a reconnect condition, showing the same single persistent reconnect toast until the actor is available again (no duplicate spam).",
       "acceptanceCriteria": [
-        "Clicking \"Export to CSV\" downloads a file named exactly \"pioneers-export.csv\".",
-        "The first row of the CSV is a header row with the exact column names and order specified.",
-        "The CSV contains all pioneers shown in the Pioneers list (not just currently visible rows).",
-        "For each pioneer, \"Pioneer Name\" uses the pioneer's display name (publisherName), and \"Service Year\" uses the pioneer's serviceYear.",
-        "For each pioneer, monthly hour columns are filled from that pioneer's monthly hours for the same serviceYear; months with no entry are exported as \"0\" (or blank, consistently).",
-        "\"Total Hours\" equals the sum of all recorded monthly hours for that pioneer’s serviceYear.",
-        "\"Average Hours\" equals Total Hours divided by the number of recorded monthly entries for that serviceYear (not divided by 12), matching the Pioneers table logic; when there are no entries, Average Hours exports as 0 or blank consistently.",
-        "\"Current Status\" matches the same logic and labels as the UI badge: \"No Entries\" when there are no hours, \"On Track\" when average >= 50, otherwise \"Behind\".",
-        "CSV fields are properly escaped/quoted so names containing commas/quotes/newlines export correctly."
+        "If a mutation or query throws an error with message containing \"Actor not available\" (as seen in existing hooks), the reconnect toast appears and stays visible until the actor becomes available again.",
+        "The reconnect toast does not spam duplicates; at most one reconnect toast is visible at a time (use a stable toast id or equivalent).",
+        "After reconnection, the reconnect toast is dismissed and normal success/error toasts continue to work as before."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/pioneersCsvExport.ts",
+          "path": "frontend/src/utils/reconnectState.ts",
           "operation": "create",
-          "description": "Add a focused CSV export utility for the Pioneers page: define the required header column list/order, month ordering (September through August), CSV field escaping/quoting rules, and helpers to build a CSV string and trigger a browser download as \"pioneers-export.csv\"."
+          "description": "Add a small shared frontend-only state utility (e.g., subscribe/notify) to record when an \"Actor not available\" error has been observed so the reconnect toast can be triggered globally without adding per-hook UI handling. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/Pioneers.tsx",
+          "path": "frontend/src/main.tsx",
           "operation": "modify",
-          "description": "Implement the \"Export to CSV\" click handler to (1) use the already-loaded pioneers list (all rows), (2) fetch each pioneer's monthly hours for that pioneer's serviceYear via the existing backend actor capability, (3) compute Total Hours, Average Hours (divide by count of recorded entries), Current Status (No Entries / On Track / Behind) using the same logic as the UI, (4) fill monthly columns with a consistent missing-month value (use \"0\" consistently), and (5) generate and download the CSV via the new pioneersCsvExport utility without altering existing table rendering, sorting, navigation, or modal behavior."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button sizing/typography/hover behavior while visually differentiating it (secondary treatment and/or download icon) without changing other UI.",
-      "acceptanceCriteria": [
-        "The \"Export to CSV\" button uses the same general size, typography, and hover behavior as the \"Add Pioneer\" button.",
-        "The \"Export to CSV\" button is visually distinct from \"Add Pioneer\" (e.g., a secondary color treatment and/or a download icon).",
-        "No other styling changes occur outside of adding this new button."
-      ],
-      "file_operations": [
+          "description": "Configure the React Query QueryClient to globally observe query/mutation errors and, when an Error message includes \"Actor not available\", signal reconnectState (without changing existing per-feature success/error toasts). Verify the component's usage instructions before implementing."
+        },
         {
-          "path": "frontend/src/pages/Pioneers.tsx",
+          "path": "frontend/src/components/system/ReconnectToastManager.tsx",
           "operation": "modify",
-          "description": "Apply styling to the new \"Export to CSV\" Button to align with the existing \"Add Pioneer\" button’s size/typography/hover feel while differentiating it via a secondary treatment (e.g., outline/secondary color) and optionally include an existing icon (e.g., from lucide-react if already used elsewhere) placed within the button; keep all other UI unchanged."
+          "description": "Integrate reconnectState so the manager also shows the persistent reconnect toast when an \"Actor not available\" error is detected (even if no in-flight operations remain), ensuring only one toast instance via a stable id and dismissing automatically when the actor becomes available again. Verify the component's usage instructions before implementing."
         }
       ]
     }

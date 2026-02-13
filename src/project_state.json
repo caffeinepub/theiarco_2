@@ -1,32 +1,26 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Add CSV export capability to the Pioneers page.",
-  "architectural_notes": [],
+  "summary": "New project",
+  "architectural_notes": [
+    "Global pending canister-call state should drive a persistent 'connecting' toast; toast auto-dismisses on successful reconnect/connection."
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-an-export-to-csv-button-to-the-pioneers-page-header-positioned-in-the-top-right-next-to-the-existing-add-pioneer-button",
-      "title": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
+      "id": "feature-add-a-global-toast-notification-that-appears-whenever-any-canister-call-is-pending-and-the-backend-actor-is-not-available-and-keep-the-toast-visible-until-the-actor-reconnects-then-auto-dismiss-it",
+      "title": "Add a global toast notification that appears whenever any canister call is pending and the backend actor is not available, and keep the toast visible until the actor reconnects, then auto-dismiss it.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-client-side-csv-generation-and-download-when-the-export-to-csv-button-is-clicked-the-exported-csv-must-include-one-row-per-pioneer-and-the-following-columns-in-this-exact-order-pioneer-name-service-year-total-hours-average-hours-current-status-september-hours-october-hours-november-hours-december-hours-january-hours-february-hours-march-hours-april-hours-may-hours-june-hours-july-hours-august-hours",
-      "title": "Implement client-side CSV generation and download when the \"Export to CSV\" button is clicked. The exported CSV must include one row per pioneer and the following columns in this exact order: Pioneer Name, Service Year, Total Hours, Average Hours, Current Status, September Hours, October Hours, November Hours, December Hours, January Hours, February Hours, March Hours, April Hours, May Hours, June Hours, July Hours, August Hours.",
+      "id": "feature-detect-and-treat-the-actor-not-available-failure-state-as-a-reconnect-condition-by-showing-the-same-persistent-reconnect-toast-when-react-query-operations-fail-with-an-error-whose-message-includes-actor-not-available-and-keep-it-visible-until-the-actor-is-available-again",
+      "title": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
       "reqIds": [
         "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-style-the-new-export-to-csv-button-to-match-the-existing-add-pioneer-button-styling-on-the-pioneers-page-but-differentiate-it-using-a-secondary-visual-treatment-and-or-a-download-icon-while-keeping-all-other-ui-unchanged",
-      "title": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling on the Pioneers page, but differentiate it using a secondary visual treatment and/or a download icon, while keeping all other UI unchanged.",
-      "reqIds": [
-        "REQ-3"
       ],
       "version": 1
     }
@@ -34,12 +28,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add an \"Export to CSV\" button on the Pioneers page that downloads \"pioneers-export.csv\" containing all pioneers with specified columns including monthly hours (0/blank when missing), styled similarly to \"Add Pioneer\" (secondary color and/or download icon).",
+      "summary": "Show a toast notification whenever any canister call is pending; keep it visible until the connection/reconnect succeeds, then auto-dismiss.",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Add Export to CSV button on Pioneers page",
+  "projectName": "Persistent reconnect toast while canister calls are pending",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

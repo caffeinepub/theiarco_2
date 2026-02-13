@@ -1,47 +1,35 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T00:15:05.303Z",
-  "summary": "CSV export utility and export handler logic were added, including client-side CSV generation, escaping, and download as pioneers-export.csv. However, the diff excerpt does not show the Pioneers page header JSX changes, so the presence/placement/styling of the new \"Export to CSV\" button cannot be confirmed from the provided diff summary. Some additional behaviors (e.g., sorting export rows alphabetically and toast notifications) were implemented but not explicitly requested.",
+  "generatedAt": "2026-02-13T06:29:51.928Z",
+  "summary": "Implemented a global ReconnectToastManager mounted in AppLayout that shows a persistent Sonner loading toast when there are in-flight React Query operations and the actor is unavailable, and dismisses it on reconnection. However, the diff does not show any wiring that detects React Query failures with error messages containing \"Actor not available\" to trigger the same reconnect toast, so REQ-2 is not fully implemented.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
-      "reason": "The modified Pioneers page file is truncated before the rendered header/JSX, so there is no evidence in the diff summary that a new button is actually rendered in the header next to \"Add Pioneer\" (or that it is only present on this page).",
+      "id": "REQ-2",
+      "requirement": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
+      "reason": "The diff introduces a shared reconnectState and the ReconnectToastManager subscribes to it, but there is no evidence in the provided changes that any React Query query/mutation error handler (or hooks) sets reconnectState based on errors whose message includes \"Actor not available\". Without that wiring, failures will not trigger the reconnect toast as required.",
       "evidence": [
-        "frontend/src/pages/Pioneers.tsx (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling but be visually distinct (secondary treatment and/or download icon), with no other styling changes.",
-      "reason": "While a download icon import is shown, the diff summary does not include the JSX where the button is rendered nor any className/variant props demonstrating styling parity/distinction; therefore this requirement cannot be verified from the provided diff excerpt.",
-      "evidence": [
-        "frontend/src/pages/Pioneers.tsx (truncated)"
+        "frontend/src/components/system/ReconnectToastManager.tsx",
+        "frontend/src/utils/reconnectState.ts",
+        "frontend-file-summaries.txt (shows many hooks exist, but no diff evidence of modifications to set reconnectState on errors)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Sort exported CSV rows alphabetically by pioneer name before generating/downloading the CSV.",
-      "reason": "The requirements specify exporting all pioneers with specific columns and calculations, but do not request re-ordering/sorting the export output; the diff explicitly adds sorting.",
+      "description": "Shows an additional \"Connection restored\" success toast automatically whenever the reconnect condition ends.",
+      "reason": "The request/AC require the reconnect toast to auto-dismiss when connectivity is restored and mention English text examples, but do not explicitly request emitting a separate success toast on restoration. This is added behavior beyond the stated requirement.",
       "evidence": [
-        "frontend/src/pages/Pioneers.tsx (pioneersData.sort((a, b) => a.pioneerName.localeCompare(b.pioneerName));)"
-      ]
-    },
-    {
-      "description": "Toast notifications for export success/failure and \"No data to export\".",
-      "reason": "User-facing toast messaging is not mentioned in the requirements/acceptance criteria for the CSV export feature, but was added as part of the export flow.",
-      "evidence": [
-        "frontend/src/pages/Pioneers.tsx (imports toast from 'sonner' and calls toast.error/toast.success)"
+        "frontend/src/components/system/ReconnectToastManager.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/Pioneers.tsx",
-    "frontend/src/utils/pioneersCsvExport.ts",
+    "frontend/src/components/layout/AppLayout.tsx",
+    "frontend/src/components/system/ReconnectToastManager.tsx",
+    "frontend/src/utils/reconnectState.ts",
     "project_state.json"
   ]
 }

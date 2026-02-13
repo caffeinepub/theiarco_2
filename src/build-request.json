@@ -1,95 +1,60 @@
 {
   "kind": "build_request",
-  "title": "Add Export to CSV button on Pioneers page",
+  "title": "Persistent reconnect toast while canister calls are pending",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add an \"Export to CSV\" button to the Pioneers page header, positioned in the top-right next to the existing \"Add Pioneer\" button.",
+      "text": "Add a global toast notification that appears whenever any canister call is pending and the backend actor is not available, and keep the toast visible until the actor reconnects, then auto-dismiss it.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-15"
         ],
         "quotes": [
-          "Add an \"Export to CSV\" button in the top-right corner of the Pioneers page (next to the \"Add Pioneer\" button)."
+          "1. When the canister call is pending.\n2. Make it a toast notification that shows until it is connected. \n3. Yes i would like it to automatically disappear one it reconnects."
         ]
       },
       "acceptanceCriteria": [
-        "On the Pioneers page, the header area shows two buttons on the right side: \"Export to CSV\" and \"Add Pioneer\".",
-        "The \"Add Pioneer\" button retains its current styling and behavior.",
-        "The \"Export to CSV\" button is visible only on the Pioneers page and does not affect other pages."
+        "When at least one React Query query or mutation is in-flight (pending) and the backend actor is not available, a toast is shown in the top-right (using the existing Sonner <Toaster /> in AppLayout).",
+        "The toast remains visible (is not auto-timed-out) until connectivity is restored (actor becomes available again).",
+        "Once the actor becomes available again, the toast is dismissed automatically without user interaction.",
+        "The toast uses English user-facing text (e.g., \"Reconnecting…\" / \"Connection restored\").",
+        "The solution is global (no need to add per-button/per-modal loading UI) and applies across all pages/routes."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement client-side CSV generation and download when the \"Export to CSV\" button is clicked. The exported CSV must include one row per pioneer and the following columns in this exact order: Pioneer Name, Service Year, Total Hours, Average Hours, Current Status, September Hours, October Hours, November Hours, December Hours, January Hours, February Hours, March Hours, April Hours, May Hours, June Hours, July Hours, August Hours.",
+      "text": "Detect and treat the \"Actor not available\" failure state as a reconnect condition by showing the same persistent reconnect toast when React Query operations fail with an Error whose message includes \"Actor not available\", and keep it visible until the actor is available again.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-12",
+          "msg-15"
         ],
         "quotes": [
-          "When clicked, create a CSV file with these columns:",
-          "Include data for all pioneers, with their monthly hours filled in where they exist (show \"0\" or blank for months with no data).",
-          "Download the file as \"pioneers-export.csv\"."
+          "What happens when the actor not available error comes on and i have already pushed the version live?",
+          "Make it a toast notification that shows until it is connected."
         ]
       },
       "acceptanceCriteria": [
-        "Clicking \"Export to CSV\" downloads a file named exactly \"pioneers-export.csv\".",
-        "The first row of the CSV is a header row with the exact column names and order specified.",
-        "The CSV contains all pioneers shown in the Pioneers list (not just currently visible rows).",
-        "For each pioneer, \"Pioneer Name\" uses the pioneer's display name (publisherName), and \"Service Year\" uses the pioneer's serviceYear.",
-        "For each pioneer, monthly hour columns are filled from that pioneer's monthly hours for the same serviceYear; months with no entry are exported as \"0\" (or blank, consistently).",
-        "\"Total Hours\" equals the sum of all recorded monthly hours for that pioneer’s serviceYear.",
-        "\"Average Hours\" equals Total Hours divided by the number of recorded monthly entries for that serviceYear (not divided by 12), matching the Pioneers table logic; when there are no entries, Average Hours exports as 0 or blank consistently.",
-        "\"Current Status\" matches the same logic and labels as the UI badge: \"No Entries\" when there are no hours, \"On Track\" when average >= 50, otherwise \"Behind\".",
-        "CSV fields are properly escaped/quoted so names containing commas/quotes/newlines export correctly."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Style the new \"Export to CSV\" button to match the existing \"Add Pioneer\" button styling on the Pioneers page, but differentiate it using a secondary visual treatment and/or a download icon, while keeping all other UI unchanged.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Use the same button styling as the \"Add Pioneer\" button but maybe use a secondary color or add a download icon.",
-          "Keep everything else unchanged."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The \"Export to CSV\" button uses the same general size, typography, and hover behavior as the \"Add Pioneer\" button.",
-        "The \"Export to CSV\" button is visually distinct from \"Add Pioneer\" (e.g., a secondary color treatment and/or a download icon).",
-        "No other styling changes occur outside of adding this new button."
+        "If a mutation or query throws an error with message containing \"Actor not available\" (as seen in existing hooks), the reconnect toast appears and stays visible until the actor becomes available again.",
+        "The reconnect toast does not spam duplicates; at most one reconnect toast is visible at a time (use a stable toast id or equivalent).",
+        "After reconnection, the reconnect toast is dismissed and normal success/error toasts continue to work as before."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/components/ui (compose existing UI components instead).",
-    "Keep all existing Pioneers page behaviors (sorting, modals, navigation, table rendering) unchanged except for adding CSV export.",
-    "Use English for any user-facing text."
+    "Do not edit files in frontend/immutablePaths (including frontend/src/hooks/useActor.ts and frontend/src/hooks/useInternetIdentity.ts).",
+    "Keep the existing toast system (Sonner) and its placement in frontend/src/components/layout/AppLayout.tsx intact; compose additional logic around it rather than replacing it."
   ],
   "nonGoals": [
-    "Adding backend endpoints specifically for CSV export.",
-    "Adding filtering options or exporting only a subset of pioneers.",
-    "Exporting to formats other than CSV (e.g., XLSX, PDF).",
-    "Changing how averages/status are calculated in the UI."
+    "Adding a full-screen blocking overlay or waiting screen (user requested a toast notification).",
+    "Backend changes to Motoko canisters or canister deployment configuration.",
+    "Implementing real-time connectivity via WebSockets or push mechanisms."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Download } from 'lucide-react';
 import { useGetAllTerritories } from '../hooks/useTerritories';
 import { useGetAllPublishers } from '../hooks/useQueries';
 import { AddTerritoryModal } from '../components/territories/AddTerritoryModal';
+import { exportTerritoryAssignmentRecord } from '../utils/territoryAssignmentRecordCsvExport';
 import type { Territory, CheckoutRecord } from '../backend';
 
 export default function Territories() {
@@ -28,6 +30,12 @@ export default function Territories() {
 
   const handleTerritoryClick = (territoryId: string) => {
     navigate({ to: '/territories/$id', params: { id: territoryId } });
+  };
+
+  const handleExportCsv = () => {
+    if (territories && territories.length > 0) {
+      exportTerritoryAssignmentRecord(territories);
+    }
   };
 
   // Helper to get the most recent checkout record (largest dateCheckedOut)
@@ -125,13 +133,24 @@ export default function Territories() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Territories</h1>
-        <Button
-          onClick={() => setIsAddModalOpen(true)}
-          style={{ backgroundColor: '#43587A', color: 'white' }}
-          className="hover:opacity-90"
-        >
-          Add Territory
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleExportCsv}
+            variant="outline"
+            disabled={!territories || territories.length === 0}
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export Territory History
+          </Button>
+          <Button
+            onClick={() => setIsAddModalOpen(true)}
+            style={{ backgroundColor: '#43587A', color: 'white' }}
+            className="hover:opacity-90"
+          >
+            Add Territory
+          </Button>
+        </div>
       </div>
 
       {/* Loading State */}
