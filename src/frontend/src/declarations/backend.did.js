@@ -257,7 +257,11 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'checkOutTerritory' : IDL.Func([IDL.Text, PublisherId, IDL.Bool], [], []),
+  'checkOutTerritory' : IDL.Func(
+      [IDL.Text, PublisherId, IDL.Bool, IDL.Int],
+      [],
+      [],
+    ),
   'createGlobalNote' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
       [IDL.Nat],
@@ -727,7 +731,11 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'checkOutTerritory' : IDL.Func([IDL.Text, PublisherId, IDL.Bool], [], []),
+    'checkOutTerritory' : IDL.Func(
+        [IDL.Text, PublisherId, IDL.Bool, IDL.Int],
+        [],
+        [],
+      ),
     'createGlobalNote' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(PublisherId)],
         [IDL.Nat],

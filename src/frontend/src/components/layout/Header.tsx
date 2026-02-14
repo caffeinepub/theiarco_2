@@ -17,20 +17,20 @@ export default function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-card px-4 shadow-sm">
+    <header className="flex h-16 items-center justify-between border-b bg-primary px-4 shadow-sm">
       <div className="flex items-center gap-4">
         {/* Mobile Menu Button */}
         <Button
           variant="ghost"
           size="icon"
           onClick={onMenuClick}
-          className="lg:hidden"
+          className="lg:hidden text-primary-foreground hover:bg-primary/90"
         >
           <Menu className="h-5 w-5" />
         </Button>
 
         {/* App Title */}
-        <h1 className="text-2xl font-bold text-theiarco-primary">
+        <h1 className="text-2xl font-bold text-primary-foreground">
           Theiarco
         </h1>
       </div>
@@ -40,7 +40,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         onClick={handleLogout}
         variant="outline"
         size="sm"
-        className="gap-2"
+        className="gap-2 bg-primary-foreground/10 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/20"
       >
         <LogOut className="h-4 w-4" />
         <span className="hidden sm:inline">Logout</span>

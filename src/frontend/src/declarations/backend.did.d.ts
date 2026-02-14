@@ -234,7 +234,10 @@ export interface _SERVICE {
   'addTrainedConductor' : ActorMethod<[CreateTrainedConductorInput], string>,
   'addTrainedPublisher' : ActorMethod<[CreateTrainedPublisherInput], string>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'checkOutTerritory' : ActorMethod<[string, PublisherId, boolean], undefined>,
+  'checkOutTerritory' : ActorMethod<
+    [string, PublisherId, boolean, bigint],
+    undefined
+  >,
   'createGlobalNote' : ActorMethod<
     [string, string, string, [] | [PublisherId]],
     bigint

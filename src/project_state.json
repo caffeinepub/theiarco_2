@@ -1,32 +1,66 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Add sorting functionality to the Territories page table (clickable column headers with tri-state sorting and styling consistent with other sortable tables).",
-  "architectural_notes": [],
+  "summary": "Update the app UI color scheme to a new navy/slate/gold palette while keeping layout and functionality unchanged and ensuring good contrast/readability.",
+  "architectural_notes": [
+    "Adopt UI color palette: Primary #003057, Secondary #5B8FA3, Accent #F4A82E, Text-on-dark #FFFFFF, Neutral gray #A8A9AD; ensure adequate contrast/readability across UI."
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-implement-tri-state-sorting-on-the-territories-page-table-frontend-src-pages-territories-tsx-make-each-table-column-header-clickable-and-on-click-cycle-sort-state-for-that-column-in-the-order-default-no-sort-ascending-descending-default-only-one-column-may-be-actively-sorted-at-a-time-clicking-a-different-column-must-clear-the-previous-column-s-sort-state",
-      "title": "Implement tri-state sorting on the Territories page table (frontend/src/pages/Territories.tsx): make each table column header clickable, and on click cycle sort state for that column in the order default (no sort) → ascending → descending → default. Only one column may be actively sorted at a time; clicking a different column must clear the previous column’s sort state.",
+      "id": "feature-replace-the-app-s-existing-primary-branding-color-43587a-with-the-new-palette-by-updating-the-global-theme-color-variables-so-that-primary-003057-navy-blue-secondary-5b8fa3-slate-blue-accent-f4a82e-gold-yellow-text-on-dark-backgrounds-ffffff-white-neutral-gray-a8a9ad-light-gray-this-must-be-applied-via-the-project-s-existing-tailwind-oklch-css-variable-approach-not-inline-per-component-hex-colors",
+      "title": "Replace the app’s existing primary branding color (#43587A) with the new palette by updating the global theme/color variables so that:\n- Primary = #003057 (navy blue)\n- Secondary = #5B8FA3 (slate blue)\n- Accent = #F4A82E (gold/yellow)\n- Text on dark backgrounds = #FFFFFF (white)\n- Neutral gray = #A8A9AD (light gray)\nThis must be applied via the project’s existing Tailwind/OKLCH CSS variable approach (not inline per-component hex colors).",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-sort-indicators-and-header-hover-affordance-on-the-territories-table-headers-when-a-column-is-sorted-ascending-render-an-up-arrow-character-immediately-next-to-the-column-label-when-sorted-descending-render-a-down-arrow-character-when-not-sorted-render-no-arrow-add-a-subtle-hover-effect-to-indicate-the-headers-are-clickable-e-g-pointer-cursor-and-slightly-darker-header-background-on-hover-and-match-existing-table-styling-patterns-in-the-app-use-tailwind-utility-classes-on-the-header-content-without-modifying-shared-ui-components",
-      "title": "Add sort indicators and header hover affordance on the Territories table headers: when a column is sorted ascending, render an up arrow character (↑) immediately next to the column label; when sorted descending, render a down arrow character (↓). When not sorted, render no arrow. Add a subtle hover effect to indicate the headers are clickable (e.g., pointer cursor and slightly darker header background on hover), and match existing table styling patterns in the app (use Tailwind utility classes on the header content without modifying shared UI components).",
+      "id": "feature-update-the-header-navigation-styling-so-the-header-background-uses-the-new-primary-navy-003057-and-all-header-text-icons-maintain-readable-contrast-white-on-navy-where-applicable-while-keeping-the-header-layout-and-behavior-unchanged",
+      "title": "Update the header/navigation styling so the header background uses the new primary navy (#003057) and all header text/icons maintain readable contrast (white on navy where applicable), while keeping the header layout and behavior unchanged.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-ensure-the-territories-table-supports-sorting-for-the-existing-displayed-columns-using-appropriate-comparison-logic-territory-number-numeric-if-possible-otherwise-lexicographic-publisher-alphabetical-by-the-displayed-publisher-name-where-sorts-consistently-status-alphabetical-type-alphabetical-and-checked-out-duration-numeric-by-months-where-territories-without-a-duration-display-and-sort-consistently",
-      "title": "Ensure the Territories table supports sorting for the existing displayed columns using appropriate comparison logic: Territory Number (numeric if possible, otherwise lexicographic), Publisher (alphabetical by the displayed publisher name, where '—' sorts consistently), Status (alphabetical), Type (alphabetical), and Checked Out Duration (numeric by months, where territories without a duration display '—' and sort consistently).",
+      "id": "feature-update-the-sidebar-active-navigation-item-colors-so-the-active-item-background-is-the-new-primary-navy-003057-and-active-text-icon-color-remains-readable-white-on-navy-without-changing-sidebar-layout-or-navigation-behavior",
+      "title": "Update the sidebar active navigation item colors so the active item background is the new primary navy (#003057) and active text/icon color remains readable (white on navy), without changing sidebar layout or navigation behavior.",
       "reqIds": [
         "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-primary-buttons-throughout-the-app-so-their-primary-styling-e-g-main-action-buttons-such-as-add-publisher-record-visit-etc-uses-the-new-primary-navy-003057-with-hover-focus-active-states-using-complementary-shades-aligned-to-the-new-palette-including-using-5b8fa3-where-appropriate-while-preserving-all-existing-button-sizes-variants-and-behavior",
+      "title": "Update primary buttons throughout the app so their primary styling (e.g., main action buttons such as “Add Publisher”, “Record Visit”, etc.) uses the new primary navy (#003057), with hover/focus/active states using complementary shades aligned to the new palette (including using #5B8FA3 where appropriate), while preserving all existing button sizes, variants, and behavior.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-dashboard-stat-card-colors-to-use-a-combination-of-the-new-navy-003057-slate-5b8fa3-and-gold-f4a82e-while-preserving-the-existing-stat-card-layout-typography-and-interactions-including-hover-effects-keep-existing-non-stat-alert-colors-e-g-overdue-red-orange-functionally-consistent-but-harmonize-with-the-new-palette-where-those-colors-are-controlled-by-theme-variables",
+      "title": "Update the Dashboard stat card colors to use a combination of the new navy (#003057), slate (#5B8FA3), and gold (#F4A82E) while preserving the existing stat card layout, typography, and interactions (including hover effects). Keep existing non-stat alert colors (e.g., overdue red/orange) functionally consistent but harmonize with the new palette where those colors are controlled by theme variables.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-status-badge-color-shades-green-red-orange-across-the-app-to-better-complement-the-new-navy-slate-gold-palette-while-keeping-the-same-semantic-meanings-e-g-success-on-track-stays-green-destructive-behind-stays-red-warning-stays-orange-and-ensuring-readable-contrast-between-badge-text-and-badge-backgrounds",
+      "title": "Adjust status badge color shades (green/red/orange) across the app to better complement the new navy/slate/gold palette while keeping the same semantic meanings (e.g., success/on-track stays green, destructive/behind stays red, warning stays orange) and ensuring readable contrast between badge text and badge backgrounds.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-and-enforce-readable-contrast-across-the-updated-palette-in-both-light-and-dark-themes-by-updating-theme-foreground-foreground-on-color-variables-e-g-primary-foreground-secondary-foreground-accent-foreground-muted-foreground-and-any-brand-specific-foreground-usage-so-that-text-icons-are-legible-on-their-respective-backgrounds",
+      "title": "Verify and enforce readable contrast across the updated palette in both light and dark themes by updating theme foreground/foreground-on-color variables (e.g., primary-foreground, secondary-foreground, accent-foreground, muted-foreground, and any brand-specific foreground usage) so that text/icons are legible on their respective backgrounds.",
+      "reqIds": [
+        "REQ-7"
       ],
       "version": 1
     }
@@ -34,12 +68,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Implement sortable Territories page table: clickable headers with tri-state sort (asc/desc/default), single active sorted column, sort indicators, and subtle hover styling consistent with other app tables.",
+      "summary": "Update app color scheme to new palette (Primary #003057, Secondary #5B8FA3, Accent #F4A82E, Text on dark #FFFFFF, Neutral #A8A9AD) across sidebar, header/nav, buttons, dashboard stat cards, and complementary status badge shades while keeping layout/functionality unchanged and maintaining accessible contrast.",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Add tri-state column sorting to Territories table",
+  "projectName": "Update UI color palette to navy/slate/gold across navigation, buttons, dashboard cards, and badges",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useGetAllPublishers } from '../../hooks/useQueries';
 import { useCheckOutTerritory } from '../../hooks/useCheckOutTerritory';
@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 
@@ -28,12 +29,28 @@ interface CheckOutTerritoryModalProps {
   territoryId: string;
 }
 
+// Helper to get today's date in YYYY-MM-DD format
+function getTodayDateString(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Helper to convert YYYY-MM-DD string to seconds timestamp
+function dateStringToSeconds(dateString: string): bigint {
+  const date = new Date(dateString + 'T00:00:00');
+  return BigInt(Math.floor(date.getTime() / 1000));
+}
+
 export function CheckOutTerritoryModal({
   open,
   onOpenChange,
   territoryId,
 }: CheckOutTerritoryModalProps) {
   const [selectedPublisherId, setSelectedPublisherId] = useState<string>('');
+  const [dateCheckedOut, setDateCheckedOut] = useState<string>('');
   const [isCampaign, setIsCampaign] = useState(false);
 
   const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
@@ -44,9 +61,23 @@ export function CheckOutTerritoryModal({
     .filter((p) => p.isActive)
     .sort((a, b) => a.fullName.localeCompare(b.fullName));
 
+  // Reset form and set date to today when modal opens
+  useEffect(() => {
+    if (open) {
+      setSelectedPublisherId('');
+      setDateCheckedOut(getTodayDateString());
+      setIsCampaign(false);
+    }
+  }, [open]);
+
   const handleSubmit = async () => {
     if (!selectedPublisherId) {
       toast.error('Please select a publisher');
+      return;
+    }
+
+    if (!dateCheckedOut) {
+      toast.error('Please select a checkout date');
       return;
     }
 
@@ -55,6 +86,7 @@ export function CheckOutTerritoryModal({
         territoryId,
         publisherId: BigInt(selectedPublisherId),
         isCampaign,
+        dateCheckedOut: dateStringToSeconds(dateCheckedOut),
       });
 
       toast.success('Territory checked out successfully!', {
@@ -62,9 +94,7 @@ export function CheckOutTerritoryModal({
         className: 'bg-green-600 text-white',
       });
 
-      // Reset form and close modal
-      setSelectedPublisherId('');
-      setIsCampaign(false);
+      // Close modal (form reset handled by useEffect)
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to check out territory:', error);
@@ -73,8 +103,6 @@ export function CheckOutTerritoryModal({
   };
 
   const handleCancel = () => {
-    setSelectedPublisherId('');
-    setIsCampaign(false);
     onOpenChange(false);
   };
 
@@ -101,7 +129,7 @@ export function CheckOutTerritoryModal({
                 <SelectTrigger id="publisher">
                   <SelectValue placeholder="Select a publisher" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[250px]">
                   {activePublishers.map((publisher) => (
                     <SelectItem
                       key={publisher.id.toString()}
@@ -113,6 +141,18 @@ export function CheckOutTerritoryModal({
                 </SelectContent>
               </Select>
             )}
+          </div>
+
+          {/* Date Checked Out */}
+          <div className="space-y-2">
+            <Label htmlFor="dateCheckedOut">Date Checked Out</Label>
+            <Input
+              id="dateCheckedOut"
+              type="date"
+              value={dateCheckedOut}
+              onChange={(e) => setDateCheckedOut(e.target.value)}
+              required
+            />
           </div>
 
           {/* Campaign Checkbox */}
@@ -141,7 +181,7 @@ export function CheckOutTerritoryModal({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!selectedPublisherId || checkOutMutation.isPending}
+            disabled={!selectedPublisherId || !dateCheckedOut || checkOutMutation.isPending}
             className="gap-2"
           >
             {checkOutMutation.isPending && (

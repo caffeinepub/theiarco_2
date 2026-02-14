@@ -609,6 +609,7 @@ actor {
     territoryId : Text,
     publisherId : PublisherId,
     isCampaign : Bool,
+    dateCheckedOut : Int,
   ) : async () {
     checkUserPermission(caller, #user);
 
@@ -629,7 +630,7 @@ actor {
     let newCheckOutRecord : CheckoutRecord = {
       publisherId;
       publisherName = publisher.fullName;
-      dateCheckedOut = Time.now();
+      dateCheckedOut;
       dateReturned = null;
       isCampaign;
     };

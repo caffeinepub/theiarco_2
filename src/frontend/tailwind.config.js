@@ -66,7 +66,12 @@ export default {
                     border: 'oklch(var(--sidebar-border))',
                     ring: 'oklch(var(--sidebar-ring))'
                 },
-                'theiarco-primary': 'oklch(var(--theiarco-primary))'
+                'theiarco-primary': 'oklch(var(--theiarco-primary))',
+                'neutral-gray': 'oklch(var(--neutral-gray))',
+                'status-success': 'oklch(var(--status-success))',
+                'status-warning': 'oklch(var(--status-warning))',
+                'status-danger': 'oklch(var(--status-danger))',
+                'status-neutral': 'oklch(var(--status-neutral))'
             },
             borderRadius: {
                 lg: 'var(--radius)',

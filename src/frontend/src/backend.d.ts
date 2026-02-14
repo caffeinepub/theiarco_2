@@ -231,7 +231,7 @@ export interface backendInterface {
     addTrainedConductor(input: CreateTrainedConductorInput): Promise<string>;
     addTrainedPublisher(input: CreateTrainedPublisherInput): Promise<string>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    checkOutTerritory(territoryId: string, publisherId: PublisherId, isCampaign: boolean): Promise<void>;
+    checkOutTerritory(territoryId: string, publisherId: PublisherId, isCampaign: boolean, dateCheckedOut: bigint): Promise<void>;
     createGlobalNote(title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<bigint>;
     createPioneer(input: CreatePioneerInput): Promise<string>;
     createShepherdingVisit(input: CreateShepherdingVisitInput): Promise<string>;

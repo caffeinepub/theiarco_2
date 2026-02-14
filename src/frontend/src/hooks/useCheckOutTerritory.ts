@@ -6,6 +6,7 @@ interface CheckOutTerritoryInput {
   territoryId: string;
   publisherId: PublisherId;
   isCampaign: boolean;
+  dateCheckedOut: bigint;
 }
 
 export function useCheckOutTerritory() {
@@ -18,7 +19,8 @@ export function useCheckOutTerritory() {
       return actor.checkOutTerritory(
         input.territoryId,
         input.publisherId,
-        input.isCampaign
+        input.isCampaign,
+        input.dateCheckedOut
       );
     },
     onSuccess: (_, variables) => {

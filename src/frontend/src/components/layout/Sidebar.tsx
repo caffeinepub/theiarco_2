@@ -84,8 +84,8 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-theiarco-primary text-white'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'
                   )}
                   onClick={() => {
                     // Close sidebar on mobile after navigation
@@ -105,12 +105,12 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         {/* Sidebar Footer */}
         <div className="border-t p-4">
           <p className="text-xs text-muted-foreground text-center">
-            © 2026. Built with love using{' '}
+            © {new Date().getFullYear()}. Built with love using{' '}
             <a
-              href="https://caffeine.ai"
+              href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-theiarco-primary hover:underline"
+              className="text-primary hover:underline"
             >
               caffeine.ai
             </a>

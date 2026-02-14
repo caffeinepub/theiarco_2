@@ -38,6 +38,9 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 
+type SortColumn = 'name' | 'group' | 'privileges' | null;
+type SortDirection = 'default' | 'asc' | 'desc';
+
 export default function Publishers() {
   const navigate = useNavigate();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -49,6 +52,10 @@ export default function Publishers() {
   const [searchText, setSearchText] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [showInactive, setShowInactive] = useState(false);
+  
+  // Sort states
+  const [sortColumn, setSortColumn] = useState<SortColumn>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('default');
   
   const { data: publishers, isLoading } = useGetAllPublishers();
   const deletePublisher = useDeletePublisher();
@@ -89,6 +96,71 @@ export default function Publishers() {
     if (labels.length === 0) labels.push('Unbaptized Publisher');
     return labels.join(', ');
   };
+
+  // Handle column header click for sorting
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      // Cycle through: asc -> desc -> default
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection('default');
+        setSortColumn(null);
+      } else {
+        setSortDirection('asc');
+      }
+    } else {
+      // New column clicked, start with ascending
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  // Get sort indicator for a column
+  const getSortIndicator = (column: SortColumn) => {
+    if (sortColumn !== column) return null;
+    if (sortDirection === 'asc') return ' ↑';
+    if (sortDirection === 'desc') return ' ↓';
+    return null;
+  };
+
+  // Compute displayed publishers with sorting applied
+  const displayedPublishers = useMemo(() => {
+    if (!filteredPublishers || filteredPublishers.length === 0) return [];
+    if (sortColumn === null || sortDirection === 'default') {
+      return filteredPublishers;
+    }
+
+    const sorted = [...filteredPublishers].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortColumn) {
+        case 'name': {
+          comparison = a.fullName.toLowerCase().localeCompare(b.fullName.toLowerCase());
+          break;
+        }
+
+        case 'group': {
+          comparison = Number(a.fieldServiceGroup) - Number(b.fieldServiceGroup);
+          break;
+        }
+
+        case 'privileges': {
+          const aPrivileges = renderPrivileges(a.privileges);
+          const bPrivileges = renderPrivileges(b.privileges);
+          comparison = aPrivileges.toLowerCase().localeCompare(bPrivileges.toLowerCase());
+          break;
+        }
+
+        default:
+          comparison = 0;
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    return sorted;
+  }, [filteredPublishers, sortColumn, sortDirection]);
 
   const handleEditClick = (publisher: Publisher) => {
     setSelectedPublisher(publisher);
@@ -197,7 +269,7 @@ export default function Publishers() {
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mr-3" />
           <span className="text-muted-foreground">Loading...</span>
         </div>
-      ) : filteredPublishers.length === 0 ? (
+      ) : displayedPublishers.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           {publishers && publishers.length === 0
             ? "No publishers found. Click 'Add Publisher' to get started."
@@ -208,14 +280,35 @@ export default function Publishers() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Group</TableHead>
-                <TableHead>Privileges</TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('name')}
+                    className="w-full text-left font-medium cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors"
+                  >
+                    Name{getSortIndicator('name')}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('group')}
+                    className="w-full text-left font-medium cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors"
+                  >
+                    Group{getSortIndicator('group')}
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('privileges')}
+                    className="w-full text-left font-medium cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors"
+                  >
+                    Privileges{getSortIndicator('privileges')}
+                  </button>
+                </TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredPublishers.map((publisher) => (
+              {displayedPublishers.map((publisher) => (
                 <TableRow
                   key={publisher.id.toString()}
                   className={!publisher.isActive ? 'bg-gray-100 dark:bg-gray-800' : ''}
