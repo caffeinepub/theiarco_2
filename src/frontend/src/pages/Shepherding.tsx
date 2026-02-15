@@ -1,15 +1,20 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -22,175 +27,154 @@ import RecordVisitModal from '../components/shepherding/RecordVisitModal';
 import { EditShepherdingVisitModal } from '../components/shepherding/EditShepherdingVisitModal';
 import { toast } from 'sonner';
 import type { ShepherdingVisit } from '../backend';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
+import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
 
 export default function Shepherding() {
   const navigate = useNavigate();
-  const { data: visits, isLoading } = useGetAllShepherdingVisits();
-  const { data: allPublishers } = useGetAllPublishers();
-  const deleteVisit = useDeleteShepherdingVisit();
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState<ShepherdingVisit | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [visitToDelete, setVisitToDelete] = useState<string | null>(null);
+  const [visitToDelete, setVisitToDelete] = useState<ShepherdingVisit | null>(null);
+  const [searchText, setSearchText] = useState('');
 
-  // Filter and sort active publishers alphabetically by fullName
-  const activePublishers = useMemo(() => {
-    if (!allPublishers) return [];
-    return allPublishers
-      .filter((p) => p.isActive)
-      .sort((a, b) => a.fullName.localeCompare(b.fullName));
-  }, [allPublishers]);
+  const { data: visits = [], isLoading } = useGetAllShepherdingVisits();
+  const { data: publishers = [] } = useGetAllPublishers();
+  const deleteVisitMutation = useDeleteShepherdingVisit();
 
-  // Sort visits by date (most recent first) and filter by publisher name
+  // Filter visits by publisher name (case-insensitive)
   const filteredVisits = useMemo(() => {
-    if (!visits) return [];
-    
-    // Sort by visitDate descending (most recent first)
-    const sorted = [...visits].sort((a, b) => {
-      const dateA = Number(a.visitDate);
-      const dateB = Number(b.visitDate);
-      return dateB - dateA;
-    });
-
-    // Filter by search query
-    const query = searchQuery.toLowerCase().trim();
-    if (!query) return sorted;
-    
-    return sorted.filter((visit) =>
-      visit.publisherName.toLowerCase().includes(query)
+    if (!searchText) return visits;
+    return visits.filter((visit) =>
+      visit.publisherName.toLowerCase().includes(searchText.toLowerCase())
     );
-  }, [visits, searchQuery]);
+  }, [visits, searchText]);
 
-  const handleRecordVisit = () => {
-    setIsModalOpen(true);
+  // Sort visits by date (most recent first)
+  const sortedVisits = useMemo(() => {
+    return [...filteredVisits].sort((a, b) => Number(b.visitDate) - Number(a.visitDate));
+  }, [filteredVisits]);
+
+  const handlePublisherClick = (publisherId: string) => {
+    navigate({ to: `/publishers/${publisherId}` });
   };
 
-  const handleVisitClick = (visitId: string) => {
+  const handleVisitDateClick = (visitId: string) => {
     navigate({ to: `/shepherding/${visitId}` });
   };
 
-  const handleEditClick = (visit: ShepherdingVisit, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleEditClick = (visit: ShepherdingVisit) => {
     setSelectedVisit(visit);
     setIsEditModalOpen(true);
   };
 
-  const handleDeleteClick = (visitId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setVisitToDelete(visitId);
-    setShowDeleteDialog(true);
+  const handleEditClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedVisit(null);
+  };
+
+  const handleDeleteClick = (visit: ShepherdingVisit) => {
+    setVisitToDelete(visit);
   };
 
   const handleDeleteConfirm = async () => {
     if (!visitToDelete) return;
 
     try {
-      await deleteVisit.mutateAsync(visitToDelete);
+      await deleteVisitMutation.mutateAsync(visitToDelete.id);
       toast.success('Visit deleted successfully!', {
         duration: 3000,
-        style: {
-          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-          color: 'white',
-        },
+        className: 'bg-green-600 text-white',
       });
-      setShowDeleteDialog(false);
-      setVisitToDelete(null);
     } catch (error) {
       console.error('Failed to delete visit:', error);
-      toast.error('Failed to delete visit');
-      setShowDeleteDialog(false);
+      toast.error('Failed to delete visit. Please try again.');
+    } finally {
       setVisitToDelete(null);
     }
   };
 
   const handleDeleteCancel = () => {
-    setShowDeleteDialog(false);
     setVisitToDelete(null);
   };
+
+  const headerTextColor = getContrastColor(themeColor);
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Shepherding Visits</h1>
-        <Button
-          onClick={handleRecordVisit}
-          style={{ backgroundColor: '#43587A', color: 'white' }}
-          className="hover:opacity-90"
+        <ThemedPrimaryButton
+          themeColor={themeColor}
+          onClick={() => setIsRecordModalOpen(true)}
         >
           Record Visit
-        </Button>
+        </ThemedPrimaryButton>
       </div>
 
-      {/* Search Box */}
+      {/* Search Bar */}
       <div className="max-w-md">
+        <Label htmlFor="search">Search by Publisher Name</Label>
         <Input
+          id="search"
           type="text"
-          placeholder="Search by publisher name..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full"
+          placeholder="Search..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          className="mt-2"
         />
       </div>
 
       {/* Loading State */}
       {isLoading && (
         <div className="flex items-center justify-center py-12">
-          <div className="text-center space-y-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mr-3" />
+          <span className="text-muted-foreground">Loading...</span>
         </div>
       )}
 
       {/* Empty State */}
-      {!isLoading && filteredVisits.length === 0 && !searchQuery && (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">
-            No shepherding visits recorded. Click 'Record Visit' to create one.
-          </p>
-        </div>
-      )}
-
-      {/* No Search Results */}
-      {!isLoading && filteredVisits.length === 0 && searchQuery && (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">
-            No visits found matching "{searchQuery}"
-          </p>
+      {!isLoading && sortedVisits.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          {visits.length === 0
+            ? "No visits recorded. Click 'Record Visit' to add one."
+            : 'No visits match your search.'}
         </div>
       )}
 
       {/* Visits Table */}
-      {!isLoading && filteredVisits.length > 0 && (
+      {!isLoading && sortedVisits.length > 0 && (
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Publisher Name</TableHead>
-                <TableHead>Visit Date</TableHead>
-                <TableHead>Elders Present</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
+              <ThemedTableHeaderRow themeColor={themeColor}>
+                <ThemedTableHead themeColor={themeColor}>Publisher</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Visit Date</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Elders Present</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+              </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
-              {filteredVisits.map((visit) => (
-                <TableRow key={visit.id}>
-                  <TableCell className="font-medium">
+              {sortedVisits.map((visit) => (
+                <tr key={visit.id}>
+                  <TableCell>
                     <button
-                      className="text-primary hover:underline cursor-pointer"
-                      onClick={() => handleVisitClick(visit.id)}
+                      className="text-primary hover:underline font-medium"
+                      onClick={() => handlePublisherClick(visit.publisherId)}
                     >
                       {visit.publisherName}
                     </button>
                   </TableCell>
                   <TableCell>
                     <button
-                      className="text-primary hover:underline cursor-pointer"
-                      onClick={() => handleVisitClick(visit.id)}
+                      className="text-primary hover:underline"
+                      onClick={() => handleVisitDateClick(visit.id)}
                     >
                       {formatVisitDate(visit.visitDate)}
                     </button>
@@ -201,22 +185,24 @@ export default function Shepherding() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => handleEditClick(visit, e)}
-                        className="h-8 w-8 p-0"
+                        onClick={() => handleEditClick(visit)}
+                        className="h-8 gap-2"
                       >
                         <Pencil className="h-4 w-4" />
+                        Edit
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => handleDeleteClick(visit.id, e)}
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteClick(visit)}
+                        className="h-8 gap-2 text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
+                        Delete
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
+                </tr>
               ))}
             </TableBody>
           </Table>
@@ -225,9 +211,9 @@ export default function Shepherding() {
 
       {/* Record Visit Modal */}
       <RecordVisitModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        publishers={activePublishers}
+        open={isRecordModalOpen}
+        onOpenChange={setIsRecordModalOpen}
+        publishers={publishers}
       />
 
       {/* Edit Visit Modal */}
@@ -236,18 +222,15 @@ export default function Shepherding() {
           open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
           visit={selectedVisit}
-          publishers={activePublishers}
+          publishers={publishers}
         />
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog open={!!visitToDelete} onOpenChange={(open) => !open && handleDeleteCancel()}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this visit?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone.
-            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>

@@ -6,9 +6,7 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
-  TableRow,
 } from '@/components/ui/table';
 import {
   AlertDialog,
@@ -29,10 +27,18 @@ import AddTaskModal from '../components/tasks/AddTaskModal';
 import EditTaskModal from '../components/tasks/EditTaskModal';
 import { toast } from 'sonner';
 import { buildTasksCsv, downloadCsv } from '../utils/tasksCsvExport';
+import { useRouterState } from '@tanstack/react-router';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
+import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
 
 type FilterType = 'all' | 'completed' | 'uncompleted';
 
 export default function Tasks() {
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -127,6 +133,7 @@ export default function Tasks() {
 
   // Show loading state during initial load or refetch
   const showLoading = isLoading || isFetching;
+  const headerTextColor = getContrastColor(themeColor);
 
   return (
     <div className="flex h-full flex-col p-6 space-y-6">
@@ -142,13 +149,12 @@ export default function Tasks() {
             <Download className="h-4 w-4" />
             Export to CSV
           </Button>
-          <Button
-            style={{ backgroundColor: '#43587A' }}
-            className="text-white hover:opacity-90 transition-opacity"
+          <ThemedPrimaryButton
+            themeColor={themeColor}
             onClick={handleAddTaskClick}
           >
             Add Task
-          </Button>
+          </ThemedPrimaryButton>
         </div>
       </div>
 
@@ -158,7 +164,7 @@ export default function Tasks() {
           variant={activeFilter === 'all' ? 'default' : 'outline'}
           style={
             activeFilter === 'all'
-              ? { backgroundColor: '#43587A', color: 'white' }
+              ? { backgroundColor: themeColor, color: getContrastColor(themeColor) }
               : undefined
           }
           className={
@@ -174,7 +180,7 @@ export default function Tasks() {
           variant={activeFilter === 'completed' ? 'default' : 'outline'}
           style={
             activeFilter === 'completed'
-              ? { backgroundColor: '#43587A', color: 'white' }
+              ? { backgroundColor: themeColor, color: getContrastColor(themeColor) }
               : undefined
           }
           className={
@@ -190,7 +196,7 @@ export default function Tasks() {
           variant={activeFilter === 'uncompleted' ? 'default' : 'outline'}
           style={
             activeFilter === 'uncompleted'
-              ? { backgroundColor: '#43587A', color: 'white' }
+              ? { backgroundColor: themeColor, color: getContrastColor(themeColor) }
               : undefined
           }
           className={
@@ -220,19 +226,19 @@ export default function Tasks() {
         ) : (
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">
+              <ThemedTableHeaderRow themeColor={themeColor}>
+                <ThemedTableHead themeColor={themeColor} className="w-[50px]">
                   <span className="sr-only">Checkbox</span>
-                </TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="w-[180px]">Actions</TableHead>
-              </TableRow>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Title</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Due Date</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Category</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor} className="w-[180px]">Actions</ThemedTableHead>
+              </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {tasks.map((task) => (
-                <TableRow key={task.id.toString()}>
+                <tr key={task.id.toString()}>
                   <TableCell>
                     <Checkbox
                       checked={task.isCompleted}
@@ -265,7 +271,7 @@ export default function Tasks() {
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
+                </tr>
               ))}
             </TableBody>
           </Table>

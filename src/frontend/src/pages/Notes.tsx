@@ -17,55 +17,39 @@ import { useGetAllPublishers } from '../hooks/useQueries';
 import { useDeleteGlobalNote } from '../hooks/useDeleteGlobalNote';
 import { toast } from 'sonner';
 import type { GlobalNote } from '../backend';
+import { useRouterState } from '@tanstack/react-router';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
 
-const categories = [
-  'All Notes',
-  'Publishers',
-  'Territory',
-  'Shepherding',
-  'Elder',
-  'General',
-  'Uncategorized'
-] as const;
+type CategoryFilter = 'All' | 'General' | 'Publishers' | 'Territories' | 'Service' | 'Other';
 
 export default function Notes() {
-  const [activeCategory, setActiveCategory] = useState<string>('All Notes');
-  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
-  const [noteToEdit, setNoteToEdit] = useState<GlobalNote | null>(null);
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState<GlobalNote | null>(null);
   const [noteToDelete, setNoteToDelete] = useState<GlobalNote | null>(null);
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('All');
 
   const { data: notes = [], isLoading } = useGetAllGlobalNotes();
   const { data: publishers = [] } = useGetAllPublishers();
   const deleteNoteMutation = useDeleteGlobalNote();
 
-  // Filter notes by active category
+  // Filter notes by category
   const filteredNotes = useMemo(() => {
-    if (activeCategory === 'All Notes') {
-      return notes;
-    }
-    if (activeCategory === 'Uncategorized') {
-      return notes.filter((note) => note.category === 'None');
-    }
+    if (activeCategory === 'All') return notes;
     return notes.filter((note) => note.category === activeCategory);
   }, [notes, activeCategory]);
 
-  // Sort notes by creation date (most recent first)
+  // Sort notes by date (newest first)
   const sortedNotes = useMemo(() => {
-    return [...filteredNotes].sort((a, b) => {
-      return Number(b.createdAt - a.createdAt);
-    });
+    return [...filteredNotes].sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
   }, [filteredNotes]);
 
-  // Helper to get publisher name by ID
-  const getPublisherName = (publisherId?: bigint): string | undefined => {
-    if (!publisherId) return undefined;
-    const publisher = publishers.find((p) => p.id === publisherId);
-    return publisher?.fullName;
-  };
-
   const handleEditClick = (note: GlobalNote) => {
-    setNoteToEdit(note);
-    setIsAddNoteModalOpen(true);
+    setEditingNote(note);
   };
 
   const handleDeleteClick = (note: GlobalNote) => {
@@ -93,27 +77,26 @@ export default function Notes() {
     setNoteToDelete(null);
   };
 
-  const handleModalClose = () => {
-    setIsAddNoteModalOpen(false);
-    setNoteToEdit(null);
+  // Helper to get publisher name by ID
+  const getPublisherName = (publisherId: bigint | undefined): string | undefined => {
+    if (!publisherId) return undefined;
+    const publisher = publishers.find((p) => p.id === publisherId);
+    return publisher?.fullName;
   };
 
+  const categories: CategoryFilter[] = ['All', 'General', 'Publishers', 'Territories', 'Service', 'Other'];
+
   return (
-    <div className="flex h-full flex-col p-6 space-y-6">
+    <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Notes</h1>
-      </div>
-
-      {/* Add Note Button */}
-      <div>
-        <Button
-          style={{ backgroundColor: '#43587A' }}
-          className="text-white hover:opacity-90 transition-opacity"
-          onClick={() => setIsAddNoteModalOpen(true)}
+        <ThemedPrimaryButton
+          themeColor={themeColor}
+          onClick={() => setIsAddModalOpen(true)}
         >
           Add Note
-        </Button>
+        </ThemedPrimaryButton>
       </div>
 
       {/* Category Filter Buttons */}
@@ -124,7 +107,7 @@ export default function Notes() {
             variant={activeCategory === category ? 'default' : 'outline'}
             style={
               activeCategory === category
-                ? { backgroundColor: '#43587A', color: 'white' }
+                ? { backgroundColor: themeColor, color: getContrastColor(themeColor) }
                 : undefined
             }
             className={
@@ -139,40 +122,52 @@ export default function Notes() {
         ))}
       </div>
 
-      {/* Notes Display Area */}
-      <div className="flex-1">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mr-3" />
-            <span className="text-muted-foreground">Loading...</span>
-          </div>
-        ) : sortedNotes.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-lg text-muted-foreground">
-              No notes in this category. Click 'Add Note' to create one.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sortedNotes.map((note) => (
-              <GlobalNoteCard
-                key={note.id.toString()}
-                note={note}
-                attachedPublisherName={getPublisherName(note.attachedPublisher)}
-                onEdit={() => handleEditClick(note)}
-                onDelete={() => handleDeleteClick(note)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mr-3" />
+          <span className="text-muted-foreground">Loading...</span>
+        </div>
+      )}
 
-      {/* Add/Edit Note Modal */}
+      {/* Empty State */}
+      {!isLoading && sortedNotes.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          {notes.length === 0
+            ? "No notes found. Click 'Add Note' to create your first note."
+            : `No notes in the ${activeCategory} category.`}
+        </div>
+      )}
+
+      {/* Notes Grid */}
+      {!isLoading && sortedNotes.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedNotes.map((note) => (
+            <GlobalNoteCard
+              key={note.id}
+              note={note}
+              attachedPublisherName={getPublisherName(note.attachedPublisher)}
+              onEdit={() => handleEditClick(note)}
+              onDelete={() => handleDeleteClick(note)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Add Note Modal */}
       <AddGlobalNoteModal
-        isOpen={isAddNoteModalOpen}
-        onClose={handleModalClose}
-        noteToEdit={noteToEdit}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
       />
+
+      {/* Edit Note Modal */}
+      {editingNote && (
+        <AddGlobalNoteModal
+          isOpen={!!editingNote}
+          onClose={() => setEditingNote(null)}
+          noteToEdit={editingNote}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!noteToDelete} onOpenChange={(open) => !open && handleDeleteCancel()}>

@@ -1,109 +1,61 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T05:44:05.251Z",
+  "generatedAt": "2026-02-14T23:58:06.068Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 7,
-    "implemented": 7,
+    "total": 4,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Replace the app’s existing primary branding color (#43587A) with the new palette by updating the global theme/color variables so that:\n- Primary = #003057 (navy blue)\n- Secondary = #5B8FA3 (slate blue)\n- Accent = #F4A82E (gold/yellow)\n- Text on dark backgrounds = #FFFFFF (white)\n- Neutral gray = #A8A9AD (light gray)\nThis must be applied via the project’s existing Tailwind/OKLCH CSS variable approach (not inline per-component hex colors).",
+        "summary": "Create a single, shared privilege badge styling implementation for the \"Elder\" and \"Ministerial Servant\" badges, and use it everywhere these privilege badges are rendered in the UI so the styling is consistent across pages.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js"
+          "frontend/src/components/publishers/PrivilegeBadge.tsx",
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js"
+          "frontend/src/components/publishers/PrivilegeBadge.tsx",
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Update the header/navigation styling so the header background uses the new primary navy (#003057) and all header text/icons maintain readable contrast (white on navy where applicable), while keeping the header layout and behavior unchanged.",
+        "summary": "Update Elder and Ministerial Servant badge background colors everywhere they appear: Elder must use #7C3AED and Ministerial Servant must use #2563EB; badge text must remain white; do not introduce dark-mode variants for these badges.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/layout/Header.tsx"
+          "frontend/src/components/publishers/PrivilegeBadge.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/layout/Header.tsx"
+          "frontend/src/components/publishers/PrivilegeBadge.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Update the sidebar active navigation item colors so the active item background is the new primary navy (#003057) and active text/icon color remains readable (white on navy), without changing sidebar layout or navigation behavior.",
+        "summary": "Ensure that only the Elder and Ministerial Servant privilege badges change color; all other badges (e.g., Available, Checked Out, On Track, Behind, Overseer, Assistant, Inactive, etc.) must retain their current colors and styling.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/layout/Sidebar.tsx",
-          "frontend/src/index.css"
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/layout/Sidebar.tsx",
-          "frontend/src/index.css"
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Update primary buttons throughout the app so their primary styling (e.g., main action buttons such as “Add Publisher”, “Record Visit”, etc.) uses the new primary navy (#003057), with hover/focus/active states using complementary shades aligned to the new palette (including using #5B8FA3 where appropriate), while preserving all existing button sizes, variants, and behavior.",
-        "status": "implemented",
+        "summary": "Apply the updated Elder/Ministerial Servant badge styling in all the known pages where they appear (Publishers page table, Publisher profile page, Field Service Groups page publisher lists, Field Service Group profile page publisher lists, Pioneers page table) and any other UI location that displays these privilege badges next to publisher names.",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/Login.tsx"
+          "frontend/src/pages/Publishers.tsx",
+          "frontend/src/pages/PublisherProfile.tsx",
+          "frontend/src/pages/FieldServiceGroups.tsx",
+          "frontend/src/pages/Pioneers.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/Login.tsx"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Update the Dashboard stat card colors to use a combination of the new navy (#003057), slate (#5B8FA3), and gold (#F4A82E) while preserving the existing stat card layout, typography, and interactions (including hover effects). Keep existing non-stat alert colors (e.g., overdue red/orange) functionally consistent but harmonize with the new palette where those colors are controlled by theme variables.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/Dashboard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/index.css"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Adjust status badge color shades (green/red/orange) across the app to better complement the new navy/slate/gold palette while keeping the same semantic meanings (e.g., success/on-track stays green, destructive/behind stays red, warning stays orange) and ensuring readable contrast between badge text and badge backgrounds.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js",
-          "frontend/src/components/pioneers/CurrentStatusBadge.tsx",
-          "frontend/src/components/pioneers/PioneerTableRow.tsx",
-          "frontend/src/pages/PublicWitnessing.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js",
-          "frontend/src/components/pioneers/CurrentStatusBadge.tsx",
-          "frontend/src/pages/PublicWitnessing.tsx"
-        ]
-      },
-      {
-        "id": "REQ-7",
-        "summary": "Verify and enforce readable contrast across the updated palette in both light and dark themes by updating theme foreground/foreground-on-color variables (e.g., primary-foreground, secondary-foreground, accent-foreground, muted-foreground, and any brand-specific foreground usage) so that text/icons are legible on their respective backgrounds.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/components/layout/Header.tsx",
-          "frontend/src/components/layout/Sidebar.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/components/layout/Header.tsx",
-          "frontend/src/components/layout/Sidebar.tsx"
-        ]
+        "matchedFiles": []
       }
     ]
   },
@@ -112,13 +64,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/layout/Header.tsx",
-    "frontend/src/components/layout/Sidebar.tsx",
-    "frontend/src/components/pioneers/CurrentStatusBadge.tsx",
-    "frontend/src/index.css",
-    "frontend/src/pages/Login.tsx",
-    "frontend/src/pages/PublicWitnessing.tsx",
-    "frontend/tailwind.config.js",
+    "frontend/src/components/publishers/PrivilegeBadge.tsx",
+    "frontend/src/pages/FieldServiceGroupProfile.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

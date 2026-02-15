@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import AddPublisherModal from '../components/publishers/AddPublisherModal';
 import EditPublisherModal from '../components/publishers/EditPublisherModal';
 import { useGetAllPublishers } from '../hooks/useQueries';
@@ -10,9 +10,7 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
-  TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,12 +35,19 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
+import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
 
 type SortColumn = 'name' | 'group' | 'privileges' | null;
 type SortDirection = 'default' | 'asc' | 'desc';
 
 export default function Publishers() {
   const navigate = useNavigate();
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
@@ -200,18 +205,20 @@ export default function Publishers() {
     navigate({ to: `/publishers/${publisherId.toString()}` });
   };
 
+  const headerTextColor = getContrastColor(themeColor);
+
   return (
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Publishers</h1>
-        <button
+        <ThemedPrimaryButton
+          themeColor={themeColor}
           onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-md hover:opacity-90 transition-opacity"
-          style={{ backgroundColor: '#43587A' }}
+          className="flex items-center gap-2"
         >
           <Plus className="h-5 w-5" />
           Add Publisher
-        </button>
+        </ThemedPrimaryButton>
       </div>
 
       {/* Filter Bar */}
@@ -279,37 +286,40 @@ export default function Publishers() {
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>
+              <ThemedTableHeaderRow themeColor={themeColor}>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('name')}
-                    className="w-full text-left font-medium cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Name{getSortIndicator('name')}
                   </button>
-                </TableHead>
-                <TableHead>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('group')}
-                    className="w-full text-left font-medium cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Group{getSortIndicator('group')}
                   </button>
-                </TableHead>
-                <TableHead>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('privileges')}
-                    className="w-full text-left font-medium cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Privileges{getSortIndicator('privileges')}
                   </button>
-                </TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+              </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {displayedPublishers.map((publisher) => (
-                <TableRow
+                <tr
                   key={publisher.id.toString()}
                   className={!publisher.isActive ? 'bg-gray-100 dark:bg-gray-800' : ''}
                 >
@@ -357,7 +367,7 @@ export default function Publishers() {
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
+                </tr>
               ))}
             </TableBody>
           </Table>

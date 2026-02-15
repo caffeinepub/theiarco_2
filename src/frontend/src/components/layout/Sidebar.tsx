@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor, lightenColor } from '@/theme/colorUtils';
+import { useState } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -39,6 +42,7 @@ const navigationItems = [
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const [hoveredPath, setHoveredPath] = useState<string | null>(null);
 
   return (
     <>
@@ -76,17 +80,34 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPath === item.path;
+              const isHovered = hoveredPath === item.path;
+              const themeColor = getPageThemeColor(item.path);
+              const hoverColor = lightenColor(themeColor, 15);
+              const textColor = getContrastColor(isHovered ? hoverColor : themeColor);
 
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+                    !isActive && 'text-muted-foreground hover:text-accent-foreground'
                   )}
+                  style={
+                    isActive
+                      ? {
+                          backgroundColor: themeColor,
+                          color: textColor,
+                        }
+                      : isHovered
+                      ? {
+                          backgroundColor: hoverColor,
+                          color: textColor,
+                        }
+                      : undefined
+                  }
+                  onMouseEnter={() => setHoveredPath(item.path)}
+                  onMouseLeave={() => setHoveredPath(null)}
                   onClick={() => {
                     // Close sidebar on mobile after navigation
                     if (window.innerWidth < 1024) {
@@ -110,7 +131,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+              className="text-theiarco-primary hover:underline"
             >
               caffeine.ai
             </a>

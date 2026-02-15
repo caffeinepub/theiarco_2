@@ -1,167 +1,89 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Apply navy/slate/gold palette via existing Tailwind OKLCH theme variables (no layout changes)",
+  "title": "Update Elder and Ministerial Servant privilege badge colors app-wide",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update global OKLCH theme/color variables to the new navy/slate/gold palette and ensure legacy brand utilities render the new primary.",
+      "summary": "Introduce a single shared PrivilegeBadge implementation for Elder/Ministerial Servant and replace ad-hoc rendering where these privilege badges appear.",
       "acceptanceCriteria": [
-        "Global theme variables in frontend/src/index.css are updated to reflect the new palette, using OKLCH variables consistent with the existing implementation.",
-        "Any existing references to the old brand color variable (e.g., --theiarco-primary and any derived utilities) now render as the new primary navy (#003057).",
-        "No layout changes occur; only colors change across the app."
+        "There is a single shared implementation (e.g., a dedicated component or shared helper) responsible for styling/rendering the Elder and Ministerial Servant privilege badges.",
+        "All locations that render Elder/Ministerial Servant as colored pill/rectangle badges are updated to use the shared implementation rather than duplicating ad-hoc styling.",
+        "The updated badges remain the same size/shape/typography as before (only background color changes for these two badges)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update :root and .dark OKLCH CSS variables to reflect the new palette: primary (#003057), secondary (#5B8FA3), accent (#F4A82E), dark-surface text (#FFFFFF), and neutral gray (#A8A9AD). Keep the existing variable-driven approach; update --theiarco-primary to match the new primary and ensure existing custom utilities (e.g., .bg-theiarco-primary, .text-theiarco-primary) inherit the new color without per-component hex usage."
+          "path": "frontend/src/components/publishers/PrivilegeBadge.tsx",
+          "operation": "create",
+          "description": "Create a shared PrivilegeBadge component dedicated to rendering the \"Elder\" and \"Ministerial Servant\" privilege badges with consistent styling across the app (compose the existing shadcn Badge component; do not modify any files under frontend/src/components/ui)."
         },
         {
-          "path": "frontend/tailwind.config.js",
+          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
           "operation": "modify",
-          "description": "Extend Tailwind color tokens (still variable-driven via OKLCH) to expose any needed semantic colors for the new palette (e.g., a neutral gray token aligned to #A8A9AD) while preserving existing mappings. Do not introduce per-component hex usage; keep the project’s CSS-variable approach."
+          "description": "Replace inline/ad-hoc Elder/Ministerial Servant badge rendering with the shared PrivilegeBadge component everywhere these privilege badges are rendered on this page; keep other badge rendering (e.g., Overseer/Assistant/Inactive) as-is."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Restyle the header/navigation to use the new primary navy background with readable foreground contrast, without changing layout or behavior.",
+      "summary": "Set Elder badge background to #7C3AED and Ministerial Servant badge background to #2563EB with white text, with no dark-mode variants and no noticeable hover/focus color shifts.",
       "acceptanceCriteria": [
-        "The header bar uses the navy primary as its background color.",
-        "Header title and controls remain readable (sufficient contrast) against the navy background.",
-        "Header spacing, height, and interactions (menu toggle, logout) are unchanged."
+        "Every \"Elder\" privilege badge renders with background color #7C3AED and white text.",
+        "Every \"Ministerial Servant\" privilege badge renders with background color #2563EB and white text.",
+        "No separate/different colors are applied for dark mode for these two badges (they use the same colors in all themes).",
+        "Hover/focus states (if any) do not change the background away from the specified colors in a noticeable way (i.e., remain effectively the same specified color)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/layout/Header.tsx",
+          "path": "frontend/src/components/publishers/PrivilegeBadge.tsx",
           "operation": "modify",
-          "description": "Switch header container styling from card background to the theme’s primary background and update title/control colors to use the appropriate theme foreground tokens (e.g., primary-foreground) for contrast. Keep structure, spacing, and event handlers unchanged."
+          "description": "Implement the exact Elder (#7C3AED) and Ministerial Servant (#2563EB) background colors with white text, explicitly overriding dark-mode classes so both themes use identical colors; ensure hover/focus states remain effectively the same specified color by forcing hover/focus background classes to match."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Update sidebar active nav item styling to use the new primary navy background with readable active foreground, without changing navigation behavior.",
+      "summary": "Ensure only Elder and Ministerial Servant privilege badges change color; all other badges remain unchanged.",
       "acceptanceCriteria": [
-        "Active sidebar link background renders as #003057 (via existing utility/variable approach).",
-        "Active sidebar link text/icons render with readable contrast (white on navy).",
-        "Hover/inactive styles remain functionally the same, only color-adjusted to fit the new palette."
+        "Badges unrelated to Elder/Ministerial Servant privileges are visually unchanged compared to current behavior.",
+        "Status badges such as \"On Track\"/\"Behind\" and role badges such as \"Overseer\"/\"Assistant\" remain as they are today (colors and variants unchanged)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/layout/Sidebar.tsx",
+          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
           "operation": "modify",
-          "description": "Update the active Link class styling to use the theme primary background/foreground tokens (variable-driven) rather than relying on legacy brand utilities. Preserve existing hover/inactive behavior while harmonizing colors with the new palette."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "If needed to support REQ-3 without touching UI library internals, add/adjust variable-driven utility classes for brand/primary usage so sidebar active styling resolves to the new primary navy with correct contrast."
+          "description": "Limit usage of the new PrivilegeBadge component to only the \"Elder\" and \"Ministerial Servant\" labels; keep existing Badge variants/classes for other labels (e.g., Overseer, Assistant, Inactive) unchanged to preserve their current colors and styling."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Ensure primary button styling across the app uses the new primary navy with complementary hover/focus/active states aligned to the slate secondary, without changing button behavior or sizing.",
+      "summary": "Apply the shared updated privilege badge styling across all known pages/locations where Elder/Ministerial Servant privilege badges are displayed next to publisher names.",
       "acceptanceCriteria": [
-        "Primary button backgrounds render as #003057 and text remains readable (white on navy where applicable).",
-        "Hover/focus/active states are updated to complementary palette shades and remain visually distinct from the default state.",
-        "No button functionality, placement, or sizing changes occur."
+        "Where the app currently displays an Elder badge next to a publisher name on any page, it uses #7C3AED with white text.",
+        "Where the app currently displays a Ministerial Servant badge next to a publisher name on any page, it uses #2563EB with white text.",
+        "If any of the listed pages do not currently show privilege badges next to names, no new product behavior is introduced beyond ensuring any existing Elder/Ministerial Servant badge instances are updated wherever present."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
+          "path": "frontend/src/pages/Publishers.tsx",
           "operation": "modify",
-          "description": "Adjust theme variables that drive shadcn/Tailwind button colors (e.g., --primary, --primary-foreground, --ring, and any related tokens used for focus) so default, hover, and focus states reflect the new navy/slate palette via OKLCH variables. Do not edit files under frontend/src/components/ui."
+          "description": "Audit this page for any existing Elder/Ministerial Servant pill/rectangle badge rendering next to publisher names; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
         },
         {
-          "path": "frontend/src/pages/Login.tsx",
+          "path": "frontend/src/pages/PublisherProfile.tsx",
           "operation": "modify",
-          "description": "Replace per-button brand class usage (e.g., bg-theiarco-primary) with theme token classes (e.g., bg-primary text-primary-foreground, plus appropriate hover/focus styles) so primary actions reflect the updated palette consistently while preserving layout and behavior."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Update dashboard stat card background colors to navy/slate/gold combinations via existing dashboard stat CSS variables, keeping layout/typography/interactions unchanged.",
-      "acceptanceCriteria": [
-        "Dashboard stat cards that currently use custom CSS variables (e.g., bg-dashboard-stat-*) are updated so their backgrounds reflect the new navy/slate/gold palette.",
-        "Stat card text remains readable (good contrast) on the updated backgrounds.",
-        "Card layout, counts, labels, and link behavior remain unchanged."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update the existing --dashboard-stat-* OKLCH variables (light and dark) so bg-dashboard-stat-1/2/3/4 and the uncompleted/green variants harmonize with the new navy (#003057), slate (#5B8FA3), and gold (#F4A82E) palette while preserving readability."
+          "description": "Audit this page for any existing Elder/Ministerial Servant pill/rectangle badge rendering next to the publisher name/details; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
         },
         {
-          "path": "frontend/src/pages/Dashboard.tsx",
+          "path": "frontend/src/pages/FieldServiceGroups.tsx",
           "operation": "modify",
-          "description": "Verify stat card classes remain mapped to bg-dashboard-stat-* utilities and adjust only where necessary to ensure contrast (text/icons remain readable) while keeping markup, layout, and link behavior unchanged."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Harmonize semantic status badge shades (green/red/orange) with the new palette using variable-driven tokens, preserving meanings and readability.",
-      "acceptanceCriteria": [
-        "Status badges still appear green/red/orange by meaning, but their shades are adjusted to look cohesive with the new palette.",
-        "Badge text remains readable on each badge background in both light and dark modes (where applicable).",
-        "No badge wording or logic changes occur (only styling)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Introduce or adjust variable-driven semantic colors for status states (success/ok, warning, danger) in both light and dark themes using OKLCH variables (no inline hex per component). Ensure matching foreground variables for contrast."
+          "description": "Audit publisher lists on this page for any existing Elder/Ministerial Servant badge rendering next to names; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
         },
         {
-          "path": "frontend/tailwind.config.js",
+          "path": "frontend/src/pages/Pioneers.tsx",
           "operation": "modify",
-          "description": "Expose the new semantic status color tokens (e.g., success/warning/danger + their foregrounds) as Tailwind colors mapped to the CSS variables so badges can use consistent classes without editing frontend/src/components/ui. Keep existing theme mappings intact."
-        },
-        {
-          "path": "frontend/src/components/pioneers/CurrentStatusBadge.tsx",
-          "operation": "modify",
-          "description": "Replace hardcoded Tailwind colors (e.g., bg-green-600, bg-gray-*) with the new variable-driven semantic status/neutral classes so the badge remains readable and cohesive. Do not change badge logic or wording."
-        },
-        {
-          "path": "frontend/src/components/pioneers/PioneerTableRow.tsx",
-          "operation": "modify",
-          "description": "Audit and replace any hardcoded green/red/orange/gray status badge styling with the new variable-driven semantic badge classes to keep semantics the same while harmonizing shades. Keep layout and logic unchanged."
-        },
-        {
-          "path": "frontend/src/pages/PublicWitnessing.tsx",
-          "operation": "modify",
-          "description": "Audit status badge styling (if present) and update any hardcoded semantic colors to the new variable-driven semantic badge classes for cohesive green/red/orange shades, without changing behavior or layout."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Ensure readable contrast across light/dark themes by updating foreground tokens associated with primary/secondary/accent and muted/brand usages.",
-      "acceptanceCriteria": [
-        "Text on navy backgrounds renders as white (#FFFFFF) where intended and remains legible.",
-        "Accent (gold) usage does not reduce readability of overlaid text; foreground values are adjusted accordingly.",
-        "No new UI regressions where text becomes low-contrast due to palette changes."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update theme foreground variables (e.g., --primary-foreground, --secondary-foreground, --accent-foreground, --muted-foreground, and any brand-specific foreground usages) in both :root and .dark to ensure legible text/icons on their respective backgrounds after applying the new palette."
-        },
-        {
-          "path": "frontend/src/components/layout/Header.tsx",
-          "operation": "modify",
-          "description": "Align header text/icon classes to the updated theme foreground tokens (e.g., primary-foreground) to guarantee contrast on the navy header background without altering spacing or behavior."
-        },
-        {
-          "path": "frontend/src/components/layout/Sidebar.tsx",
-          "operation": "modify",
-          "description": "Ensure active/inactive/hover sidebar text/icon classes leverage the updated theme foreground tokens so navigation remains legible in both themes, without changing layout or routing behavior."
+          "description": "Audit the pioneers table for any existing Elder/Ministerial Servant badge rendering next to publisher names; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
         }
       ]
     }

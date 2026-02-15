@@ -1,137 +1,56 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { Download, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+} from '@/components/ui/table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useGetAllTerritories } from '../hooks/useTerritories';
-import { useGetAllPublishers } from '../hooks/useQueries';
+import { useDeleteTerritory } from '../hooks/useTerritory';
 import { AddTerritoryModal } from '../components/territories/AddTerritoryModal';
-import { exportTerritoryAssignmentRecord } from '../utils/territoryAssignmentRecordCsvExport';
-import type { Territory, CheckoutRecord } from '../backend';
+import { EditTerritoryModal } from '../components/territories/EditTerritoryModal';
+import { toast } from 'sonner';
+import type { Territory } from '../backend';
+import { buildTerritoryAssignmentRecordCsv } from '../utils/territoryAssignmentRecordCsvExport';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
+import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
+import { calculateCheckoutDuration, getCheckoutDurationMonths } from '@/utils/territoryTime';
 
 type SortColumn = 'number' | 'publisher' | 'status' | 'type' | 'duration' | null;
 type SortDirection = 'default' | 'asc' | 'desc';
 
 export default function Territories() {
-  const { data: territories, isLoading } = useGetAllTerritories();
-  const { data: publishers } = useGetAllPublishers();
+  const navigate = useNavigate();
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTerritory, setSelectedTerritory] = useState<Territory | null>(null);
+  const [territoryToDelete, setTerritoryToDelete] = useState<Territory | null>(null);
+  
+  // Sort states
   const [sortColumn, setSortColumn] = useState<SortColumn>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('default');
-  const navigate = useNavigate();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Available':
-        return 'text-green-600';
-      case 'Checked Out':
-        return 'text-blue-600';
-      case 'Under Review':
-        return 'text-orange-600';
-      default:
-        return 'text-foreground';
-    }
-  };
-
-  const handleTerritoryClick = (territoryId: string) => {
-    navigate({ to: '/territories/$id', params: { id: territoryId } });
-  };
-
-  const handleExportCsv = () => {
-    if (territories && territories.length > 0) {
-      exportTerritoryAssignmentRecord(territories);
-    }
-  };
-
-  // Helper to get the most recent checkout record (largest dateCheckedOut)
-  const getMostRecentCheckoutRecord = (territory: Territory): CheckoutRecord | null => {
-    if (!territory.checkOutHistory || territory.checkOutHistory.length === 0) {
-      return null;
-    }
-
-    // Return the record with the largest dateCheckedOut
-    return territory.checkOutHistory.reduce((latest, current) => {
-      return Number(current.dateCheckedOut) > Number(latest.dateCheckedOut) ? current : latest;
-    });
-  };
-
-  // Helper to get the active checkout record (most recent with dateReturned = null)
-  const getActiveCheckoutRecord = (territory: Territory): CheckoutRecord | null => {
-    const activeRecords = territory.checkOutHistory.filter(
-      (record) => record.dateReturned === undefined || record.dateReturned === null
-    );
-
-    if (activeRecords.length === 0) return null;
-
-    // Return the record with the largest dateCheckedOut
-    return activeRecords.reduce((latest, current) => {
-      return Number(current.dateCheckedOut) > Number(latest.dateCheckedOut) ? current : latest;
-    });
-  };
-
-  // Helper to get publisher name for display
-  const getPublisherName = (territory: Territory): string => {
-    if (territory.status === 'Available') {
-      return '—';
-    }
-
-    if (territory.status === 'Checked Out') {
-      const mostRecentRecord = getMostRecentCheckoutRecord(territory);
-      
-      if (!mostRecentRecord) {
-        return '—';
-      }
-
-      // Use the publisher name from the checkout record
-      if (mostRecentRecord.publisherName) {
-        return mostRecentRecord.publisherName;
-      }
-
-      // Fallback: try to look up publisher by ID if name is missing
-      if (publishers && mostRecentRecord.publisherId !== undefined) {
-        const publisher = publishers.find(p => Number(p.id) === Number(mostRecentRecord.publisherId));
-        if (publisher) {
-          return publisher.fullName;
-        }
-      }
-
-      return '—';
-    }
-
-    // For "Under Review" or other statuses, show em dash
-    return '—';
-  };
-
-  // Helper to calculate checked out duration in months
-  const getCheckedOutDuration = (territory: Territory): { months: number; display: string } | null => {
-    if (territory.status !== 'Checked Out') {
-      return null;
-    }
-
-    const activeRecord = getActiveCheckoutRecord(territory);
-    if (!activeRecord) {
-      return null;
-    }
-
-    const currentTimestampSeconds = Math.floor(Date.now() / 1000);
-    const dateCheckedOutSeconds = Number(activeRecord.dateCheckedOut);
-    const months = Math.floor((currentTimestampSeconds - dateCheckedOutSeconds) / (30 * 24 * 60 * 60));
-
-    return {
-      months,
-      display: `${months} months`,
-    };
-  };
-
-  // Helper to determine if row should have red background
-  const shouldHighlightRow = (territory: Territory): boolean => {
-    if (territory.status !== 'Checked Out') {
-      return false;
-    }
-
-    const duration = getCheckedOutDuration(territory);
-    return duration !== null && duration.months >= 4;
-  };
+  const { data: territories, isLoading } = useGetAllTerritories();
+  const deleteTerritory = useDeleteTerritory();
 
   // Handle column header click for sorting
   const handleSort = (column: SortColumn) => {
@@ -160,6 +79,32 @@ export default function Territories() {
     return null;
   };
 
+  // Helper to get current publisher name
+  const getCurrentPublisher = (territory: Territory): string => {
+    if (territory.status !== 'Checked Out') return '—';
+    const currentCheckout = territory.checkOutHistory.find((record) => !record.dateReturned);
+    return currentCheckout?.publisherName || '—';
+  };
+
+  // Helper to get checkout duration in months for sorting
+  const getTerritoryDurationMonths = (territory: Territory): number | null => {
+    if (territory.status !== 'Checked Out') return null;
+    const currentCheckout = territory.checkOutHistory.find((record) => !record.dateReturned);
+    if (!currentCheckout) return null;
+    
+    return getCheckoutDurationMonths(currentCheckout.dateCheckedOut);
+  };
+
+  // Helper to format checkout duration for display
+  const formatCheckoutDuration = (territory: Territory): string => {
+    if (territory.status !== 'Checked Out') return '—';
+    const currentCheckout = territory.checkOutHistory.find((record) => !record.dateReturned);
+    if (!currentCheckout) return '—';
+    
+    const duration = calculateCheckoutDuration(currentCheckout.dateCheckedOut);
+    return duration.displayText;
+  };
+
   // Compute displayed territories with sorting applied
   const displayedTerritories = useMemo(() => {
     if (!territories || territories.length === 0) return [];
@@ -172,24 +117,14 @@ export default function Territories() {
 
       switch (sortColumn) {
         case 'number': {
-          // Try numeric comparison first
-          const aNum = parseFloat(a.number);
-          const bNum = parseFloat(b.number);
-          if (!isNaN(aNum) && !isNaN(bNum)) {
-            comparison = aNum - bNum;
-          } else {
-            comparison = a.number.localeCompare(b.number);
-          }
+          comparison = a.number.localeCompare(b.number, undefined, { numeric: true });
           break;
         }
 
         case 'publisher': {
-          const aName = getPublisherName(a);
-          const bName = getPublisherName(b);
-          // Sort em-dash consistently (put at end)
-          if (aName === '—' && bName !== '—') return 1;
-          if (aName !== '—' && bName === '—') return -1;
-          comparison = aName.localeCompare(bName);
+          const aPublisher = getCurrentPublisher(a);
+          const bPublisher = getCurrentPublisher(b);
+          comparison = aPublisher.localeCompare(bPublisher);
           break;
         }
 
@@ -204,144 +139,236 @@ export default function Territories() {
         }
 
         case 'duration': {
-          const aDuration = getCheckedOutDuration(a);
-          const bDuration = getCheckedOutDuration(b);
-          const aMonths = aDuration?.months ?? -1;
-          const bMonths = bDuration?.months ?? -1;
-          // Sort missing duration (em-dash) consistently (put at end)
-          if (aMonths === -1 && bMonths !== -1) return 1;
-          if (aMonths !== -1 && bMonths === -1) return -1;
-          comparison = aMonths - bMonths;
+          const aDuration = getTerritoryDurationMonths(a) ?? -1;
+          const bDuration = getTerritoryDurationMonths(b) ?? -1;
+          comparison = aDuration - bDuration;
           break;
         }
+
+        default:
+          comparison = 0;
       }
 
       return sortDirection === 'asc' ? comparison : -comparison;
     });
 
     return sorted;
-  }, [territories, sortColumn, sortDirection, publishers]);
+  }, [territories, sortColumn, sortDirection]);
+
+  const handleTerritoryClick = (territoryId: string) => {
+    navigate({ to: `/territories/${territoryId}` });
+  };
+
+  const handleEditClick = (e: React.MouseEvent, territory: Territory) => {
+    e.stopPropagation();
+    setSelectedTerritory(territory);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedTerritory(null);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, territory: Territory) => {
+    e.stopPropagation();
+    setTerritoryToDelete(territory);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!territoryToDelete) return;
+
+    try {
+      await deleteTerritory.mutateAsync(territoryToDelete.id);
+      toast.success('Territory deleted successfully!', {
+        duration: 3000,
+        className: 'bg-green-600 text-white',
+      });
+    } catch (error) {
+      console.error('Failed to delete territory:', error);
+      toast.error('Failed to delete territory. Please try again.');
+    } finally {
+      setTerritoryToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setTerritoryToDelete(null);
+  };
+
+  const handleExportCsv = () => {
+    if (!territories || territories.length === 0) {
+      toast.error('No territories to export');
+      return;
+    }
+
+    try {
+      const csvContent = buildTerritoryAssignmentRecordCsv(territories);
+      // Download CSV
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'territory-assignment-record.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Territory history exported successfully!', {
+        duration: 3000,
+        className: 'bg-green-600 text-white',
+      });
+    } catch (error) {
+      console.error('Failed to export territory history:', error);
+      toast.error('Failed to export territory history. Please try again.');
+    }
+  };
+
+  const getStatusBadgeColor = (status: string) => {
+    switch (status) {
+      case 'Available':
+        return 'bg-green-600 hover:bg-green-700';
+      case 'Checked Out':
+        return 'bg-blue-600 hover:bg-blue-700';
+      case 'Under Review':
+        return 'bg-yellow-600 hover:bg-yellow-700';
+      default:
+        return '';
+    }
+  };
+
+  const headerTextColor = getContrastColor(themeColor);
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="p-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Territories</h1>
         <div className="flex items-center gap-3">
           <Button
-            onClick={handleExportCsv}
             variant="outline"
-            disabled={!territories || territories.length === 0}
-            className="flex items-center gap-2"
+            onClick={handleExportCsv}
+            className="gap-2"
           >
             <Download className="h-4 w-4" />
             Export Territory History
           </Button>
-          <Button
+          <ThemedPrimaryButton
+            themeColor={themeColor}
             onClick={() => setIsAddModalOpen(true)}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
-            className="hover:opacity-90"
           >
             Add Territory
-          </Button>
+          </ThemedPrimaryButton>
         </div>
       </div>
 
-      {/* Loading State */}
-      {isLoading && (
+      {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="text-center space-y-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-            <p className="text-muted-foreground">Loading...</p>
-          </div>
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mr-3" />
+          <span className="text-muted-foreground">Loading...</span>
         </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && territories && territories.length === 0 && (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">
-            No territories added. Click 'Add Territory' to create one.
-          </p>
+      ) : displayedTerritories.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          No territories found. Click 'Add Territory' to get started.
         </div>
-      )}
-
-      {/* Territories Table */}
-      {!isLoading && territories && territories.length > 0 && (
+      ) : (
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>
+              <ThemedTableHeaderRow themeColor={themeColor}>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('number')}
-                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Territory Number{getSortIndicator('number')}
                   </button>
-                </TableHead>
-                <TableHead>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('publisher')}
-                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Publisher{getSortIndicator('publisher')}
                   </button>
-                </TableHead>
-                <TableHead>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('status')}
-                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Status{getSortIndicator('status')}
                   </button>
-                </TableHead>
-                <TableHead>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('type')}
-                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Type{getSortIndicator('type')}
                   </button>
-                </TableHead>
-                <TableHead>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
                   <button
                     onClick={() => handleSort('duration')}
-                    className="cursor-pointer hover:bg-muted/50 px-2 py-1 -mx-2 -my-1 rounded transition-colors w-full text-left font-medium"
+                    className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
+                    style={{ color: headerTextColor }}
                   >
                     Checked Out Duration{getSortIndicator('duration')}
                   </button>
-                </TableHead>
-              </TableRow>
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+              </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {displayedTerritories.map((territory) => {
-                const duration = getCheckedOutDuration(territory);
-                const highlight = shouldHighlightRow(territory);
-                const publisherName = getPublisherName(territory);
-                const isAvailable = territory.status === 'Available';
+                const durationMonths = getTerritoryDurationMonths(territory);
+                const isOverdue = durationMonths !== null && durationMonths >= 4;
 
                 return (
-                  <TableRow key={territory.id} className={highlight ? 'bg-red-100' : ''}>
-                    <TableCell className="font-medium">
-                      <button
-                        onClick={() => handleTerritoryClick(territory.id)}
-                        className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded"
-                      >
-                        {territory.number}
-                      </button>
-                    </TableCell>
-                    <TableCell className={isAvailable ? 'text-muted-foreground' : ''}>
-                      {publisherName}
-                    </TableCell>
-                    <TableCell className={getStatusColor(territory.status)}>
-                      {territory.status}
+                  <tr
+                    key={territory.id}
+                    className={`cursor-pointer hover:bg-muted/50 ${
+                      isOverdue ? 'bg-red-100 dark:bg-red-900/20' : ''
+                    }`}
+                    onClick={() => handleTerritoryClick(territory.id)}
+                  >
+                    <TableCell className="font-medium">{territory.number}</TableCell>
+                    <TableCell>{getCurrentPublisher(territory)}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusBadgeColor(territory.status)}>
+                        {territory.status}
+                      </Badge>
                     </TableCell>
                     <TableCell>{territory.territoryType}</TableCell>
+                    <TableCell>{formatCheckoutDuration(territory)}</TableCell>
                     <TableCell>
-                      {duration ? duration.display : '—'}
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => handleEditClick(e, territory)}
+                          className="h-8 gap-2"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => handleDeleteClick(e, territory)}
+                          className="h-8 gap-2 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </Button>
+                      </div>
                     </TableCell>
-                  </TableRow>
+                  </tr>
                 );
               })}
             </TableBody>
@@ -349,11 +376,33 @@ export default function Territories() {
         </div>
       )}
 
-      {/* Add Territory Modal */}
       <AddTerritoryModal
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
       />
+
+      {selectedTerritory && (
+        <EditTerritoryModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          territory={selectedTerritory}
+        />
+      )}
+
+      <AlertDialog open={!!territoryToDelete} onOpenChange={(open) => !open && handleDeleteCancel()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Territory</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this territory? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

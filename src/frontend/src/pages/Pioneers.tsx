@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader } from '@/components/ui/table';
 import { Download } from 'lucide-react';
 import { useGetAllPioneers } from '../hooks/usePioneers';
 import { useGetAllPublishers } from '../hooks/useQueries';
@@ -10,12 +10,19 @@ import AddPioneerModal from '../components/pioneers/AddPioneerModal';
 import EditPioneerModal from '../components/pioneers/EditPioneerModal';
 import DeletePioneerDialog from '../components/pioneers/DeletePioneerDialog';
 import PioneerTableRow from '../components/pioneers/PioneerTableRow';
-import { buildPioneersCsv, downloadCsv, getServiceYearMonths } from '../utils/pioneersCsvExport';
+import { buildPioneersCsv, downloadCsv } from '../utils/pioneersCsvExport';
 import { toast } from 'sonner';
 import type { Pioneer } from '../backend';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
+import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
 
 export default function Pioneers() {
   const navigate = useNavigate();
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const { actor } = useActor();
   const { data: pioneers, isLoading } = useGetAllPioneers();
   const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
@@ -112,6 +119,8 @@ export default function Pioneers() {
     ? [...pioneers].sort((a, b) => a.publisherName.localeCompare(b.publisherName))
     : [];
 
+  const headerTextColor = getContrastColor(themeColor);
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -127,13 +136,12 @@ export default function Pioneers() {
             <Download className="h-4 w-4" />
             {isExporting ? 'Exporting...' : 'Export to CSV'}
           </Button>
-          <Button
+          <ThemedPrimaryButton
+            themeColor={themeColor}
             onClick={handleAddPioneer}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
-            className="hover:opacity-90"
           >
             Add Pioneer
-          </Button>
+          </ThemedPrimaryButton>
         </div>
       </div>
 
@@ -191,14 +199,14 @@ export default function Pioneers() {
         <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Service Year</TableHead>
-                <TableHead>Total Hours</TableHead>
-                <TableHead>Average Hours</TableHead>
-                <TableHead>Current Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
+              <ThemedTableHeaderRow themeColor={themeColor}>
+                <ThemedTableHead themeColor={themeColor}>Name</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Service Year</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Total Hours</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Average Hours</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Current Status</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor} className="text-right">Actions</ThemedTableHead>
+              </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {sortedPioneers.map((pioneer) => (

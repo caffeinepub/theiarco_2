@@ -93,33 +93,27 @@ export function CheckOutTerritoryModal({
         duration: 3000,
         className: 'bg-green-600 text-white',
       });
-
-      // Close modal (form reset handled by useEffect)
       onOpenChange(false);
     } catch (error) {
       console.error('Failed to check out territory:', error);
-      toast.error('Failed to check out territory');
+      toast.error('Failed to check out territory. Please try again.');
     }
-  };
-
-  const handleCancel = () => {
-    onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Check Out Territory</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Assigned To Dropdown */}
           <div className="space-y-2">
-            <Label htmlFor="publisher">Assigned To</Label>
+            <Label htmlFor="publisher">Publisher *</Label>
             {publishersLoading ? (
-              <div className="flex items-center justify-center py-4">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading publishers...
               </div>
             ) : (
               <Select
@@ -143,30 +137,27 @@ export function CheckOutTerritoryModal({
             )}
           </div>
 
-          {/* Date Checked Out */}
           <div className="space-y-2">
-            <Label htmlFor="dateCheckedOut">Date Checked Out</Label>
+            <Label htmlFor="dateCheckedOut">Date Checked Out *</Label>
             <Input
               id="dateCheckedOut"
               type="date"
               value={dateCheckedOut}
               onChange={(e) => setDateCheckedOut(e.target.value)}
-              required
             />
           </div>
 
-          {/* Campaign Checkbox */}
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="campaign"
+              id="isCampaign"
               checked={isCampaign}
               onCheckedChange={(checked) => setIsCampaign(checked === true)}
             />
             <Label
-              htmlFor="campaign"
+              htmlFor="isCampaign"
               className="text-sm font-normal cursor-pointer"
             >
-              This is a campaign assignment
+              This is a campaign
             </Label>
           </div>
         </div>
@@ -174,20 +165,24 @@ export function CheckOutTerritoryModal({
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={handleCancel}
+            onClick={() => onOpenChange(false)}
             disabled={checkOutMutation.isPending}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!selectedPublisherId || !dateCheckedOut || checkOutMutation.isPending}
-            className="gap-2"
+            disabled={checkOutMutation.isPending}
+            className="bg-green-600 hover:bg-green-700 text-white"
           >
-            {checkOutMutation.isPending && (
-              <Loader2 className="h-4 w-4 animate-spin" />
+            {checkOutMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Checking Out...
+              </>
+            ) : (
+              'Check Out'
             )}
-            Submit
           </Button>
         </DialogFooter>
       </DialogContent>

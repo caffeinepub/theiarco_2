@@ -8,6 +8,7 @@ import { Users, Map, ListTodo, AlertCircle, AlertTriangle, TrendingUp } from 'lu
 import { formatVisitDate } from '../utils/formatters';
 import { getCurrentServiceYear } from '../utils/serviceYear';
 import { Link } from '@tanstack/react-router';
+import { getPageThemeColor } from '../theme/pageTheme';
 
 export default function Dashboard() {
   const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
@@ -109,7 +110,8 @@ export default function Dashboard() {
         {/* Active Publishers Card */}
         <Link
           to="/publishers"
-          className="block rounded-lg bg-dashboard-stat-1 p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          style={{ backgroundColor: getPageThemeColor('/publishers') }}
         >
           <div className="flex items-center justify-between mb-4">
             <Users className="h-8 w-8 opacity-80" />
@@ -123,7 +125,8 @@ export default function Dashboard() {
         {/* Checked Out Territories Card */}
         <Link
           to="/territories"
-          className="block rounded-lg bg-dashboard-stat-2 p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          style={{ backgroundColor: getPageThemeColor('/territories') }}
         >
           <div className="flex items-center justify-between mb-4">
             <Map className="h-8 w-8 opacity-80" />
@@ -137,7 +140,8 @@ export default function Dashboard() {
         {/* Uncompleted Tasks Card */}
         <Link
           to="/tasks"
-          className="block rounded-lg bg-dashboard-stat-uncompleted p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          style={{ backgroundColor: getPageThemeColor('/tasks') }}
         >
           <div className="flex items-center justify-between mb-4">
             <ListTodo className="h-8 w-8 opacity-80" />
@@ -151,7 +155,8 @@ export default function Dashboard() {
         {/* Pioneers On Track Card */}
         <Link
           to="/pioneers"
-          className="block rounded-lg bg-dashboard-stat-green p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          style={{ backgroundColor: getPageThemeColor('/pioneers') }}
         >
           <div className="flex items-center justify-between mb-4">
             <TrendingUp className="h-8 w-8 opacity-80" />

@@ -5,8 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Pencil, Save, X } from 'lucide-react';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useCallerUserProfile';
 import { toast } from 'sonner';
+import { useRouterState } from '@tanstack/react-router';
+import { getPageThemeColor } from '@/theme/pageTheme';
 
 export default function UserProfile() {
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const { data: userProfile, isLoading } = useGetCallerUserProfile();
   const saveProfileMutation = useSaveCallerUserProfile();
 
@@ -77,30 +82,24 @@ export default function UserProfile() {
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">User Profile</h1>
-        <p className="text-muted-foreground mt-1">Manage your account settings</p>
-      </div>
+    <div className="p-6 max-w-2xl">
+      <h1 className="text-3xl font-bold text-foreground mb-6">User Profile</h1>
 
-      {/* Personal Information Section */}
-      <div className="bg-card border border-border rounded-lg p-6 space-y-6">
-        <h2 className="text-xl font-semibold text-foreground">Personal Information</h2>
-
+      <div className="space-y-6 bg-card border rounded-lg p-6">
         {/* Full Name Field */}
         <div className="space-y-2">
           <Label htmlFor="fullName">Full Name</Label>
           <div className="flex items-center gap-2">
             <Input
               id="fullName"
+              type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               disabled={!isEditingFullName}
@@ -109,33 +108,31 @@ export default function UserProfile() {
             {!isEditingFullName ? (
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={() => setIsEditingFullName(true)}
               >
-                <Pencil className="h-4 w-4 mr-1" />
-                Edit
+                <Pencil className="h-4 w-4" />
               </Button>
             ) : (
-              <div className="flex gap-2">
+              <>
                 <Button
-                  variant="default"
-                  size="sm"
+                  size="icon"
                   onClick={handleSaveFullName}
                   disabled={saveProfileMutation.isPending}
+                  style={{ backgroundColor: themeColor, color: 'white' }}
+                  className="hover:opacity-90"
                 >
-                  <Save className="h-4 w-4 mr-1" />
-                  Save
+                  <Save className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="icon"
                   onClick={handleCancelFullName}
                   disabled={saveProfileMutation.isPending}
                 >
-                  <X className="h-4 w-4 mr-1" />
-                  Cancel
+                  <X className="h-4 w-4" />
                 </Button>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -146,6 +143,7 @@ export default function UserProfile() {
           <div className="flex items-center gap-2">
             <Input
               id="congregationName"
+              type="text"
               value={congregationName}
               onChange={(e) => setCongregationName(e.target.value)}
               disabled={!isEditingCongregationName}
@@ -154,33 +152,31 @@ export default function UserProfile() {
             {!isEditingCongregationName ? (
               <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 onClick={() => setIsEditingCongregationName(true)}
               >
-                <Pencil className="h-4 w-4 mr-1" />
-                Edit
+                <Pencil className="h-4 w-4" />
               </Button>
             ) : (
-              <div className="flex gap-2">
+              <>
                 <Button
-                  variant="default"
-                  size="sm"
+                  size="icon"
                   onClick={handleSaveCongregationName}
                   disabled={saveProfileMutation.isPending}
+                  style={{ backgroundColor: themeColor, color: 'white' }}
+                  className="hover:opacity-90"
                 >
-                  <Save className="h-4 w-4 mr-1" />
-                  Save
+                  <Save className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="icon"
                   onClick={handleCancelCongregationName}
                   disabled={saveProfileMutation.isPending}
                 >
-                  <X className="h-4 w-4 mr-1" />
-                  Cancel
+                  <X className="h-4 w-4" />
                 </Button>
-              </div>
+              </>
             )}
           </div>
         </div>

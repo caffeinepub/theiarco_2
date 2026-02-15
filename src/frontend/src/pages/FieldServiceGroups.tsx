@@ -1,9 +1,13 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useRouterState } from '@tanstack/react-router';
 import { useGetAllPublishers } from '../hooks/useQueries';
 import { Users } from 'lucide-react';
 import type { Publisher } from '../backend';
+import { getPageThemeColor } from '@/theme/pageTheme';
 
 export default function FieldServiceGroups() {
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const { data: publishers = [], isLoading } = useGetAllPublishers();
 
   if (isLoading) {
@@ -61,7 +65,7 @@ export default function FieldServiceGroups() {
               className="block border rounded-lg p-6 bg-card space-y-4 hover:bg-accent/50 transition-colors cursor-pointer"
             >
               <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <Users className="h-6 w-6 text-theiarco-primary" />
+                <Users className="h-6 w-6" style={{ color: themeColor }} />
                 Group {groupNumber}
               </h2>
 

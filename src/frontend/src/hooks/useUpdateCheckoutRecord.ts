@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { PublisherId } from '../backend';
+import { normalizeToEpochSeconds } from '@/utils/territoryTime';
 
 interface UpdateCheckoutRecordInput {
   territoryId: string;
@@ -19,13 +20,20 @@ export function useUpdateCheckoutRecord() {
   return useMutation({
     mutationFn: async (input: UpdateCheckoutRecordInput) => {
       if (!actor) throw new Error('Actor not available');
+      
+      // Defensively normalize all timestamps to seconds before sending to backend
+      const normalizedDateCheckedOut = normalizeToEpochSeconds(input.newDateCheckedOut);
+      const normalizedDateReturned = input.newDateReturned 
+        ? normalizeToEpochSeconds(input.newDateReturned)
+        : null;
+      
       return actor.updateCheckoutRecord(
         input.territoryId,
         input.originalPublisherId,
         input.originalDateCheckedOut,
         input.newPublisherId,
-        input.newDateCheckedOut,
-        input.newDateReturned,
+        normalizedDateCheckedOut,
+        normalizedDateReturned,
         input.newIsCampaign
       );
     },

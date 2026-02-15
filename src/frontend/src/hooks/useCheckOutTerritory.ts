@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { PublisherId } from '../backend';
+import { normalizeToEpochSeconds } from '@/utils/territoryTime';
 
 interface CheckOutTerritoryInput {
   territoryId: string;
@@ -16,11 +17,15 @@ export function useCheckOutTerritory() {
   return useMutation({
     mutationFn: async (input: CheckOutTerritoryInput) => {
       if (!actor) throw new Error('Actor not available');
+      
+      // Defensively normalize to seconds before sending to backend
+      const normalizedDate = normalizeToEpochSeconds(input.dateCheckedOut);
+      
       return actor.checkOutTerritory(
         input.territoryId,
         input.publisherId,
         input.isCampaign,
-        input.dateCheckedOut
+        normalizedDate
       );
     },
     onSuccess: (_, variables) => {

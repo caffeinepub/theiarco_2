@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,18 +7,23 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
-  TableRow,
 } from '@/components/ui/table';
 import { useGetAllTrainedConductors } from '../hooks/useTrainedConductors';
 import { formatTrainingDate } from '../utils/formatters';
 import ConductorModal from '../components/conductors/ConductorModal';
 import DeleteConductorDialog from '../components/conductors/DeleteConductorDialog';
 import type { TrainedServiceMeetingConductor } from '../backend';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
+import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
 
 export default function ServiceMeetingConductors() {
   const navigate = useNavigate();
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const { data: conductors, isLoading } = useGetAllTrainedConductors();
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -51,18 +56,19 @@ export default function ServiceMeetingConductors() {
     ? [...conductors].sort((a, b) => a.publisherName.localeCompare(b.publisherName))
     : [];
 
+  const headerTextColor = getContrastColor(themeColor);
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Service Meeting Conductors</h1>
-        <Button
+        <ThemedPrimaryButton
+          themeColor={themeColor}
           onClick={handleAddConductor}
-          style={{ backgroundColor: '#43587A' }}
-          className="text-white hover:opacity-90"
         >
           Add Conductor
-        </Button>
+        </ThemedPrimaryButton>
       </div>
 
       {/* Loading State */}
@@ -89,13 +95,13 @@ export default function ServiceMeetingConductors() {
         <div className="border rounded-lg">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Conductor Name</TableHead>
-                <TableHead>Training Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Available Days</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
+              <ThemedTableHeaderRow themeColor={themeColor}>
+                <ThemedTableHead themeColor={themeColor}>Conductor Name</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Training Date</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Status</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Available Days</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+              </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {sortedConductors.map((conductor) => {
@@ -106,7 +112,7 @@ export default function ServiceMeetingConductors() {
                 if (conductor.availableSunday) availableDays.push('Sun');
 
                 return (
-                  <TableRow 
+                  <tr 
                     key={conductor.id}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleConductorClick(conductor.id)}
@@ -156,7 +162,7 @@ export default function ServiceMeetingConductors() {
                         </Button>
                       </div>
                     </TableCell>
-                  </TableRow>
+                  </tr>
                 );
               })}
             </TableBody>

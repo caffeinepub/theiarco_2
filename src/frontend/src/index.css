@@ -11,24 +11,14 @@
         --card-foreground: 0.145 0 0;
         --popover: 1 0 0;
         --popover-foreground: 0.145 0 0;
-        
-        /* Primary: Navy Blue #003057 */
-        --primary: 0.23 0.08 250;
-        --primary-foreground: 1 0 0;
-        
-        /* Secondary: Slate Blue #5B8FA3 */
-        --secondary: 0.60 0.06 220;
-        --secondary-foreground: 1 0 0;
-        
-        /* Accent: Gold/Yellow #F4A82E */
-        --accent: 0.75 0.14 70;
-        --accent-foreground: 0.20 0 0;
-        
-        /* Neutral Gray: #A8A9AD */
-        --neutral-gray: 0.70 0.01 260;
-        
+        --primary: 0.205 0 0;
+        --primary-foreground: 0.985 0 0;
+        --secondary: 0.97 0 0;
+        --secondary-foreground: 0.205 0 0;
         --muted: 0.97 0 0;
         --muted-foreground: 0.556 0 0;
+        --accent: 0.97 0 0;
+        --accent-foreground: 0.205 0 0;
         --destructive: 0.577 0.245 27.325;
         --destructive-foreground: 0.985 0 0;
         --border: 0.922 0 0;
@@ -40,30 +30,20 @@
         --chart-4: 0.828 0.189 84.429;
         --chart-5: 0.769 0.188 70.08;
         
-        /* Theiarco custom color - now Navy Blue #003057 */
-        --theiarco-primary: 0.23 0.08 250;
+        /* Theiarco custom color #43587A */
+        --theiarco-primary: 0.38 0.08 240;
         
-        /* Dashboard stat card colors - Navy/Slate/Gold combinations */
-        --dashboard-stat-1: 0.23 0.08 250; /* Navy */
-        --dashboard-stat-2: 0.60 0.06 220; /* Slate Blue */
-        --dashboard-stat-3: 0.75 0.14 70;  /* Gold */
-        --dashboard-stat-4: 0.30 0.08 250; /* Lighter Navy */
+        /* Dashboard stat card colors - blue shades based on #43587A */
+        --dashboard-stat-1: 0.48 0.10 240;
+        --dashboard-stat-2: 0.42 0.09 240;
+        --dashboard-stat-3: 0.36 0.07 240;
+        --dashboard-stat-4: 0.30 0.06 240;
         
-        /* Dashboard stat card color for uncompleted tasks - adjusted orange to complement palette */
-        --dashboard-stat-uncompleted: 0.70 0.16 50;
+        /* Dashboard stat card color for uncompleted tasks - orange */
+        --dashboard-stat-uncompleted: 0.65 0.18 45;
         
-        /* Dashboard stat card color for pioneers on track - adjusted green to complement palette */
-        --dashboard-stat-green: 0.62 0.14 150;
-        
-        /* Semantic status colors - harmonized with new palette */
-        --status-success: 0.62 0.14 150;
-        --status-success-foreground: 1 0 0;
-        --status-warning: 0.70 0.16 50;
-        --status-warning-foreground: 0.20 0 0;
-        --status-danger: 0.577 0.245 27.325;
-        --status-danger-foreground: 1 0 0;
-        --status-neutral: 0.70 0.01 260;
-        --status-neutral-foreground: 1 0 0;
+        /* Dashboard stat card color for pioneers on track - green */
+        --dashboard-stat-green: 0.60 0.15 145;
     }
 
     .dark {
@@ -73,24 +53,14 @@
         --card-foreground: 0.985 0 0;
         --popover: 0.269 0 0;
         --popover-foreground: 0.985 0 0;
-        
-        /* Primary: Navy Blue (slightly lighter for dark mode) */
-        --primary: 0.30 0.09 250;
-        --primary-foreground: 1 0 0;
-        
-        /* Secondary: Slate Blue (adjusted for dark mode) */
-        --secondary: 0.55 0.07 220;
-        --secondary-foreground: 1 0 0;
-        
-        /* Accent: Gold/Yellow (slightly adjusted for dark mode) */
-        --accent: 0.72 0.15 70;
-        --accent-foreground: 0.15 0 0;
-        
-        /* Neutral Gray (adjusted for dark mode) */
-        --neutral-gray: 0.65 0.01 260;
-        
+        --primary: 0.922 0 0;
+        --primary-foreground: 0.205 0 0;
+        --secondary: 0.269 0 0;
+        --secondary-foreground: 0.985 0 0;
         --muted: 0.269 0 0;
         --muted-foreground: 0.708 0 0;
+        --accent: 0.371 0 0;
+        --accent-foreground: 0.985 0 0;
         --destructive: 0.704 0.191 22.216;
         --destructive-foreground: 0.205 0 0;
         --border: 1 0 0 / 10%;
@@ -102,30 +72,20 @@
         --chart-4: 0.627 0.265 303.9;
         --chart-5: 0.645 0.246 16.439;
         
-        /* Theiarco custom color for dark mode - lighter navy */
-        --theiarco-primary: 0.30 0.09 250;
+        /* Theiarco custom color for dark mode - slightly lighter */
+        --theiarco-primary: 0.45 0.09 240;
         
         /* Dashboard stat card colors for dark mode - adjusted for better contrast */
-        --dashboard-stat-1: 0.30 0.09 250; /* Navy */
-        --dashboard-stat-2: 0.55 0.07 220; /* Slate Blue */
-        --dashboard-stat-3: 0.72 0.15 70;  /* Gold */
-        --dashboard-stat-4: 0.35 0.09 250; /* Lighter Navy */
+        --dashboard-stat-1: 0.52 0.11 240;
+        --dashboard-stat-2: 0.46 0.10 240;
+        --dashboard-stat-3: 0.40 0.08 240;
+        --dashboard-stat-4: 0.34 0.07 240;
         
         /* Dashboard stat card color for uncompleted tasks - orange (dark mode) */
         --dashboard-stat-uncompleted: 0.68 0.16 50;
         
         /* Dashboard stat card color for pioneers on track - green (dark mode) */
-        --dashboard-stat-green: 0.65 0.15 150;
-        
-        /* Semantic status colors for dark mode */
-        --status-success: 0.65 0.15 150;
-        --status-success-foreground: 1 0 0;
-        --status-warning: 0.68 0.16 50;
-        --status-warning-foreground: 0.15 0 0;
-        --status-danger: 0.704 0.191 22.216;
-        --status-danger-foreground: 1 0 0;
-        --status-neutral: 0.65 0.01 260;
-        --status-neutral-foreground: 1 0 0;
+        --dashboard-stat-green: 0.65 0.16 145;
     }
 
     * {
@@ -163,29 +123,5 @@
     }
     .bg-dashboard-stat-green {
         background-color: oklch(var(--dashboard-stat-green));
-    }
-    .bg-status-success {
-        background-color: oklch(var(--status-success));
-    }
-    .text-status-success-foreground {
-        color: oklch(var(--status-success-foreground));
-    }
-    .bg-status-warning {
-        background-color: oklch(var(--status-warning));
-    }
-    .text-status-warning-foreground {
-        color: oklch(var(--status-warning-foreground));
-    }
-    .bg-status-danger {
-        background-color: oklch(var(--status-danger));
-    }
-    .text-status-danger-foreground {
-        color: oklch(var(--status-danger-foreground));
-    }
-    .bg-status-neutral {
-        background-color: oklch(var(--status-neutral));
-    }
-    .text-status-neutral-foreground {
-        color: oklch(var(--status-neutral-foreground));
     }
 }

@@ -104,8 +104,11 @@ export default function TerritoryProfile() {
     setIsDeleteCheckoutDialogOpen(true);
   };
 
-  const handleEditCheckoutSuccess = () => {
-    setSelectedCheckoutRecord(null);
+  const handleEditCheckoutModalChange = (open: boolean) => {
+    setIsEditCheckoutModalOpen(open);
+    if (!open) {
+      setSelectedCheckoutRecord(null);
+    }
   };
 
   const handleMarkReturnedClick = async () => {
@@ -304,14 +307,15 @@ export default function TerritoryProfile() {
         territoryId={territoryId}
       />
 
-      {/* Edit Checkout Record Modal */}
-      <EditCheckoutRecordModal
-        open={isEditCheckoutModalOpen}
-        onOpenChange={setIsEditCheckoutModalOpen}
-        territoryId={territoryId}
-        record={selectedCheckoutRecord}
-        onSuccess={handleEditCheckoutSuccess}
-      />
+      {/* Edit Checkout Record Modal - only render when record is selected */}
+      {selectedCheckoutRecord && (
+        <EditCheckoutRecordModal
+          open={isEditCheckoutModalOpen}
+          onOpenChange={handleEditCheckoutModalChange}
+          territoryId={territoryId}
+          record={selectedCheckoutRecord}
+        />
+      )}
 
       {/* Delete Checkout Record Dialog */}
       <DeleteCheckoutRecordDialog

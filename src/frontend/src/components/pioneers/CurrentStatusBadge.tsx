@@ -11,7 +11,7 @@ export default function CurrentStatusBadge({ pioneerId, serviceYear }: CurrentSt
 
   if (isLoading) {
     return (
-      <Badge variant="secondary" className="bg-status-neutral text-status-neutral-foreground">
+      <Badge variant="secondary" className="bg-gray-200 text-gray-600">
         Loading...
       </Badge>
     );
@@ -20,7 +20,7 @@ export default function CurrentStatusBadge({ pioneerId, serviceYear }: CurrentSt
   // No entries case
   if (monthlyHours.length === 0) {
     return (
-      <Badge variant="secondary" className="bg-status-neutral text-status-neutral-foreground hover:bg-status-neutral/90">
+      <Badge variant="secondary" className="bg-gray-400 hover:bg-gray-500 text-white">
         No Entries
       </Badge>
     );
@@ -33,7 +33,7 @@ export default function CurrentStatusBadge({ pioneerId, serviceYear }: CurrentSt
   // On Track (average >= 50)
   if (average >= 50) {
     return (
-      <Badge className="bg-status-success text-status-success-foreground hover:bg-status-success/90">
+      <Badge className="bg-green-600 hover:bg-green-700">
         On Track
       </Badge>
     );

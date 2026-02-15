@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-replace-the-app-s-existing-primary-branding-color-43587a-with-the-new-palette-by-updating-the-global-theme-color-variables-so-that-primary-003057-navy-blue-secondary-5b8fa3-slate-blue-accent-f4a82e-gold-yellow-text-on-dark-backgrounds-ffffff-white-neutral-gray-a8a9ad-light-gray-this-must-be-applied-via-the-project-s-existing-tailwind-oklch-css-variable-approach-not-inline-per-component-hex-colors",
-      "featureTitle": "Replace the app’s existing primary branding color (#43587A) with the new palette by updating the global theme/color variables so that:\n- Primary = #003057 (navy blue)\n- Secondary = #5B8FA3 (slate blue)\n- Accent = #F4A82E (gold/yellow)\n- Text on dark backgrounds = #FFFFFF (white)\n- Neutral gray = #A8A9AD (light gray)\nThis must be applied via the project’s existing Tailwind/OKLCH CSS variable approach (not inline per-component hex colors).",
+      "featureId": "feature-create-a-single-shared-privilege-badge-styling-implementation-for-the-elder-and-ministerial-servant-badges-and-use-it-everywhere-these-privilege-badges-are-rendered-in-the-ui-so-the-styling-is-consistent-across-pages",
+      "featureTitle": "Create a single, shared privilege badge styling implementation for the \"Elder\" and \"Ministerial Servant\" badges, and use it everywhere these privilege badges are rendered in the UI so the styling is consistent across pages.",
       "files": [
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
+        "frontend/src/components/publishers/PrivilegeBadge.tsx",
+        "frontend/src/pages/FieldServiceGroupProfile.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -22,10 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-header-navigation-styling-so-the-header-background-uses-the-new-primary-navy-003057-and-all-header-text-icons-maintain-readable-contrast-white-on-navy-where-applicable-while-keeping-the-header-layout-and-behavior-unchanged",
-      "featureTitle": "Update the header/navigation styling so the header background uses the new primary navy (#003057) and all header text/icons maintain readable contrast (white on navy where applicable), while keeping the header layout and behavior unchanged.",
+      "featureId": "feature-update-elder-and-ministerial-servant-badge-background-colors-everywhere-they-appear-elder-must-use-7c3aed-and-ministerial-servant-must-use-2563eb-badge-text-must-remain-white-do-not-introduce-dark-mode-variants-for-these-badges",
+      "featureTitle": "Update Elder and Ministerial Servant badge background colors everywhere they appear: Elder must use #7C3AED and Ministerial Servant must use #2563EB; badge text must remain white; do not introduce dark-mode variants for these badges.",
       "files": [
-        "frontend/src/components/layout/Header.tsx"
+        "frontend/src/components/publishers/PrivilegeBadge.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -41,11 +41,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-sidebar-active-navigation-item-colors-so-the-active-item-background-is-the-new-primary-navy-003057-and-active-text-icon-color-remains-readable-white-on-navy-without-changing-sidebar-layout-or-navigation-behavior",
-      "featureTitle": "Update the sidebar active navigation item colors so the active item background is the new primary navy (#003057) and active text/icon color remains readable (white on navy), without changing sidebar layout or navigation behavior.",
+      "featureId": "feature-ensure-that-only-the-elder-and-ministerial-servant-privilege-badges-change-color-all-other-badges-e-g-available-checked-out-on-track-behind-overseer-assistant-inactive-etc-must-retain-their-current-colors-and-styling",
+      "featureTitle": "Ensure that only the Elder and Ministerial Servant privilege badges change color; all other badges (e.g., Available, Checked Out, On Track, Behind, Overseer, Assistant, Inactive, etc.) must retain their current colors and styling.",
       "files": [
-        "frontend/src/components/layout/Sidebar.tsx",
-        "frontend/src/index.css"
+        "frontend/src/pages/FieldServiceGroupProfile.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -57,88 +56,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-primary-buttons-throughout-the-app-so-their-primary-styling-e-g-main-action-buttons-such-as-add-publisher-record-visit-etc-uses-the-new-primary-navy-003057-with-hover-focus-active-states-using-complementary-shades-aligned-to-the-new-palette-including-using-5b8fa3-where-appropriate-while-preserving-all-existing-button-sizes-variants-and-behavior",
-      "featureTitle": "Update primary buttons throughout the app so their primary styling (e.g., main action buttons such as “Add Publisher”, “Record Visit”, etc.) uses the new primary navy (#003057), with hover/focus/active states using complementary shades aligned to the new palette (including using #5B8FA3 where appropriate), while preserving all existing button sizes, variants, and behavior.",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/Login.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-dashboard-stat-card-colors-to-use-a-combination-of-the-new-navy-003057-slate-5b8fa3-and-gold-f4a82e-while-preserving-the-existing-stat-card-layout-typography-and-interactions-including-hover-effects-keep-existing-non-stat-alert-colors-e-g-overdue-red-orange-functionally-consistent-but-harmonize-with-the-new-palette-where-those-colors-are-controlled-by-theme-variables",
-      "featureTitle": "Update the Dashboard stat card colors to use a combination of the new navy (#003057), slate (#5B8FA3), and gold (#F4A82E) while preserving the existing stat card layout, typography, and interactions (including hover effects). Keep existing non-stat alert colors (e.g., overdue red/orange) functionally consistent but harmonize with the new palette where those colors are controlled by theme variables.",
-      "files": [
-        "frontend/src/index.css"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-adjust-status-badge-color-shades-green-red-orange-across-the-app-to-better-complement-the-new-navy-slate-gold-palette-while-keeping-the-same-semantic-meanings-e-g-success-on-track-stays-green-destructive-behind-stays-red-warning-stays-orange-and-ensuring-readable-contrast-between-badge-text-and-badge-backgrounds",
-      "featureTitle": "Adjust status badge color shades (green/red/orange) across the app to better complement the new navy/slate/gold palette while keeping the same semantic meanings (e.g., success/on-track stays green, destructive/behind stays red, warning stays orange) and ensuring readable contrast between badge text and badge backgrounds.",
-      "files": [
-        "frontend/src/components/pioneers/CurrentStatusBadge.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/PublicWitnessing.tsx",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-verify-and-enforce-readable-contrast-across-the-updated-palette-in-both-light-and-dark-themes-by-updating-theme-foreground-foreground-on-color-variables-e-g-primary-foreground-secondary-foreground-accent-foreground-muted-foreground-and-any-brand-specific-foreground-usage-so-that-text-icons-are-legible-on-their-respective-backgrounds",
-      "featureTitle": "Verify and enforce readable contrast across the updated palette in both light and dark themes by updating theme foreground/foreground-on-color variables (e.g., primary-foreground, secondary-foreground, accent-foreground, muted-foreground, and any brand-specific foreground usage) so that text/icons are legible on their respective backgrounds.",
-      "files": [
-        "frontend/src/components/layout/Header.tsx",
-        "frontend/src/components/layout/Sidebar.tsx",
-        "frontend/src/index.css"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
       ],
       "confidence": "high"
     }
