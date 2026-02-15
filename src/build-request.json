@@ -1,53 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Update privilege badge background colors for Elder and Ministerial Servant",
+  "title": "Darken Field Service Group 3 green and align Publisher table Overseer/Assistant badges",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the PRIVILEGE badges (the small badges shown next to publisher names) so that the \"Elder\" badge background color is Amethyst Purple (#7C3AED) and the \"Ministerial Servant\" badge background color is Sapphire Blue (#2563EB), while keeping all other badge styling exactly the same (padding, border radius, font weight, size, etc.).",
+      "text": "Update the centralized Field Service Group color mapping so Group 3 uses the darker green hex color #0B6623, and ensure this new color is reflected everywhere Field Service Group colors are consumed (including Field Service Groups main page colored bars/group text/icons and Field Service Group profile pages heading text/colored bars/Record Visit button).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "I'm updating the PRIVILEGE badges for Elders and Ministerial Servants:\n\n1. Elder privilege badge: Change to Amethyst Purple #7C3AED\n2. Ministerial Servant privilege badge: Change to Sapphire Blue #2563EB\n\nThese are the small badges that appear next to publisher names showing their privileges (like \"Elder\" or \"Ministerial Servant\" tags).\n\nKeep all styling (padding, border radius, font weight) exactly the same - only change the background colors."
+          "Change Group 3 (Green) to a darker shade: - #0B6623 (Dark Green)\n\nUpdate these colors everywhere they appear:\n   - Field Service Groups main page (colored bars, group text, icons)\n   - Group profile pages (heading text, colored bars, Record Visit button)"
         ]
       },
       "acceptanceCriteria": [
-        "Wherever an \"Elder\" privilege badge is rendered next to a publisher name, its background color is exactly #7C3AED.",
-        "Wherever a \"Ministerial Servant\" privilege badge is rendered next to a publisher name, its background color is exactly #2563EB.",
-        "No changes are made to badge padding, border radius, font weight, text size, or any other styling besides background color.",
-        "Changes apply across the app anywhere these privilege badges appear (including the publishers list shown on Field Service Group profile pages)."
+        "In frontend/src/utils/fieldServiceGroupColors.ts, Group 3 color is exactly '#0B6623' (hex) and other group colors remain unchanged.",
+        "On the Field Service Groups main page, Group 3’s top bar, group label text, and icon render using #0B6623.",
+        "On the Field Service Group profile page for Group 3, the page heading, the group leadership colored section, and the Record Visit button use #0B6623.",
+        "No other styling or behavior changes occur outside of Group 3’s color update."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Ensure the Field Service Group leadership role badges (\"Overseer\" and \"Assistant\") remain exactly as they are and are not modified as part of this change.",
+      "text": "On the Publishers page table, update the Overseer and Assistant badges so their styling (background + text + hover behavior) matches the badge styling used for Overseer and Assistant on the Field Service Group profile page.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "The Overseer and Assistant badges (for field service groups) should stay exactly as they are - don't change those."
+          "Update the Overseer and Assistant badge on the Publisher page in the table so that it looks similar to the the color the badges have in the Field Service Groups profile page."
         ]
       },
       "acceptanceCriteria": [
-        "Existing \"Overseer\" and \"Assistant\" badges keep their current colors and styling with no visual or code changes made specifically to them while implementing the privilege badge color updates."
+        "In the Publishers table rows, the Overseer badge uses the same Tailwind classes as the Field Service Group profile’s Overseer badge (currently black background with white text, including matching hover styling).",
+        "In the Publishers table rows, the Assistant badge uses the same Tailwind classes as the Field Service Group profile’s Assistant badge (currently gray background with white text, including matching hover styling).",
+        "Badge text remains 'Overseer' and 'Assistant' and appears only when the corresponding boolean flags are true.",
+        "No other Publisher table styling, sorting, filtering, or CRUD behavior is changed."
       ]
     }
   ],
   "constraints": [
-    "Do not change Overseer and Assistant badges anywhere in the app.",
-    "Do not change any badge styling other than the Elder/Ministerial Servant privilege badge background colors (no changes to padding, border radius, font weight, size, etc.).",
-    "Do not edit any files under frontend/src/components/ui (immutable UI components must be used as-is)."
+    "Keep everything else unchanged outside the specified color/badge styling updates.",
+    "Do not edit files under frontend/src/components/ui (compose existing components instead).",
+    "Do not change backend behavior or data models for this request."
   ],
   "nonGoals": [
-    "Do not change the text labels for any badges.",
-    "Do not change how privileges are determined or stored (no backend privilege logic changes).",
-    "Do not update Field Service Group pages to add new badges or new UI elements beyond the color changes requested."
+    "Changing Group 1, Group 2, or Group 4 colors.",
+    "Redesigning the Field Service Groups pages or Publishers page beyond the specified color/badge adjustments.",
+    "Changing privilege badge colors for Elder/Ministerial Servant (only Overseer/Assistant badges on the Publishers table are in scope)."
   ],
   "imageRequirements": {
     "required": [],

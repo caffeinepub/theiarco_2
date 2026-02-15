@@ -1,49 +1,41 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:28:06.001Z",
-  "summary": "Diff adds a new utility to map privilege names to Tailwind class overrides and wires it into FieldServiceGroupProfile, but the evidence does not show app-wide adoption. The utility also adds non-background styling changes (text color and hover styles), which conflicts with the constraint to change only background colors.",
+  "generatedAt": "2026-02-15T04:18:12.578Z",
+  "summary": "REQ-1 (Group 3 color mapping) is implemented in the centralized color map. Evidence for REQ-2 (Publisher table Overseer/Assistant badge class alignment) is inconclusive from the provided truncated diff, and there are indications of additional Publishers page theming changes beyond the requested badge styling update.",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Apply the Elder (#7C3AED) and Ministerial Servant (#2563EB) privilege badge background color changes across the app anywhere privilege badges are rendered (including publishers lists on Field Service Group profile pages).",
-      "reason": "The diff only shows usage/import in FieldServiceGroupProfile; no evidence of updating other pages/components where privilege badges may be rendered (e.g., publishers list page, publisher profile, other lists).",
+      "id": "REQ-2",
+      "requirement": "On the Publishers page table, update the Overseer and Assistant badges so their styling (background + text + hover behavior) matches the badge styling used for Overseer and Assistant on the Field Service Group profile page.",
+      "reason": "The diff snippet for frontend/src/pages/Publishers.tsx is truncated before any badge rendering/classes are shown, so the required Tailwind class alignment and hover behavior changes cannot be verified from the provided evidence.",
       "evidence": [
-        "frontend/src/pages/FieldServiceGroupProfile.tsx",
-        "frontend/src/utils/privilegeBadges.ts"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "Keep all other badge styling exactly the same (no changes besides background color: padding, border radius, font weight, size, etc.).",
-      "reason": "The new className overrides include `text-white` and `hover:bg[...]` which change non-background styling/behavior beyond just the background color.",
-      "evidence": [
-        "frontend/src/utils/privilegeBadges.ts"
+        "frontend/src/pages/Publishers.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Privilege badge overrides also force white text (`text-white`) and add hover background classes (`hover:bg[...]`).",
-      "reason": "BuildRequest only asked to change the Elder/Ministerial Servant badge background colors and explicitly disallowed other styling changes.",
+      "description": "Additional Publishers page theming/table header changes (e.g., themed primary button, themed table header row) beyond the requested Overseer/Assistant badge styling update.",
+      "reason": "BuildRequest REQ-2 only asks to align Overseer/Assistant badge styling in the Publishers table. The diff shows new theming-related imports and (per file summary) themed header/button behavior, which is outside the specified badge-only scope.",
       "evidence": [
-        "frontend/src/utils/privilegeBadges.ts"
+        "frontend/src/pages/Publishers.tsx (truncated)",
+        "frontend-file-summaries.txt (truncated)"
       ]
     },
     {
-      "description": "Project metadata/state updates unrelated to badge color change (e.g., adding new_feature_requests entries marked pending).",
-      "reason": "BuildRequest did not request changes to project tracking files/metadata.",
+      "description": "Updates to project tracking/metadata files (project_state.json and frontend-file-summaries.txt).",
+      "reason": "The BuildRequest did not request changes to repository metadata/status summary files; these are ancillary changes not required to satisfy REQ-1/REQ-2.",
       "evidence": [
         "project_state.json",
-        "frontend-file-summaries.txt"
+        "frontend-file-summaries.txt (truncated)"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.64,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/FieldServiceGroupProfile.tsx",
-    "frontend/src/utils/privilegeBadges.ts",
+    "frontend/src/pages/Publishers.tsx",
+    "frontend/src/utils/fieldServiceGroupColors.ts",
     "project_state.json"
   ]
 }

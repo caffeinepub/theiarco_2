@@ -1,41 +1,39 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update privilege badge background colors for Elder and Ministerial Servant",
+  "title": "Update Group 3 color mapping and align Publisher table Overseer/Assistant badges",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Change only the background colors for the \"Elder\" and \"Ministerial Servant\" privilege badges everywhere they are rendered next to publisher names, keeping all other badge styling unchanged.",
+      "summary": "Change Field Service Group 3 to use darker green #0B6623 in the centralized color map so all consuming UI reflects the new color.",
       "acceptanceCriteria": [
-        "Wherever an \"Elder\" privilege badge is rendered next to a publisher name, its background color is exactly #7C3AED.",
-        "Wherever a \"Ministerial Servant\" privilege badge is rendered next to a publisher name, its background color is exactly #2563EB.",
-        "No changes are made to badge padding, border radius, font weight, text size, or any other styling besides background color.",
-        "Changes apply across the app anywhere these privilege badges appear (including the publishers list shown on Field Service Group profile pages)."
+        "In frontend/src/utils/fieldServiceGroupColors.ts, Group 3 color is exactly '#0B6623' (hex) and other group colors remain unchanged.",
+        "On the Field Service Groups main page, Group 3’s top bar, group label text, and icon render using #0B6623.",
+        "On the Field Service Group profile page for Group 3, the page heading, the group leadership colored section, and the Record Visit button use #0B6623.",
+        "No other styling or behavior changes occur outside of Group 3’s color update."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/privilegeBadges.ts",
-          "operation": "create",
-          "description": "Add a small helper that returns Tailwind class overrides for PRIVILEGE badges, mapping \"Elder\" to background #7C3AED and \"Ministerial Servant\" to background #2563EB (including matching hover background), without changing any other styling. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
+          "path": "frontend/src/utils/fieldServiceGroupColors.ts",
           "operation": "modify",
-          "description": "Update privilege badge rendering to apply the new Elder/Ministerial Servant background colors via a shared helper, while keeping all other Badge props and styling the same. Ensure only privilege badges change (not layout, spacing, typography, padding, radius, etc.). Verify the component's usage instructions before implementing."
+          "description": "Update the Group 3 entry in FIELD_SERVICE_GROUP_COLORS from '#059669' to exactly '#0B6623' so all pages using getGroupColor (Field Service Groups list + Field Service Group profile UI elements) automatically reflect the darker green."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Ensure the Field Service Group leadership role badges (\"Overseer\" and \"Assistant\") are not changed while implementing privilege badge color updates.",
+      "summary": "Make the Publishers table Overseer/Assistant badges use the same Tailwind styling (including hover) as the Field Service Group profile page badges.",
       "acceptanceCriteria": [
-        "Existing \"Overseer\" and \"Assistant\" badges keep their current colors and styling with no visual or code changes made specifically to them while implementing the privilege badge color updates."
+        "In the Publishers table rows, the Overseer badge uses the same Tailwind classes as the Field Service Group profile’s Overseer badge (currently black background with white text, including matching hover styling).",
+        "In the Publishers table rows, the Assistant badge uses the same Tailwind classes as the Field Service Group profile’s Assistant badge (currently gray background with white text, including matching hover styling).",
+        "Badge text remains 'Overseer' and 'Assistant' and appears only when the corresponding boolean flags are true.",
+        "No other Publisher table styling, sorting, filtering, or CRUD behavior is changed."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
+          "path": "frontend/src/pages/Publishers.tsx",
           "operation": "modify",
-          "description": "Keep the current Overseer (black) and Assistant (gray) badge className styling untouched and ensure any refactor applies the new colors only to the \"Elder\" and \"Ministerial Servant\" privilege badges. Verify the component's usage instructions before implementing."
+          "description": "Update the conditional Overseer/Assistant <Badge> components in the Name column to match FieldServiceGroupProfile styling: Overseer uses 'bg-black text-white hover:bg-black' and Assistant uses 'bg-gray-500 text-white hover:bg-gray-500' (retain existing conditional rendering and keep other table behavior unchanged)."
         }
       ]
     }

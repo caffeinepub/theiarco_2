@@ -2,11 +2,10 @@ import { Link, useRouterState } from '@tanstack/react-router';
 import { useGetAllPublishers } from '../hooks/useQueries';
 import { Users } from 'lucide-react';
 import type { Publisher } from '../backend';
-import { getPageThemeColor } from '@/theme/pageTheme';
+import { getGroupColor } from '@/utils/fieldServiceGroupColors';
 
 export default function FieldServiceGroups() {
   const routerState = useRouterState();
-  const themeColor = getPageThemeColor(routerState.location.pathname);
   
   const { data: publishers = [], isLoading } = useGetAllPublishers();
 
@@ -56,52 +55,61 @@ export default function FieldServiceGroups() {
           const overseer = getOverseer(groupNumber);
           const assistant = getAssistant(groupNumber);
           const groupPublishers = getGroupPublishers(groupNumber);
+          const groupColor = getGroupColor(groupNumber);
 
           return (
             <Link
               key={groupNumber}
               to="/field-service-groups/$groupNumber"
               params={{ groupNumber: groupNumber.toString() }}
-              className="block border rounded-lg p-6 bg-card space-y-4 hover:bg-accent/50 transition-colors cursor-pointer"
+              className="block border rounded-lg bg-card hover:bg-accent/50 transition-colors cursor-pointer overflow-hidden"
             >
-              <h2 className="text-2xl font-semibold text-foreground flex items-center gap-2">
-                <Users className="h-6 w-6" style={{ color: themeColor }} />
-                Group {groupNumber}
-              </h2>
+              {/* Top colored bar */}
+              <div className="h-1.5 w-full" style={{ backgroundColor: groupColor }} />
+              
+              {/* Card content */}
+              <div className="p-6 space-y-4">
+                <h2 className="text-2xl font-semibold flex items-center gap-2">
+                  <Users className="h-6 w-6" style={{ color: groupColor }} />
+                  <span style={{ color: groupColor }}>
+                    Group {groupNumber}
+                  </span>
+                </h2>
 
-              <div className="space-y-2">
-                <div>
-                  <span className="font-medium text-foreground">Overseer: </span>
-                  {overseer ? (
-                    <span className="text-foreground">{overseer.fullName}</span>
-                  ) : (
-                    <span className="text-muted-foreground">No overseer assigned</span>
-                  )}
+                <div className="space-y-2">
+                  <div>
+                    <span className="font-medium text-foreground">Overseer: </span>
+                    {overseer ? (
+                      <span className="text-foreground">{overseer.fullName}</span>
+                    ) : (
+                      <span className="text-muted-foreground">No overseer assigned</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <span className="font-medium text-foreground">Assistant: </span>
+                    {assistant ? (
+                      <span className="text-foreground">{assistant.fullName}</span>
+                    ) : (
+                      <span className="text-muted-foreground">No assistant assigned</span>
+                    )}
+                  </div>
                 </div>
 
                 <div>
-                  <span className="font-medium text-foreground">Assistant: </span>
-                  {assistant ? (
-                    <span className="text-foreground">{assistant.fullName}</span>
+                  <h3 className="font-medium text-foreground mb-2">Publishers:</h3>
+                  {groupPublishers.length > 0 ? (
+                    <ul className="space-y-1 ml-4">
+                      {groupPublishers.map((publisher) => (
+                        <li key={publisher.id.toString()} className="text-foreground">
+                          • {publisher.fullName}
+                        </li>
+                      ))}
+                    </ul>
                   ) : (
-                    <span className="text-muted-foreground">No assistant assigned</span>
+                    <p className="text-muted-foreground ml-4">No active publishers in this group</p>
                   )}
                 </div>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Publishers:</h3>
-                {groupPublishers.length > 0 ? (
-                  <ul className="space-y-1 ml-4">
-                    {groupPublishers.map((publisher) => (
-                      <li key={publisher.id.toString()} className="text-foreground">
-                        • {publisher.fullName}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-muted-foreground ml-4">No active publishers in this group</p>
-                )}
               </div>
             </Link>
           );

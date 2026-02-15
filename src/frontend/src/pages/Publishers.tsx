@@ -332,12 +332,12 @@ export default function Publishers() {
                         {publisher.fullName}
                       </button>
                       {publisher.isGroupOverseer && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge className="text-xs bg-black text-white hover:bg-black">
                           Overseer
                         </Badge>
                       )}
                       {publisher.isGroupAssistant && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge className="text-xs bg-gray-500 text-white hover:bg-gray-500">
                           Assistant
                         </Badge>
                       )}
