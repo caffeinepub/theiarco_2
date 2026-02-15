@@ -1,109 +1,60 @@
 {
   "kind": "build_request",
-  "title": "Update Elder and Ministerial Servant privilege badge colors app-wide",
+  "title": "Fix Territories checked-out duration calculation and enforce checkout timestamps in seconds",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Create a single, shared privilege badge styling implementation for the \"Elder\" and \"Ministerial Servant\" badges, and use it everywhere these privilege badges are rendered in the UI so the styling is consistent across pages.",
+      "text": "Fix the \"Checked Out Duration\" calculation on the Territories page so it correctly computes the duration between the current (not-returned) checkout date and today using backend timestamps in seconds (with defensive handling for legacy nanoseconds/incorrect milliseconds values). Display the duration in whole months (\"1 month\", \"3 months\") when the duration is at least 1 month; otherwise display whole days (\"15 days\").",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-9"
         ],
         "quotes": [
-          "The Elder and Ministerial Servant badges are displayed throughout multiple pages, but they should all use consistent styling. Update them wherever they appear - likely they share the same styling logic or component."
+          "Fix the checkout duration calculation on the Territories page:\n\n1. The \"Checked Out Duration\" column is showing incorrect durations (like \"673 months\" instead of the actual duration).\n\n3. Fix the calculation to properly compute the duration between the checkout date and today's date:\n   - Convert the checkout date from the backend (timestamp in seconds) to a JavaScript Date\n   - Calculate the difference between today and the checkout date\n   - Display in months (e.g., \"3 months\", \"1 month\")\n   - If less than a month, show in days (e.g., \"15 days\")\n\n5. Use the same date calculation pattern that was working before the date picker was added.\n\nKeep everything else unchanged."
         ]
       },
       "acceptanceCriteria": [
-        "There is a single shared implementation (e.g., a dedicated component or shared helper) responsible for styling/rendering the Elder and Ministerial Servant privilege badges.",
-        "All locations that render Elder/Ministerial Servant as colored pill/rectangle badges are updated to use the shared implementation rather than duplicating ad-hoc styling.",
-        "The updated badges remain the same size/shape/typography as before (only background color changes for these two badges)."
+        "On frontend/src/pages/Territories.tsx, the duration calculation must not divide a seconds timestamp by 1_000_000 (nanoseconds conversion) when the value is in seconds.",
+        "If the backend timestamp appears to be in nanoseconds or milliseconds (legacy/incorrect), the duration calculation must normalize it to a correct JavaScript Date in milliseconds using the same defensive pattern used elsewhere in the app (e.g., similar to formatCheckoutDate / CSV date handling).",
+        "For a territory currently checked out (latest record with no dateReturned), the UI displays: \"1 month\" for durations from 1 month to <2 months, \"N months\" for N>=2, and \"N days\" for durations <1 month.",
+        "The \"Checked Out Duration\" column sort for the duration column still works and sorts by the same underlying duration value used for display.",
+        "All other Territories page behaviors (layout, columns, overdue highlighting threshold logic, navigation, CRUD actions) remain unchanged except for the duration text and its underlying calculation."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update Elder and Ministerial Servant badge background colors everywhere they appear: Elder must use #7C3AED and Ministerial Servant must use #2563EB; badge text must remain white; do not introduce dark-mode variants for these badges.",
-      "target": "frontend",
+      "text": "Ensure checkout dates are saved and returned as timestamps in seconds (not milliseconds and not nanoseconds) for territory checkout records created/updated via the Check Out Territory and Edit Checkout Record flows.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-user-0",
-          "msg-user-1"
+          "msg-9"
         ],
         "quotes": [
-          "Change Elder badge color to Amethyst Purple (#7C3AED).",
-          "Change Ministerial Servant badge color to Sapphire Blue (#2563EB).",
-          "Keep the badge text white for good contrast.",
-          "No dark mode variants - just use the colors I specified (#7C3AED for Elder, #2563EB for Ministerial Servant) everywhere these badges appear."
+          "4. Make sure the checkout date is being saved correctly as a timestamp in seconds (not milliseconds, not a different format)."
         ]
       },
       "acceptanceCriteria": [
-        "Every \"Elder\" privilege badge renders with background color #7C3AED and white text.",
-        "Every \"Ministerial Servant\" privilege badge renders with background color #2563EB and white text.",
-        "No separate/different colors are applied for dark mode for these two badges (they use the same colors in all themes).",
-        "Hover/focus states (if any) do not change the background away from the specified colors in a noticeable way (i.e., remain effectively the same specified color)."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Ensure that only the Elder and Ministerial Servant privilege badges change color; all other badges (e.g., Available, Checked Out, On Track, Behind, Overseer, Assistant, Inactive, etc.) must retain their current colors and styling.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-1"
-        ],
-        "quotes": [
-          "Yes, these new colors apply ONLY to Elder and Ministerial Servant badges. All other badges (like Available, Checked Out, On Track, etc.) should stay the same colors they currently are."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Badges unrelated to Elder/Ministerial Servant privileges are visually unchanged compared to current behavior.",
-        "Status badges such as \"On Track\"/\"Behind\" and role badges such as \"Overseer\"/\"Assistant\" remain as they are today (colors and variants unchanged)."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Apply the updated Elder/Ministerial Servant badge styling in all the known pages where they appear (Publishers page table, Publisher profile page, Field Service Groups page publisher lists, Field Service Group profile page publisher lists, Pioneers page table) and any other UI location that displays these privilege badges next to publisher names.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-user-0",
-          "msg-user-1"
-        ],
-        "quotes": [
-          "Update these badges everywhere they appear:\n   - Publishers page table\n   - Publisher profile page\n   - Field Service Groups page (publisher lists)\n   - Field Service Group profile page (publisher lists)\n   - Pioneers page table\n   - Any other location where privilege badges are displayed",
-          "The badges appear as small colored pills/rectangles with white text showing \"Elder\" or \"Ministerial Servant\" next to publisher names."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Where the app currently displays an Elder badge next to a publisher name on any page, it uses #7C3AED with white text.",
-        "Where the app currently displays a Ministerial Servant badge next to a publisher name on any page, it uses #2563EB with white text.",
-        "If any of the listed pages do not currently show privilege badges next to names, no new product behavior is introduced beyond ensuring any existing Elder/Ministerial Servant badge instances are updated wherever present."
+        "When checking out a territory via frontend/src/components/territories/CheckOutTerritoryModal.tsx, the value sent to the backend remains a seconds-since-epoch timestamp (BigInt seconds).",
+        "Backend territory checkout persistence (backend/main.mo checkOutTerritory) must store dateCheckedOut in seconds; if the backend receives an input that looks like milliseconds or nanoseconds, it must be normalized to seconds before storing.",
+        "Backend checkout record update persistence (backend/main.mo updateCheckoutRecord) must store newDateCheckedOut/newDateReturned in seconds; if the backend receives inputs that look like milliseconds or nanoseconds, they must be normalized to seconds before storing.",
+        "After creating a new checkout with the date picker, the stored dateCheckedOut value is consistent with seconds (e.g., ~10-digit epoch seconds), and the Territories page duration output matches real time elapsed (no extreme values like hundreds of months)."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/components/ui (shadcn UI sources are read-only); compose them by wrapping/using them from non-immutable paths.",
-    "Do not change backend/Motoko logic or data models for this request."
+    "Keep everything else unchanged aside from correcting the checkout duration calculation and ensuring territory checkout timestamps are stored in seconds.",
+    "Use English for any user-facing text.",
+    "Frontend immutable paths must not be modified: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Adding new badges or changing which privileges/roles are displayed.",
-    "Changing layout, spacing, or typography of badge elements beyond what is required to apply the two new background colors.",
-    "Changing colors for any non-Elder / non-Ministerial Servant badges.",
-    "Implementing dark mode variants for Elder/Ministerial Servant badge colors."
+    "Do not redesign the Territories page UI or change table columns beyond the corrected duration text formatting.",
+    "Do not introduce new authentication methods or third-party integrations.",
+    "Do not migrate or rewrite unrelated timestamp formatting utilities beyond what is necessary to fix the Territories duration and territory checkout timestamp storage."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

@@ -1,71 +1,63 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T23:58:06.068Z",
+  "generatedAt": "2026-02-14T18:36:21.771Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Create a single, shared privilege badge styling implementation for the \"Elder\" and \"Ministerial Servant\" badges, and use it everywhere these privilege badges are rendered in the UI so the styling is consistent across pages.",
+        "summary": "Fix the \"Checked Out Duration\" calculation on the Territories page so it correctly computes the duration between the current (not-returned) checkout date and today using backend timestamps in seconds (with defensive handling for legacy nanoseconds/incorrect milliseconds values). Display the duration in whole months (\"1 month\", \"3 months\") when the duration is at least 1 month; otherwise display whole days (\"15 days\").",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/publishers/PrivilegeBadge.tsx",
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+          "frontend/src/utils/territoryTime.ts",
+          "frontend/src/pages/Territories.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/publishers/PrivilegeBadge.tsx",
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+          "frontend/src/utils/territoryTime.ts",
+          "frontend/src/pages/Territories.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Update Elder and Ministerial Servant badge background colors everywhere they appear: Elder must use #7C3AED and Ministerial Servant must use #2563EB; badge text must remain white; do not introduce dark-mode variants for these badges.",
+        "summary": "Ensure checkout dates are saved and returned as timestamps in seconds (not milliseconds and not nanoseconds) for territory checkout records created/updated via the Check Out Territory and Edit Checkout Record flows.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/publishers/PrivilegeBadge.tsx"
+          "frontend/src/utils/territoryTime.ts",
+          "frontend/src/components/territories/CheckOutTerritoryModal.tsx",
+          "frontend/src/components/territories/EditCheckoutRecordModal.tsx",
+          "frontend/src/hooks/useCheckOutTerritory.ts",
+          "frontend/src/hooks/useUpdateCheckoutRecord.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/publishers/PrivilegeBadge.tsx"
+          "frontend/src/utils/territoryTime.ts",
+          "frontend/src/components/territories/CheckOutTerritoryModal.tsx",
+          "frontend/src/components/territories/EditCheckoutRecordModal.tsx",
+          "frontend/src/hooks/useCheckOutTerritory.ts",
+          "frontend/src/hooks/useUpdateCheckoutRecord.ts"
         ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Ensure that only the Elder and Ministerial Servant privilege badges change color; all other badges (e.g., Available, Checked Out, On Track, Behind, Overseer, Assistant, Inactive, etc.) must retain their current colors and styling.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Apply the updated Elder/Ministerial Servant badge styling in all the known pages where they appear (Publishers page table, Publisher profile page, Field Service Groups page publisher lists, Field Service Group profile page publisher lists, Pioneers page table) and any other UI location that displays these privilege badges next to publisher names.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/pages/Publishers.tsx",
-          "frontend/src/pages/PublisherProfile.tsx",
-          "frontend/src/pages/FieldServiceGroups.tsx",
-          "frontend/src/pages/Pioneers.tsx"
-        ],
-        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/publishers/PrivilegeBadge.tsx",
-    "frontend/src/pages/FieldServiceGroupProfile.tsx",
+    "frontend/src/components/territories/CheckOutTerritoryModal.tsx",
+    "frontend/src/components/territories/EditCheckoutRecordModal.tsx",
+    "frontend/src/hooks/useCheckOutTerritory.ts",
+    "frontend/src/hooks/useUpdateCheckoutRecord.ts",
+    "frontend/src/pages/Territories.tsx",
+    "frontend/src/pages/TerritoryProfile.tsx",
+    "frontend/src/utils/territoryTime.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

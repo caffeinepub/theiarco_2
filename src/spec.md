@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Make Elder and Ministerial Servant privilege badges use consistent, shared styling across the entire UI, with updated background colors.
+**Goal:** Correct the Territories “Checked Out Duration” calculation and ensure territory checkout timestamps are consistently stored/returned in epoch seconds.
 
 **Planned changes:**
-- Create a single shared implementation (component or helper) to render/style the “Elder” and “Ministerial Servant” privilege badges.
-- Update all UI locations that currently render these privilege badges (including Publishers table, Publisher profile, Field Service Groups lists/profile lists, Pioneers table, and any other existing occurrences) to use the shared implementation.
-- Change only the background colors for these two badges app-wide: Elder to #7C3AED and Ministerial Servant to #2563EB, keeping badge text white and keeping size/shape/typography unchanged.
-- Ensure all other badges (statuses/roles like Available, Checked Out, On Track, Behind, Overseer, Assistant, Inactive, etc.) remain visually unchanged and that no dark-mode variants are introduced for these two badges.
+- Update the Territories page duration logic to compute elapsed time from the latest not-returned checkout date to today using backend timestamps in seconds, with defensive normalization for legacy/incorrect millisecond or nanosecond values.
+- Adjust duration display formatting to show whole months when ≥ 1 month (“1 month”, “N months”) and whole days when < 1 month (“N days”), while keeping duration sorting based on the same underlying computed value.
+- Enforce seconds-based timestamps in checkout create/edit flows by ensuring frontend sends seconds and backend normalizes any millisecond/nanosecond-like inputs to seconds before storing for checkOutTerritory and updateCheckoutRecord.
 
-**User-visible outcome:** Wherever an Elder or Ministerial Servant badge appears next to a publisher name, it is consistently styled and uses the new specified colors (Elder #7C3AED, Ministerial Servant #2563EB) with white text, while all other badges look the same as before.
+**User-visible outcome:** The Territories table shows accurate, realistically scaled checked-out durations (days or months), and newly created/edited checkout records no longer produce extreme duration values due to inconsistent timestamp units.

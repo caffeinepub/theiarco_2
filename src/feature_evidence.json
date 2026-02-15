@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-single-shared-privilege-badge-styling-implementation-for-the-elder-and-ministerial-servant-badges-and-use-it-everywhere-these-privilege-badges-are-rendered-in-the-ui-so-the-styling-is-consistent-across-pages",
-      "featureTitle": "Create a single, shared privilege badge styling implementation for the \"Elder\" and \"Ministerial Servant\" badges, and use it everywhere these privilege badges are rendered in the UI so the styling is consistent across pages.",
+      "featureId": "feature-fix-the-checked-out-duration-calculation-on-the-territories-page-so-it-correctly-computes-the-duration-between-the-current-not-returned-checkout-date-and-today-using-backend-timestamps-in-seconds-with-defensive-handling-for-legacy-nanoseconds-incorrect-milliseconds-values-display-the-duration-in-whole-months-1-month-3-months-when-the-duration-is-at-least-1-month-otherwise-display-whole-days-15-days",
+      "featureTitle": "Fix the \"Checked Out Duration\" calculation on the Territories page so it correctly computes the duration between the current (not-returned) checkout date and today using backend timestamps in seconds (with defensive handling for legacy nanoseconds/incorrect milliseconds values). Display the duration in whole months (\"1 month\", \"3 months\") when the duration is at least 1 month; otherwise display whole days (\"15 days\").",
       "files": [
-        "frontend/src/components/publishers/PrivilegeBadge.tsx",
-        "frontend/src/pages/FieldServiceGroupProfile.tsx"
+        "frontend/src/pages/Territories.tsx",
+        "frontend/src/utils/territoryTime.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -22,10 +22,14 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-elder-and-ministerial-servant-badge-background-colors-everywhere-they-appear-elder-must-use-7c3aed-and-ministerial-servant-must-use-2563eb-badge-text-must-remain-white-do-not-introduce-dark-mode-variants-for-these-badges",
-      "featureTitle": "Update Elder and Ministerial Servant badge background colors everywhere they appear: Elder must use #7C3AED and Ministerial Servant must use #2563EB; badge text must remain white; do not introduce dark-mode variants for these badges.",
+      "featureId": "feature-ensure-checkout-dates-are-saved-and-returned-as-timestamps-in-seconds-not-milliseconds-and-not-nanoseconds-for-territory-checkout-records-created-updated-via-the-check-out-territory-and-edit-checkout-record-flows",
+      "featureTitle": "Ensure checkout dates are saved and returned as timestamps in seconds (not milliseconds and not nanoseconds) for territory checkout records created/updated via the Check Out Territory and Edit Checkout Record flows.",
       "files": [
-        "frontend/src/components/publishers/PrivilegeBadge.tsx"
+        "frontend/src/components/territories/CheckOutTerritoryModal.tsx",
+        "frontend/src/components/territories/EditCheckoutRecordModal.tsx",
+        "frontend/src/hooks/useCheckOutTerritory.ts",
+        "frontend/src/hooks/useUpdateCheckoutRecord.ts",
+        "frontend/src/utils/territoryTime.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -37,25 +41,6 @@
       ],
       "testIds": [
         "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-that-only-the-elder-and-ministerial-servant-privilege-badges-change-color-all-other-badges-e-g-available-checked-out-on-track-behind-overseer-assistant-inactive-etc-must-retain-their-current-colors-and-styling",
-      "featureTitle": "Ensure that only the Elder and Ministerial Servant privilege badges change color; all other badges (e.g., Available, Checked Out, On Track, Behind, Overseer, Assistant, Inactive, etc.) must retain their current colors and styling.",
-      "files": [
-        "frontend/src/pages/FieldServiceGroupProfile.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
       ],
       "confidence": "high"
     }

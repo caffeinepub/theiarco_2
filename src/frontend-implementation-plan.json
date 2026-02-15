@@ -1,89 +1,65 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update Elder and Ministerial Servant privilege badge colors app-wide",
+  "title": "Fix Territories checked-out duration calculation and enforce checkout timestamps in seconds",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Introduce a single shared PrivilegeBadge implementation for Elder/Ministerial Servant and replace ad-hoc rendering where these privilege badges appear.",
+      "summary": "Correct the Territories “Checked Out Duration” calculation using backend timestamps in seconds with defensive legacy normalization, and display whole months (>=1) or whole days (<1 month) while preserving sorting and overdue logic.",
       "acceptanceCriteria": [
-        "There is a single shared implementation (e.g., a dedicated component or shared helper) responsible for styling/rendering the Elder and Ministerial Servant privilege badges.",
-        "All locations that render Elder/Ministerial Servant as colored pill/rectangle badges are updated to use the shared implementation rather than duplicating ad-hoc styling.",
-        "The updated badges remain the same size/shape/typography as before (only background color changes for these two badges)."
+        "On frontend/src/pages/Territories.tsx, the duration calculation must not divide a seconds timestamp by 1_000_000 (nanoseconds conversion) when the value is in seconds.",
+        "If the backend timestamp appears to be in nanoseconds or milliseconds (legacy/incorrect), the duration calculation must normalize it to a correct JavaScript Date in milliseconds using the same defensive pattern used elsewhere in the app (e.g., similar to formatCheckoutDate / CSV date handling).",
+        "For a territory currently checked out (latest record with no dateReturned), the UI displays: \"1 month\" for durations from 1 month to <2 months, \"N months\" for N>=2, and \"N days\" for durations <1 month.",
+        "The \"Checked Out Duration\" column sort for the duration column still works and sorts by the same underlying duration value used for display.",
+        "All other Territories page behaviors (layout, columns, overdue highlighting threshold logic, navigation, CRUD actions) remain unchanged except for the duration text and its underlying calculation."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/publishers/PrivilegeBadge.tsx",
+          "path": "frontend/src/utils/territoryTime.ts",
           "operation": "create",
-          "description": "Create a shared PrivilegeBadge component dedicated to rendering the \"Elder\" and \"Ministerial Servant\" privilege badges with consistent styling across the app (compose the existing shadcn Badge component; do not modify any files under frontend/src/components/ui)."
+          "description": "Add a small, shared timestamp normalization utility for territory checkout times that converts backend bigint timestamps to JavaScript milliseconds defensively (handle seconds, legacy milliseconds, and legacy nanoseconds) and provides helpers to derive whole-month and whole-day durations for display/sort consistency."
         },
         {
-          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
+          "path": "frontend/src/pages/Territories.tsx",
           "operation": "modify",
-          "description": "Replace inline/ad-hoc Elder/Ministerial Servant badge rendering with the shared PrivilegeBadge component everywhere these privilege badges are rendered on this page; keep other badge rendering (e.g., Overseer/Assistant/Inactive) as-is."
+          "description": "Replace the current checkout duration logic (which incorrectly divides by 1_000_000) with a defensive conversion from checkout date (seconds by default; normalize ms/ns if detected) to a JS Date, then compute the difference to today. Display whole months when >= 1 month (\"1 month\"/\"N months\"), otherwise whole days (\"N days\"). Keep the same underlying numeric duration value used for both sorting and display, and keep existing overdue highlighting (>=4 months), layout, columns, navigation, and CRUD actions unchanged."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Set Elder badge background to #7C3AED and Ministerial Servant badge background to #2563EB with white text, with no dark-mode variants and no noticeable hover/focus color shifts.",
+      "summary": "Ensure territory checkout create/edit flows consistently send seconds-since-epoch timestamps to the backend, with frontend-side defensive normalization for any accidental ms/ns values before submission.",
       "acceptanceCriteria": [
-        "Every \"Elder\" privilege badge renders with background color #7C3AED and white text.",
-        "Every \"Ministerial Servant\" privilege badge renders with background color #2563EB and white text.",
-        "No separate/different colors are applied for dark mode for these two badges (they use the same colors in all themes).",
-        "Hover/focus states (if any) do not change the background away from the specified colors in a noticeable way (i.e., remain effectively the same specified color)."
+        "When checking out a territory via frontend/src/components/territories/CheckOutTerritoryModal.tsx, the value sent to the backend remains a seconds-since-epoch timestamp (BigInt seconds).",
+        "Backend territory checkout persistence (backend/main.mo checkOutTerritory) must store dateCheckedOut in seconds; if the backend receives an input that looks like milliseconds or nanoseconds, it must be normalized to seconds before storing.",
+        "Backend checkout record update persistence (backend/main.mo updateCheckoutRecord) must store newDateCheckedOut/newDateReturned in seconds; if the backend receives inputs that look like milliseconds or nanoseconds, they must be normalized to seconds before storing.",
+        "After creating a new checkout with the date picker, the stored dateCheckedOut value is consistent with seconds (e.g., ~10-digit epoch seconds), and the Territories page duration output matches real time elapsed (no extreme values like hundreds of months)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/publishers/PrivilegeBadge.tsx",
+          "path": "frontend/src/utils/territoryTime.ts",
           "operation": "modify",
-          "description": "Implement the exact Elder (#7C3AED) and Ministerial Servant (#2563EB) background colors with white text, explicitly overriding dark-mode classes so both themes use identical colors; ensure hover/focus states remain effectively the same specified color by forcing hover/focus background classes to match."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Ensure only Elder and Ministerial Servant privilege badges change color; all other badges remain unchanged.",
-      "acceptanceCriteria": [
-        "Badges unrelated to Elder/Ministerial Servant privileges are visually unchanged compared to current behavior.",
-        "Status badges such as \"On Track\"/\"Behind\" and role badges such as \"Overseer\"/\"Assistant\" remain as they are today (colors and variants unchanged)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
-          "operation": "modify",
-          "description": "Limit usage of the new PrivilegeBadge component to only the \"Elder\" and \"Ministerial Servant\" labels; keep existing Badge variants/classes for other labels (e.g., Overseer, Assistant, Inactive) unchanged to preserve their current colors and styling."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Apply the shared updated privilege badge styling across all known pages/locations where Elder/Ministerial Servant privilege badges are displayed next to publisher names.",
-      "acceptanceCriteria": [
-        "Where the app currently displays an Elder badge next to a publisher name on any page, it uses #7C3AED with white text.",
-        "Where the app currently displays a Ministerial Servant badge next to a publisher name on any page, it uses #2563EB with white text.",
-        "If any of the listed pages do not currently show privilege badges next to names, no new product behavior is introduced beyond ensuring any existing Elder/Ministerial Servant badge instances are updated wherever present."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/Publishers.tsx",
-          "operation": "modify",
-          "description": "Audit this page for any existing Elder/Ministerial Servant pill/rectangle badge rendering next to publisher names; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
+          "description": "Extend the timestamp normalization utility to include a `normalizeToEpochSeconds` helper that ensures any bigint passed (seconds/ms/ns) is normalized to seconds for submission to the backend."
         },
         {
-          "path": "frontend/src/pages/PublisherProfile.tsx",
+          "path": "frontend/src/components/territories/CheckOutTerritoryModal.tsx",
           "operation": "modify",
-          "description": "Audit this page for any existing Elder/Ministerial Servant pill/rectangle badge rendering next to the publisher name/details; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
+          "description": "Ensure the date picker conversion continues to produce seconds-since-epoch (BigInt seconds), and defensively normalize the computed value to seconds using the shared territory timestamp utility before calling the checkout mutation (no UI/layout changes)."
         },
         {
-          "path": "frontend/src/pages/FieldServiceGroups.tsx",
+          "path": "frontend/src/components/territories/EditCheckoutRecordModal.tsx",
           "operation": "modify",
-          "description": "Audit publisher lists on this page for any existing Elder/Ministerial Servant badge rendering next to names; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
+          "description": "Ensure edited checkout/return dates are submitted as seconds-since-epoch (BigInt seconds) by normalizing `newDateCheckedOut` and `newDateReturned` using the shared utility before calling the update mutation; keep existing form behavior and validations unchanged."
         },
         {
-          "path": "frontend/src/pages/Pioneers.tsx",
+          "path": "frontend/src/hooks/useCheckOutTerritory.ts",
           "operation": "modify",
-          "description": "Audit the pioneers table for any existing Elder/Ministerial Servant badge rendering next to publisher names; if present, refactor those instances to use the shared PrivilegeBadge component (do not introduce new badge displays if they do not already exist)."
+          "description": "Add a final defensive normalization step inside the mutation function so `dateCheckedOut` is guaranteed to be epoch seconds before invoking the backend capability, without changing query invalidation behavior."
+        },
+        {
+          "path": "frontend/src/hooks/useUpdateCheckoutRecord.ts",
+          "operation": "modify",
+          "description": "Add a final defensive normalization step inside the mutation function so `newDateCheckedOut` and `newDateReturned` are guaranteed to be epoch seconds before invoking the backend capability, without changing query invalidation behavior."
         }
       ]
     }
