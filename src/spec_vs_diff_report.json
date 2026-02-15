@@ -1,53 +1,49 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:11:04.205Z",
-  "summary": "The diff summary does not provide evidence that Overseer/Assistant badge colors were updated in either specified page. It also shows additional non-requested logic changes in FieldServiceGroupProfile.tsx and updates to project metadata files.",
+  "generatedAt": "2026-02-15T00:28:06.001Z",
+  "summary": "Diff adds a new utility to map privilege names to Tailwind class overrides and wires it into FieldServiceGroupProfile, but the evidence does not show app-wide adoption. The utility also adds non-background styling changes (text color and hover styles), which conflicts with the constraint to change only background colors.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "In frontend/src/pages/FieldServiceGroupProfile.tsx, update only the existing \"Overseer\" and \"Assistant\" badges’ background/text colors (Overseer: black bg + white text; Assistant: gray bg + white text) without changing sizing/styling or other role badge colors.",
-      "reason": "The provided diff excerpt for FieldServiceGroupProfile.tsx is truncated before any badge rendering/styling changes are shown, and no explicit class/color updates for the Overseer/Assistant badges are visible in the excerpt.",
+      "requirement": "Apply the Elder (#7C3AED) and Ministerial Servant (#2563EB) privilege badge background color changes across the app anywhere privilege badges are rendered (including publishers lists on Field Service Group profile pages).",
+      "reason": "The diff only shows usage/import in FieldServiceGroupProfile; no evidence of updating other pages/components where privilege badges may be rendered (e.g., publishers list page, publisher profile, other lists).",
       "evidence": [
-        "frontend/src/pages/FieldServiceGroupProfile.tsx (truncated)"
+        "frontend/src/pages/FieldServiceGroupProfile.tsx",
+        "frontend/src/utils/privilegeBadges.ts"
       ]
     },
     {
-      "id": "REQ-2",
-      "requirement": "In frontend/src/pages/FieldServiceGroups.tsx, update any existing \"Overseer\"/\"Assistant\" badge-like labels to Overseer: black bg + white text and Assistant: gray bg + white text, without other styling changes or new components.",
-      "reason": "FieldServiceGroups.tsx is not shown as modified in the diff summary, and no excerpt demonstrates any styling changes on that page.",
+      "id": "REQ-1",
+      "requirement": "Keep all other badge styling exactly the same (no changes besides background color: padding, border radius, font weight, size, etc.).",
+      "reason": "The new className overrides include `text-white` and `hover:bg[...]` which change non-background styling/behavior beyond just the background color.",
       "evidence": [
-        "File diff summary (Modified files list does not include frontend/src/pages/FieldServiceGroups.tsx)"
+        "frontend/src/utils/privilegeBadges.ts"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added/changed group number validation, additional navigation handlers, memoized sorting/mapping logic, and visit click/edit/delete state management behavior in FieldServiceGroupProfile.tsx beyond simple badge color changes.",
-      "reason": "BuildRequest constraints specify only changing Overseer/Assistant badge background/text colors and not altering other UI/logic; the diff excerpt shows multiple non-style logic additions unrelated to badge colors.",
+      "description": "Privilege badge overrides also force white text (`text-white`) and add hover background classes (`hover:bg[...]`).",
+      "reason": "BuildRequest only asked to change the Elder/Ministerial Servant badge background colors and explicitly disallowed other styling changes.",
       "evidence": [
-        "frontend/src/pages/FieldServiceGroupProfile.tsx (truncated)"
+        "frontend/src/utils/privilegeBadges.ts"
       ]
     },
     {
-      "description": "Updated/added project tracking metadata in project_state.json (new_feature_requests entries AR-1..AR-3 with status pending).",
-      "reason": "The BuildRequest only asks for UI styling changes in two page files and explicitly discourages unrelated changes; modifying project_state.json is not requested.",
+      "description": "Project metadata/state updates unrelated to badge color change (e.g., adding new_feature_requests entries marked pending).",
+      "reason": "BuildRequest did not request changes to project tracking files/metadata.",
       "evidence": [
-        "project_state.json"
-      ]
-    },
-    {
-      "description": "Modified frontend-file-summaries.txt content.",
-      "reason": "The BuildRequest only targets styling updates in two TSX page files; updating a repository summary file is not requested.",
-      "evidence": [
-        "frontend-file-summaries.txt (truncated)"
+        "project_state.json",
+        "frontend-file-summaries.txt"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.74,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/pages/FieldServiceGroupProfile.tsx",
+    "frontend/src/utils/privilegeBadges.ts",
     "project_state.json"
   ]
 }

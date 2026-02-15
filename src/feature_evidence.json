@@ -2,8 +2,28 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-frontend-src-pages-fieldservicegroupprofile-tsx-update-the-existing-badges-that-display-the-labels-overseer-and-assistant-so-that-overseer-badges-use-a-black-background-000000-or-tailwind-equivalent-with-white-text-assistant-badges-use-a-gray-background-6b7280-or-9ca3af-or-tailwind-equivalent-with-white-text-keep-the-badges-the-same-size-padding-typography-border-radius-and-general-styling-as-before-only-change-their-background-and-text-colors-do-not-change-elder-or-ministerial-servant-badge-colors",
-      "featureTitle": "In `frontend/src/pages/FieldServiceGroupProfile.tsx`, update the existing badges that display the labels \"Overseer\" and \"Assistant\" so that:\n- \"Overseer\" badges use a black background (#000000 or Tailwind equivalent) with white text.\n- \"Assistant\" badges use a gray background (#6B7280 or #9CA3AF, or Tailwind equivalent) with white text.\nKeep the badges the same size, padding, typography, border radius, and general styling as before; only change their background and text colors. Do not change \"Elder\" or \"Ministerial Servant\" badge colors.",
+      "featureId": "feature-update-the-privilege-badges-the-small-badges-shown-next-to-publisher-names-so-that-the-elder-badge-background-color-is-amethyst-purple-7c3aed-and-the-ministerial-servant-badge-background-color-is-sapphire-blue-2563eb-while-keeping-all-other-badge-styling-exactly-the-same-padding-border-radius-font-weight-size-etc",
+      "featureTitle": "Update the PRIVILEGE badges (the small badges shown next to publisher names) so that the \"Elder\" badge background color is Amethyst Purple (#7C3AED) and the \"Ministerial Servant\" badge background color is Sapphire Blue (#2563EB), while keeping all other badge styling exactly the same (padding, border radius, font weight, size, etc.).",
+      "files": [
+        "frontend/src/pages/FieldServiceGroupProfile.tsx",
+        "frontend/src/utils/privilegeBadges.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-field-service-group-leadership-role-badges-overseer-and-assistant-remain-exactly-as-they-are-and-are-not-modified-as-part-of-this-change",
+      "featureTitle": "Ensure the Field Service Group leadership role badges (\"Overseer\" and \"Assistant\") remain exactly as they are and are not modified as part of this change.",
       "files": [
         "frontend/src/pages/FieldServiceGroupProfile.tsx"
       ],
@@ -16,7 +36,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-2"
       ],
       "confidence": "high"
     }

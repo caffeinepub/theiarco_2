@@ -1,54 +1,53 @@
 {
   "kind": "build_request",
-  "title": "Update Overseer and Assistant badge colors in Field Service Groups pages",
+  "title": "Update privilege badge background colors for Elder and Ministerial Servant",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "In `frontend/src/pages/FieldServiceGroupProfile.tsx`, update the existing badges that display the labels \"Overseer\" and \"Assistant\" so that:\n- \"Overseer\" badges use a black background (#000000 or Tailwind equivalent) with white text.\n- \"Assistant\" badges use a gray background (#6B7280 or #9CA3AF, or Tailwind equivalent) with white text.\nKeep the badges the same size, padding, typography, border radius, and general styling as before; only change their background and text colors. Do not change \"Elder\" or \"Ministerial Servant\" badge colors.",
+      "text": "Update the PRIVILEGE badges (the small badges shown next to publisher names) so that the \"Elder\" badge background color is Amethyst Purple (#7C3AED) and the \"Ministerial Servant\" badge background color is Sapphire Blue (#2563EB), while keeping all other badge styling exactly the same (padding, border radius, font weight, size, etc.).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Just update the colors of the existing Overseer and Assistant badges - don't create new pages or components.\n\nSearch for \"Overseer\" and \"Assistant\" badge styling in those two files and update their colors."
+          "I'm updating the PRIVILEGE badges for Elders and Ministerial Servants:\n\n1. Elder privilege badge: Change to Amethyst Purple #7C3AED\n2. Ministerial Servant privilege badge: Change to Sapphire Blue #2563EB\n\nThese are the small badges that appear next to publisher names showing their privileges (like \"Elder\" or \"Ministerial Servant\" tags).\n\nKeep all styling (padding, border radius, font weight) exactly the same - only change the background colors."
         ]
       },
       "acceptanceCriteria": [
-        "When a publisher in the group has the Overseer badge, it renders with a black background and white text, with no change in badge sizing/shape other than color.",
-        "When a publisher in the group has the Assistant badge, it renders with a gray background and white text, with no change in badge sizing/shape other than color.",
-        "Elder and Ministerial Servant badges render exactly as they did before this change.",
-        "No new pages or reusable badge components are introduced; changes are limited to styling within `FieldServiceGroupProfile.tsx`."
+        "Wherever an \"Elder\" privilege badge is rendered next to a publisher name, its background color is exactly #7C3AED.",
+        "Wherever a \"Ministerial Servant\" privilege badge is rendered next to a publisher name, its background color is exactly #2563EB.",
+        "No changes are made to badge padding, border radius, font weight, text size, or any other styling besides background color.",
+        "Changes apply across the app anywhere these privilege badges appear (including the publishers list shown on Field Service Group profile pages)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "In `frontend/src/pages/FieldServiceGroups.tsx`, locate any existing UI elements (badges or badge-like elements) used to visually label \"Overseer\" and/or \"Assistant\" and update their colors to match:\n- Overseer: black background with white text\n- Assistant: gray background with white text\nKeep sizing/styling the same aside from colors, and do not introduce new pages or components.",
+      "text": "Ensure the Field Service Group leadership role badges (\"Overseer\" and \"Assistant\") remain exactly as they are and are not modified as part of this change.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "The pages are:\n- frontend/src/pages/FieldServiceGroups.tsx (main groups list page)\n- frontend/src/pages/FieldServiceGroupProfile.tsx (individual group profile page)\n\nThe Overseer and Assistant badges already exist on these pages showing group leadership."
+          "The Overseer and Assistant badges (for field service groups) should stay exactly as they are - don't change those."
         ]
       },
       "acceptanceCriteria": [
-        "Any existing Overseer/Assistant badges on the Field Service Groups list page render with the specified background/text colors and otherwise unchanged styling.",
-        "No Elder/Ministerial Servant badge colors are changed on this page (if present).",
-        "No new pages or components are added; updates are limited to `FieldServiceGroups.tsx` styling."
+        "Existing \"Overseer\" and \"Assistant\" badges keep their current colors and styling with no visual or code changes made specifically to them while implementing the privilege badge color updates."
       ]
     }
   ],
   "constraints": [
-    "Do not create new pages or new shared badge components; only update existing styling in the specified page files.",
-    "Only change Overseer and Assistant badge background/text colors; do not change badge size, padding, typography, layout, or other role badge colors (Elder / Ministerial Servant).",
-    "Use English for any user-facing text (no new user-facing text is expected for this change)."
+    "Do not change Overseer and Assistant badges anywhere in the app.",
+    "Do not change any badge styling other than the Elder/Ministerial Servant privilege badge background colors (no changes to padding, border radius, font weight, size, etc.).",
+    "Do not edit any files under frontend/src/components/ui (immutable UI components must be used as-is)."
   ],
   "nonGoals": [
-    "Changing backend data models or APIs.",
-    "Restyling other badges (e.g., Elder, Ministerial Servant) or changing any other UI outside the specified pages."
+    "Do not change the text labels for any badges.",
+    "Do not change how privileges are determined or stored (no backend privilege logic changes).",
+    "Do not update Field Service Group pages to add new badges or new UI elements beyond the color changes requested."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Update the existing “Overseer” and “Assistant” badge colors on the Field Service Groups list and profile pages without changing layout or introducing new components.
+**Goal:** Update privilege badge background colors for “Elder” and “Ministerial Servant” across the app without changing any other badge styling.
 
 **Planned changes:**
-- In `frontend/src/pages/FieldServiceGroupProfile.tsx`, change the existing “Overseer” badge styling to black background with white text, and the existing “Assistant” badge styling to gray background with white text, keeping all other badge styling the same.
-- In `frontend/src/pages/FieldServiceGroups.tsx`, update any existing “Overseer”/“Assistant” badge-like UI elements to use the same black/white and gray/white color scheme, with no other styling changes.
-- Ensure “Elder” and “Ministerial Servant” badge colors remain unchanged on both pages.
+- Set the “Elder” PRIVILEGE badge background color to Amethyst Purple (#7C3AED) wherever it appears next to publisher names.
+- Set the “Ministerial Servant” PRIVILEGE badge background color to Sapphire Blue (#2563EB) wherever it appears next to publisher names.
+- Ensure “Overseer” and “Assistant” Field Service Group leadership role badges remain unchanged.
 
-**User-visible outcome:** Overseer and Assistant labels in Field Service Groups pages display with the updated black/white and gray/white badge colors while all other badge styles remain the same.
+**User-visible outcome:** Wherever privilege badges appear (including on Field Service Group profile pages), “Elder” badges display with a #7C3AED background and “Ministerial Servant” badges display with a #2563EB background, with all other badge styling and other badge types unchanged.
