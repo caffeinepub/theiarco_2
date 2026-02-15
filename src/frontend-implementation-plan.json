@@ -1,65 +1,38 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Territories checked-out duration calculation and enforce checkout timestamps in seconds",
+  "title": "Update Overseer and Assistant badge colors on Field Service Groups pages",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Correct the Territories “Checked Out Duration” calculation using backend timestamps in seconds with defensive legacy normalization, and display whole months (>=1) or whole days (<1 month) while preserving sorting and overdue logic.",
+      "summary": "Update Overseer and Assistant badges in FieldServiceGroupProfile to use black/white and gray/white color schemes without altering any other badge styling.",
       "acceptanceCriteria": [
-        "On frontend/src/pages/Territories.tsx, the duration calculation must not divide a seconds timestamp by 1_000_000 (nanoseconds conversion) when the value is in seconds.",
-        "If the backend timestamp appears to be in nanoseconds or milliseconds (legacy/incorrect), the duration calculation must normalize it to a correct JavaScript Date in milliseconds using the same defensive pattern used elsewhere in the app (e.g., similar to formatCheckoutDate / CSV date handling).",
-        "For a territory currently checked out (latest record with no dateReturned), the UI displays: \"1 month\" for durations from 1 month to <2 months, \"N months\" for N>=2, and \"N days\" for durations <1 month.",
-        "The \"Checked Out Duration\" column sort for the duration column still works and sorts by the same underlying duration value used for display.",
-        "All other Territories page behaviors (layout, columns, overdue highlighting threshold logic, navigation, CRUD actions) remain unchanged except for the duration text and its underlying calculation."
+        "When a publisher in the group has the Overseer badge, it renders with a black background and white text, with no change in badge sizing/shape other than color.",
+        "When a publisher in the group has the Assistant badge, it renders with a gray background and white text, with no change in badge sizing/shape other than color.",
+        "Elder and Ministerial Servant badges render exactly as they did before this change.",
+        "No new pages or reusable badge components are introduced; changes are limited to styling within `FieldServiceGroupProfile.tsx`."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/territoryTime.ts",
-          "operation": "create",
-          "description": "Add a small, shared timestamp normalization utility for territory checkout times that converts backend bigint timestamps to JavaScript milliseconds defensively (handle seconds, legacy milliseconds, and legacy nanoseconds) and provides helpers to derive whole-month and whole-day durations for display/sort consistency."
-        },
-        {
-          "path": "frontend/src/pages/Territories.tsx",
+          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
           "operation": "modify",
-          "description": "Replace the current checkout duration logic (which incorrectly divides by 1_000_000) with a defensive conversion from checkout date (seconds by default; normalize ms/ns if detected) to a JS Date, then compute the difference to today. Display whole months when >= 1 month (\"1 month\"/\"N months\"), otherwise whole days (\"N days\"). Keep the same underlying numeric duration value used for both sorting and display, and keep existing overdue highlighting (>=4 months), layout, columns, navigation, and CRUD actions unchanged."
+          "description": "Adjust the existing Badge rendering for role labels so that only badges with label \"Overseer\" receive a black background with white text (Tailwind equivalent of #000000 + white), and only badges with label \"Assistant\" receive a gray background with white text (Tailwind equivalent of #6B7280/#9CA3AF + white). Preserve existing Badge variant usage and all other styling (size/padding/typography/radius); do not change Elder or Ministerial Servant badge colors."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Ensure territory checkout create/edit flows consistently send seconds-since-epoch timestamps to the backend, with frontend-side defensive normalization for any accidental ms/ns values before submission.",
+      "summary": "Update any existing Overseer/Assistant badge-like labeling in FieldServiceGroups list view to match the black/white and gray/white color schemes without other styling changes.",
       "acceptanceCriteria": [
-        "When checking out a territory via frontend/src/components/territories/CheckOutTerritoryModal.tsx, the value sent to the backend remains a seconds-since-epoch timestamp (BigInt seconds).",
-        "Backend territory checkout persistence (backend/main.mo checkOutTerritory) must store dateCheckedOut in seconds; if the backend receives an input that looks like milliseconds or nanoseconds, it must be normalized to seconds before storing.",
-        "Backend checkout record update persistence (backend/main.mo updateCheckoutRecord) must store newDateCheckedOut/newDateReturned in seconds; if the backend receives inputs that look like milliseconds or nanoseconds, they must be normalized to seconds before storing.",
-        "After creating a new checkout with the date picker, the stored dateCheckedOut value is consistent with seconds (e.g., ~10-digit epoch seconds), and the Territories page duration output matches real time elapsed (no extreme values like hundreds of months)."
+        "Any existing Overseer/Assistant badges on the Field Service Groups list page render with the specified background/text colors and otherwise unchanged styling.",
+        "No Elder/Ministerial Servant badge colors are changed on this page (if present).",
+        "No new pages or components are added; updates are limited to `FieldServiceGroups.tsx` styling."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/territoryTime.ts",
+          "path": "frontend/src/pages/FieldServiceGroups.tsx",
           "operation": "modify",
-          "description": "Extend the timestamp normalization utility to include a `normalizeToEpochSeconds` helper that ensures any bigint passed (seconds/ms/ns) is normalized to seconds for submission to the backend."
-        },
-        {
-          "path": "frontend/src/components/territories/CheckOutTerritoryModal.tsx",
-          "operation": "modify",
-          "description": "Ensure the date picker conversion continues to produce seconds-since-epoch (BigInt seconds), and defensively normalize the computed value to seconds using the shared territory timestamp utility before calling the checkout mutation (no UI/layout changes)."
-        },
-        {
-          "path": "frontend/src/components/territories/EditCheckoutRecordModal.tsx",
-          "operation": "modify",
-          "description": "Ensure edited checkout/return dates are submitted as seconds-since-epoch (BigInt seconds) by normalizing `newDateCheckedOut` and `newDateReturned` using the shared utility before calling the update mutation; keep existing form behavior and validations unchanged."
-        },
-        {
-          "path": "frontend/src/hooks/useCheckOutTerritory.ts",
-          "operation": "modify",
-          "description": "Add a final defensive normalization step inside the mutation function so `dateCheckedOut` is guaranteed to be epoch seconds before invoking the backend capability, without changing query invalidation behavior."
-        },
-        {
-          "path": "frontend/src/hooks/useUpdateCheckoutRecord.ts",
-          "operation": "modify",
-          "description": "Add a final defensive normalization step inside the mutation function so `newDateCheckedOut` and `newDateReturned` are guaranteed to be epoch seconds before invoking the backend capability, without changing query invalidation behavior."
+          "description": "Locate the existing UI elements that visually label \"Overseer\" and/or \"Assistant\" (badge or badge-like label styling) and update only their background/text colors to: Overseer black background with white text; Assistant gray background with white text. Keep the existing typography/layout/sizing unchanged aside from the color changes, and do not introduce new pages or components."
         }
       ]
     }

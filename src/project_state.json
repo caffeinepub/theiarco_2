@@ -1,28 +1,18 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project to fix incorrect checkout duration calculation on Territories page (after date picker change) while keeping existing behavior unchanged.",
+  "summary": "New project",
   "architectural_notes": [
-    "Backend checkout date is expected/stored as a Unix timestamp in seconds; frontend must convert to JavaScript Date before computing durations."
+    "Field Service Groups pages already exist: frontend/src/pages/FieldServiceGroups.tsx and frontend/src/pages/FieldServiceGroupProfile.tsx; update existing Overseer/Assistant badge styling in these files (search for \"Overseer\" and \"Assistant\")."
   ],
-  "known_issues": [
-    "Territories page 'Checked Out Duration' shows incorrect large values (e.g., hundreds of months) since date picker was added to Check Out Territory modal."
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-checked-out-duration-calculation-on-the-territories-page-so-it-correctly-computes-the-duration-between-the-current-not-returned-checkout-date-and-today-using-backend-timestamps-in-seconds-with-defensive-handling-for-legacy-nanoseconds-incorrect-milliseconds-values-display-the-duration-in-whole-months-1-month-3-months-when-the-duration-is-at-least-1-month-otherwise-display-whole-days-15-days",
-      "title": "Fix the \"Checked Out Duration\" calculation on the Territories page so it correctly computes the duration between the current (not-returned) checkout date and today using backend timestamps in seconds (with defensive handling for legacy nanoseconds/incorrect milliseconds values). Display the duration in whole months (\"1 month\", \"3 months\") when the duration is at least 1 month; otherwise display whole days (\"15 days\").",
+      "id": "feature-in-frontend-src-pages-fieldservicegroupprofile-tsx-update-the-existing-badges-that-display-the-labels-overseer-and-assistant-so-that-overseer-badges-use-a-black-background-000000-or-tailwind-equivalent-with-white-text-assistant-badges-use-a-gray-background-6b7280-or-9ca3af-or-tailwind-equivalent-with-white-text-keep-the-badges-the-same-size-padding-typography-border-radius-and-general-styling-as-before-only-change-their-background-and-text-colors-do-not-change-elder-or-ministerial-servant-badge-colors",
+      "title": "In `frontend/src/pages/FieldServiceGroupProfile.tsx`, update the existing badges that display the labels \"Overseer\" and \"Assistant\" so that:\n- \"Overseer\" badges use a black background (#000000 or Tailwind equivalent) with white text.\n- \"Assistant\" badges use a gray background (#6B7280 or #9CA3AF, or Tailwind equivalent) with white text.\nKeep the badges the same size, padding, typography, border radius, and general styling as before; only change their background and text colors. Do not change \"Elder\" or \"Ministerial Servant\" badge colors.",
       "reqIds": [
         "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-checkout-dates-are-saved-and-returned-as-timestamps-in-seconds-not-milliseconds-and-not-nanoseconds-for-territory-checkout-records-created-updated-via-the-check-out-territory-and-edit-checkout-record-flows",
-      "title": "Ensure checkout dates are saved and returned as timestamps in seconds (not milliseconds and not nanoseconds) for territory checkout records created/updated via the Check Out Territory and Edit Checkout Record flows.",
-      "reqIds": [
-        "REQ-2"
       ],
       "version": 1
     }
@@ -30,12 +20,20 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Fix Territories 'Checked Out Duration' calculation and ensure checkout date saved as timestamp in seconds (not ms)",
+      "summary": "Update existing Overseer and Assistant badge background colors (Overseer black, Assistant gray) with white text across Field Service Groups list and profile pages, without changing size/styling or other badge colors.",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "In `frontend/src/pages/FieldServiceGroups.tsx`, locate any existing UI elements (badges or badge-like elements) used to visually label \"Overseer\" and/or \"Assistant\" and update their colors to match:\n- Overseer: black background with white text\n- Assistant: gray background with white text\nKeep sizing/styling the same aside from colors, and do not introduce new pages or components.",
+      "reqIds": [
+        "REQ-2"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Fix Territories checked-out duration calculation and enforce checkout timestamps in seconds",
+  "projectName": "Update Overseer and Assistant badge colors in Field Service Groups pages",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

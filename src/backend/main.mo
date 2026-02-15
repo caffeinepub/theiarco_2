@@ -11,9 +11,9 @@ import Int "mo:core/Int";
 import Order "mo:core/Order";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   // AccessControl state and authorization system
   let accessControlState = AccessControl.initState();

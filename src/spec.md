@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Correct the Territories “Checked Out Duration” calculation and ensure territory checkout timestamps are consistently stored/returned in epoch seconds.
+**Goal:** Update the existing “Overseer” and “Assistant” badge colors on the Field Service Groups list and profile pages without changing layout or introducing new components.
 
 **Planned changes:**
-- Update the Territories page duration logic to compute elapsed time from the latest not-returned checkout date to today using backend timestamps in seconds, with defensive normalization for legacy/incorrect millisecond or nanosecond values.
-- Adjust duration display formatting to show whole months when ≥ 1 month (“1 month”, “N months”) and whole days when < 1 month (“N days”), while keeping duration sorting based on the same underlying computed value.
-- Enforce seconds-based timestamps in checkout create/edit flows by ensuring frontend sends seconds and backend normalizes any millisecond/nanosecond-like inputs to seconds before storing for checkOutTerritory and updateCheckoutRecord.
+- In `frontend/src/pages/FieldServiceGroupProfile.tsx`, change the existing “Overseer” badge styling to black background with white text, and the existing “Assistant” badge styling to gray background with white text, keeping all other badge styling the same.
+- In `frontend/src/pages/FieldServiceGroups.tsx`, update any existing “Overseer”/“Assistant” badge-like UI elements to use the same black/white and gray/white color scheme, with no other styling changes.
+- Ensure “Elder” and “Ministerial Servant” badge colors remain unchanged on both pages.
 
-**User-visible outcome:** The Territories table shows accurate, realistically scaled checked-out durations (days or months), and newly created/edited checkout records no longer produce extreme duration values due to inconsistent timestamp units.
+**User-visible outcome:** Overseer and Assistant labels in Field Service Groups pages display with the updated black/white and gray/white badge colors while all other badge styles remain the same.

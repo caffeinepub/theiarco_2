@@ -1,60 +1,67 @@
 {
   "kind": "build_request",
-  "title": "Fix Territories checked-out duration calculation and enforce checkout timestamps in seconds",
+  "title": "Update Overseer and Assistant badge colors in Field Service Groups pages",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the \"Checked Out Duration\" calculation on the Territories page so it correctly computes the duration between the current (not-returned) checkout date and today using backend timestamps in seconds (with defensive handling for legacy nanoseconds/incorrect milliseconds values). Display the duration in whole months (\"1 month\", \"3 months\") when the duration is at least 1 month; otherwise display whole days (\"15 days\").",
+      "text": "In `frontend/src/pages/FieldServiceGroupProfile.tsx`, update the existing badges that display the labels \"Overseer\" and \"Assistant\" so that:\n- \"Overseer\" badges use a black background (#000000 or Tailwind equivalent) with white text.\n- \"Assistant\" badges use a gray background (#6B7280 or #9CA3AF, or Tailwind equivalent) with white text.\nKeep the badges the same size, padding, typography, border radius, and general styling as before; only change their background and text colors. Do not change \"Elder\" or \"Ministerial Servant\" badge colors.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-9"
+          "msg-1"
         ],
         "quotes": [
-          "Fix the checkout duration calculation on the Territories page:\n\n1. The \"Checked Out Duration\" column is showing incorrect durations (like \"673 months\" instead of the actual duration).\n\n3. Fix the calculation to properly compute the duration between the checkout date and today's date:\n   - Convert the checkout date from the backend (timestamp in seconds) to a JavaScript Date\n   - Calculate the difference between today and the checkout date\n   - Display in months (e.g., \"3 months\", \"1 month\")\n   - If less than a month, show in days (e.g., \"15 days\")\n\n5. Use the same date calculation pattern that was working before the date picker was added.\n\nKeep everything else unchanged."
+          "Just update the colors of the existing Overseer and Assistant badges - don't create new pages or components.\n\nSearch for \"Overseer\" and \"Assistant\" badge styling in those two files and update their colors."
         ]
       },
       "acceptanceCriteria": [
-        "On frontend/src/pages/Territories.tsx, the duration calculation must not divide a seconds timestamp by 1_000_000 (nanoseconds conversion) when the value is in seconds.",
-        "If the backend timestamp appears to be in nanoseconds or milliseconds (legacy/incorrect), the duration calculation must normalize it to a correct JavaScript Date in milliseconds using the same defensive pattern used elsewhere in the app (e.g., similar to formatCheckoutDate / CSV date handling).",
-        "For a territory currently checked out (latest record with no dateReturned), the UI displays: \"1 month\" for durations from 1 month to <2 months, \"N months\" for N>=2, and \"N days\" for durations <1 month.",
-        "The \"Checked Out Duration\" column sort for the duration column still works and sorts by the same underlying duration value used for display.",
-        "All other Territories page behaviors (layout, columns, overdue highlighting threshold logic, navigation, CRUD actions) remain unchanged except for the duration text and its underlying calculation."
+        "When a publisher in the group has the Overseer badge, it renders with a black background and white text, with no change in badge sizing/shape other than color.",
+        "When a publisher in the group has the Assistant badge, it renders with a gray background and white text, with no change in badge sizing/shape other than color.",
+        "Elder and Ministerial Servant badges render exactly as they did before this change.",
+        "No new pages or reusable badge components are introduced; changes are limited to styling within `FieldServiceGroupProfile.tsx`."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Ensure checkout dates are saved and returned as timestamps in seconds (not milliseconds and not nanoseconds) for territory checkout records created/updated via the Check Out Territory and Edit Checkout Record flows.",
-      "target": "both",
+      "text": "In `frontend/src/pages/FieldServiceGroups.tsx`, locate any existing UI elements (badges or badge-like elements) used to visually label \"Overseer\" and/or \"Assistant\" and update their colors to match:\n- Overseer: black background with white text\n- Assistant: gray background with white text\nKeep sizing/styling the same aside from colors, and do not introduce new pages or components.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-9"
+          "msg-1"
         ],
         "quotes": [
-          "4. Make sure the checkout date is being saved correctly as a timestamp in seconds (not milliseconds, not a different format)."
+          "The pages are:\n- frontend/src/pages/FieldServiceGroups.tsx (main groups list page)\n- frontend/src/pages/FieldServiceGroupProfile.tsx (individual group profile page)\n\nThe Overseer and Assistant badges already exist on these pages showing group leadership."
         ]
       },
       "acceptanceCriteria": [
-        "When checking out a territory via frontend/src/components/territories/CheckOutTerritoryModal.tsx, the value sent to the backend remains a seconds-since-epoch timestamp (BigInt seconds).",
-        "Backend territory checkout persistence (backend/main.mo checkOutTerritory) must store dateCheckedOut in seconds; if the backend receives an input that looks like milliseconds or nanoseconds, it must be normalized to seconds before storing.",
-        "Backend checkout record update persistence (backend/main.mo updateCheckoutRecord) must store newDateCheckedOut/newDateReturned in seconds; if the backend receives inputs that look like milliseconds or nanoseconds, they must be normalized to seconds before storing.",
-        "After creating a new checkout with the date picker, the stored dateCheckedOut value is consistent with seconds (e.g., ~10-digit epoch seconds), and the Territories page duration output matches real time elapsed (no extreme values like hundreds of months)."
+        "Any existing Overseer/Assistant badges on the Field Service Groups list page render with the specified background/text colors and otherwise unchanged styling.",
+        "No Elder/Ministerial Servant badge colors are changed on this page (if present).",
+        "No new pages or components are added; updates are limited to `FieldServiceGroups.tsx` styling."
       ]
     }
   ],
   "constraints": [
-    "Keep everything else unchanged aside from correcting the checkout duration calculation and ensuring territory checkout timestamps are stored in seconds.",
-    "Use English for any user-facing text.",
-    "Frontend immutable paths must not be modified: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui."
+    "Do not create new pages or new shared badge components; only update existing styling in the specified page files.",
+    "Only change Overseer and Assistant badge background/text colors; do not change badge size, padding, typography, layout, or other role badge colors (Elder / Ministerial Servant).",
+    "Use English for any user-facing text (no new user-facing text is expected for this change)."
   ],
   "nonGoals": [
-    "Do not redesign the Territories page UI or change table columns beyond the corrected duration text formatting.",
-    "Do not introduce new authentication methods or third-party integrations.",
-    "Do not migrate or rewrite unrelated timestamp formatting utilities beyond what is necessary to fix the Territories duration and territory checkout timestamp storage."
+    "Changing backend data models or APIs.",
+    "Restyling other badges (e.g., Elder, Ministerial Servant) or changing any other UI outside the specified pages."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }
