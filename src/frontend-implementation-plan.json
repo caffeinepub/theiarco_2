@@ -1,39 +1,82 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update Group 3 color mapping and align Publisher table Overseer/Assistant badges",
+  "title": "Rename “Weekday” to “Mid-week” terminology across attendance UI (frontend-only)",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Change Field Service Group 3 to use darker green #0B6623 in the centralized color map so all consuming UI reflects the new color.",
+      "summary": "Update the Record Attendance modal meeting type dropdown to use “Mid-week Meeting” (label + stored value) while preserving compatibility with legacy “Weekday Meeting” records.",
       "acceptanceCriteria": [
-        "In frontend/src/utils/fieldServiceGroupColors.ts, Group 3 color is exactly '#0B6623' (hex) and other group colors remain unchanged.",
-        "On the Field Service Groups main page, Group 3’s top bar, group label text, and icon render using #0B6623.",
-        "On the Field Service Group profile page for Group 3, the page heading, the group leadership colored section, and the Record Visit button use #0B6623.",
-        "No other styling or behavior changes occur outside of Group 3’s color update."
+        "When opening the Record Attendance modal, the meeting type dropdown shows \"Mid-week Meeting\" and \"Weekend Meeting\" options.",
+        "Selecting \"Mid-week Meeting\" submits/saves the meetingType value as exactly \"Mid-week Meeting\".",
+        "No other labels, validation messages, or behaviors in the modal change."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/fieldServiceGroupColors.ts",
+          "path": "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
           "operation": "modify",
-          "description": "Update the Group 3 entry in FIELD_SERVICE_GROUP_COLORS from '#059669' to exactly '#0B6623' so all pages using getGroupColor (Field Service Groups list + Field Service Group profile UI elements) automatically reflect the darker green."
+          "description": "Replace the SelectItem option label/value \"Weekday Meeting\" with \"Mid-week Meeting\" (keeping \"Weekend Meeting\" unchanged), and normalize edit-mode prefill so legacy stored values of \"Weekday Meeting\" are treated as \"Mid-week Meeting\" for selection + save behavior."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Make the Publishers table Overseer/Assistant badges use the same Tailwind styling (including hover) as the Field Service Group profile page badges.",
+      "summary": "Change attendance statistics summary wording from “Average weekday attendance” to “Average mid-week attendance” without altering calculations or layout.",
       "acceptanceCriteria": [
-        "In the Publishers table rows, the Overseer badge uses the same Tailwind classes as the Field Service Group profile’s Overseer badge (currently black background with white text, including matching hover styling).",
-        "In the Publishers table rows, the Assistant badge uses the same Tailwind classes as the Field Service Group profile’s Assistant badge (currently gray background with white text, including matching hover styling).",
-        "Badge text remains 'Overseer' and 'Assistant' and appears only when the corresponding boolean flags are true.",
-        "No other Publisher table styling, sorting, filtering, or CRUD behavior is changed."
+        "The attendance statistics section displays \"Average mid-week attendance\" (and continues to display the weekend label unchanged).",
+        "No other statistics wording, calculations, or layout changes occur."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Publishers.tsx",
+          "path": "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
           "operation": "modify",
-          "description": "Update the conditional Overseer/Assistant <Badge> components in the Name column to match FieldServiceGroupProfile styling: Overseer uses 'bg-black text-white hover:bg-black' and Assistant uses 'bg-gray-500 text-white hover:bg-gray-500' (retain existing conditional rendering and keep other table behavior unchanged)."
+          "description": "Update the rendered label text from \"Average weekday attendance\" to \"Average mid-week attendance\" and leave the weekend label and all rendering/calculation behavior unchanged."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Ensure meeting attendance record cards display “Mid-week Meeting” wherever “Weekday Meeting” appears, without changing other card fields.",
+      "acceptanceCriteria": [
+        "Attendance record cards never display the phrase \"Weekday Meeting\".",
+        "Cards display \"Mid-week Meeting\" in its place, while leaving other card fields (date badge, counts, names, actions) unchanged."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
+          "operation": "modify",
+          "description": "Adjust the attendance record card title rendering so that when a record's meetingType is the legacy \"Weekday Meeting\" value it displays as \"Mid-week Meeting\", while leaving all other rendered fields and actions unchanged."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Remove remaining user-facing “Weekday” wording across the frontend and keep mid-week stats/filters compatible with both legacy “Weekday” and new “Mid-week” stored values.",
+      "acceptanceCriteria": [
+        "A sweep of the frontend UI finds no remaining user-visible occurrences of the word \"Weekday\".",
+        "Mid-week average calculations and any mid-week filtering/aggregation continue to include both legacy \"Weekday\" records and new \"Mid-week\" records so historical data remains reflected in the mid-week stats.",
+        "Weekend calculations remain unchanged."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/utils/meetingAttendanceStats.ts",
+          "operation": "modify",
+          "description": "Update mid-week (currently \"weekday\") attendance classification logic so it includes both legacy \"Weekday\" meetingType strings and new \"Mid-week\" meetingType strings, while keeping weekend classification unchanged."
+        },
+        {
+          "path": "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
+          "operation": "modify",
+          "description": "Confirm no remaining user-visible \"Weekday\" text remains in this component after the label change (ensure weekend wording remains unchanged)."
+        },
+        {
+          "path": "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
+          "operation": "modify",
+          "description": "Confirm no remaining user-visible \"Weekday\" text remains in the modal UI after updating the dropdown option, while keeping all validation messages and behaviors unchanged."
+        },
+        {
+          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
+          "operation": "modify",
+          "description": "Confirm no remaining user-visible \"Weekday\" text is rendered in attendance cards after applying legacy-to-new display mapping, while leaving weekend rendering unchanged."
         }
       ]
     }

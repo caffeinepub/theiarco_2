@@ -1,41 +1,50 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T04:18:12.578Z",
-  "summary": "REQ-1 (Group 3 color mapping) is implemented in the centralized color map. Evidence for REQ-2 (Publisher table Overseer/Assistant badge class alignment) is inconclusive from the provided truncated diff, and there are indications of additional Publishers page theming changes beyond the requested badge styling update.",
+  "generatedAt": "2026-02-16T21:12:31.162Z",
+  "summary": "The diff clearly updates the attendance stats label to “Average mid-week attendance” and updates attendance-average calculations to treat both legacy “Weekday” and new “Mid-week” records as mid-week. However, the diff does not provide evidence that the Record Attendance modal dropdown option/value was changed (only edit-mode normalization is shown), nor that attendance record cards were updated to display “Mid-week Meeting” instead of “Weekday Meeting”, nor that all remaining user-visible “Weekday” occurrences were swept across the frontend UI.",
   "missing_requirements": [
     {
-      "id": "REQ-2",
-      "requirement": "On the Publishers page table, update the Overseer and Assistant badges so their styling (background + text + hover behavior) matches the badge styling used for Overseer and Assistant on the Field Service Group profile page.",
-      "reason": "The diff snippet for frontend/src/pages/Publishers.tsx is truncated before any badge rendering/classes are shown, so the required Tailwind class alignment and hover behavior changes cannot be verified from the provided evidence.",
+      "id": "REQ-1",
+      "requirement": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
+      "reason": "The shown changes in RecordAttendanceModal.tsx only normalize legacy \"Weekday Meeting\" to \"Mid-week Meeting\" when prefilling edit mode; the diff excerpt is truncated before the dropdown options and submit mapping, so there is no evidence the SelectItem option label/value was updated or that new submissions save exactly \"Mid-week Meeting\".",
       "evidence": [
-        "frontend/src/pages/Publishers.tsx (truncated)"
+        "frontend/src/components/fieldService/RecordAttendanceModal.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+      "reason": "No diff content shows changes to the attendance record card component(s) or any rendering code that would replace the displayed meeting type text on cards.",
+      "evidence": [
+        "file-diff: no modified attendance record card/list component shown"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead (beyond the explicitly called out locations).",
+      "reason": "Aside from the stats label change and the edit-mode normalization comment/logic, the diff does not show a broader sweep removing remaining user-visible \"Weekday\" text across the frontend UI; other files where \"Weekday\" might appear are not evidenced as updated in the diff summary.",
+      "evidence": [
+        "file-diff: only AttendanceStatsSummaryCard.tsx and meetingAttendanceStats.ts show relevant text/logic changes"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Additional Publishers page theming/table header changes (e.g., themed primary button, themed table header row) beyond the requested Overseer/Assistant badge styling update.",
-      "reason": "BuildRequest REQ-2 only asks to align Overseer/Assistant badge styling in the Publishers table. The diff shows new theming-related imports and (per file summary) themed header/button behavior, which is outside the specified badge-only scope.",
+      "description": "Unrelated documentation/update entries describing route mounting (ServiceMeetingConductors/ConductorProfile), login screen branding, layout changes, etc., which are not part of the requested terminology-only update.",
+      "reason": "The BuildRequest scope is strictly renaming “Weekday” to “Mid-week” in attendance UI with everything else unchanged; the modified frontend-file-summaries.txt includes multiple unrelated feature descriptions.",
       "evidence": [
-        "frontend/src/pages/Publishers.tsx (truncated)",
-        "frontend-file-summaries.txt (truncated)"
-      ]
-    },
-    {
-      "description": "Updates to project tracking/metadata files (project_state.json and frontend-file-summaries.txt).",
-      "reason": "The BuildRequest did not request changes to repository metadata/status summary files; these are ancillary changes not required to satisfy REQ-1/REQ-2.",
-      "evidence": [
-        "project_state.json",
-        "frontend-file-summaries.txt (truncated)"
+        "frontend-file-summaries.txt"
       ]
     }
   ],
   "confidence": 0.64,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/Publishers.tsx",
-    "frontend/src/utils/fieldServiceGroupColors.ts",
+    "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
+    "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
+    "frontend/src/pages/FieldServiceGroupProfile.tsx",
+    "frontend/src/utils/meetingAttendanceStats.ts",
     "project_state.json"
   ]
 }

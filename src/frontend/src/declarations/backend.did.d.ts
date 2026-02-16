@@ -97,6 +97,15 @@ export interface GroupVisit {
   'discussionTopics' : string,
   'nextPlannedVisitDate' : [] | [bigint],
 }
+export interface MeetingAttendance {
+  'id' : string,
+  'groupNumber' : bigint,
+  'createdAt' : bigint,
+  'meetingDate' : bigint,
+  'meetingType' : string,
+  'publisherNamesPresent' : Array<string>,
+  'publishersPresent' : Array<string>,
+}
 export interface Pioneer {
   'id' : string,
   'serviceYear' : string,
@@ -219,6 +228,10 @@ export type UserRole = { 'admin' : null } |
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addGroupVisit' : ActorMethod<[AddGroupVisitInput], string>,
+  'addMeetingAttendance' : ActorMethod<
+    [bigint, bigint, string, Array<string>, Array<string>],
+    MeetingAttendance
+  >,
   'addPioneerHours' : ActorMethod<[CreatePioneerMonthlyHoursInput], string>,
   'addPublisher' : ActorMethod<
     [
@@ -259,6 +272,10 @@ export interface _SERVICE {
   >,
   'deleteGlobalNote' : ActorMethod<[bigint], undefined>,
   'deleteGroupVisit' : ActorMethod<[string], undefined>,
+  /**
+   * / New persistent backend method: Delete Meeting Attendance ///
+   */
+  'deleteMeetingAttendance' : ActorMethod<[string], boolean>,
   'deletePioneer' : ActorMethod<[string], undefined>,
   'deletePioneerHours' : ActorMethod<[string], undefined>,
   'deletePublisher' : ActorMethod<[PublisherId], undefined>,
@@ -291,6 +308,13 @@ export interface _SERVICE {
   'getGroupVisit' : ActorMethod<[string], [] | [GroupVisit]>,
   'getGroupVisitsByGroupNumber' : ActorMethod<[bigint], Array<GroupVisit>>,
   'getGroupVisitsForGroup' : ActorMethod<[bigint], Array<GroupVisit>>,
+  /**
+   * / New persistent query method for complete meeting record access
+   */
+  'getMeetingAttendance' : ActorMethod<
+    [[] | [bigint]],
+    Array<MeetingAttendance>
+  >,
   'getPioneer' : ActorMethod<[string], [] | [Pioneer]>,
   'getPioneerHours' : ActorMethod<[string], [] | [PioneerMonthlyHours]>,
   'getPioneerHoursForServiceYear' : ActorMethod<
@@ -346,6 +370,13 @@ export interface _SERVICE {
       [] | [bigint],
     ],
     undefined
+  >,
+  /**
+   * / New method for updating MeetingAttendance ///
+   */
+  'updateMeetingAttendance' : ActorMethod<
+    [string, bigint, string, Array<string>, Array<string>],
+    MeetingAttendance
   >,
   'updatePioneerHours' : ActorMethod<
     [string, string, string, bigint, string],

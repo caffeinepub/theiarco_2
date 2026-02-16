@@ -1,35 +1,63 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T04:18:12.581Z",
+  "generatedAt": "2026-02-16T21:12:31.167Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the centralized Field Service Group color mapping so Group 3 uses the darker green hex color #0B6623, and ensure this new color is reflected everywhere Field Service Group colors are consumed (including Field Service Groups main page colored bars/group text/icons and Field Service Group profile pages heading text/colored bars/Record Visit button).",
+        "summary": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/fieldServiceGroupColors.ts"
+          "frontend/src/components/fieldService/RecordAttendanceModal.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/fieldServiceGroupColors.ts"
+          "frontend/src/components/fieldService/RecordAttendanceModal.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "On the Publishers page table, update the Overseer and Assistant badges so their styling (background + text + hover behavior) matches the badge styling used for Overseer and Assistant on the Field Service Group profile page.",
+        "summary": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Publishers.tsx"
+          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Publishers.tsx"
+          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/meetingAttendanceStats.ts",
+          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
+          "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/meetingAttendanceStats.ts",
+          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
+          "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
+          "frontend/src/pages/FieldServiceGroupProfile.tsx"
         ]
       }
     ]
@@ -39,8 +67,10 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/Publishers.tsx",
-    "frontend/src/utils/fieldServiceGroupColors.ts",
+    "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
+    "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
+    "frontend/src/pages/FieldServiceGroupProfile.tsx",
+    "frontend/src/utils/meetingAttendanceStats.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

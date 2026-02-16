@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-centralized-field-service-group-color-mapping-so-group-3-uses-the-darker-green-hex-color-0b6623-and-ensure-this-new-color-is-reflected-everywhere-field-service-group-colors-are-consumed-including-field-service-groups-main-page-colored-bars-group-text-icons-and-field-service-group-profile-pages-heading-text-colored-bars-record-visit-button",
-      "featureTitle": "Update the centralized Field Service Group color mapping so Group 3 uses the darker green hex color #0B6623, and ensure this new color is reflected everywhere Field Service Group colors are consumed (including Field Service Groups main page colored bars/group text/icons and Field Service Group profile pages heading text/colored bars/Record Visit button).",
+      "featureId": "feature-in-the-record-attendance-modal-meeting-type-dropdown-replace-the-option-label-and-stored-value-weekday-meeting-with-mid-week-meeting-while-keeping-the-weekend-meeting-option-unchanged",
+      "featureTitle": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
       "files": [
-        "frontend/src/utils/fieldServiceGroupColors.ts"
+        "frontend/src/components/fieldService/RecordAttendanceModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,10 +21,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-on-the-publishers-page-table-update-the-overseer-and-assistant-badges-so-their-styling-background-text-hover-behavior-matches-the-badge-styling-used-for-overseer-and-assistant-on-the-field-service-group-profile-page",
-      "featureTitle": "On the Publishers page table, update the Overseer and Assistant badges so their styling (background + text + hover behavior) matches the badge styling used for Overseer and Assistant on the Field Service Group profile page.",
+      "featureId": "feature-in-the-attendance-statistics-summary-ui-change-the-user-facing-label-text-from-average-weekday-attendance-to-average-mid-week-attendance",
+      "featureTitle": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
       "files": [
-        "frontend/src/pages/Publishers.tsx"
+        "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -36,6 +36,47 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-the-meeting-attendance-record-cards-list-replace-the-displayed-meeting-type-text-weekday-meeting-with-mid-week-meeting-wherever-it-appears",
+      "featureTitle": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+      "files": [
+        "frontend/src/pages/FieldServiceGroupProfile.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-any-other-user-facing-ui-text-across-the-frontend-that-contains-weekday-to-use-mid-week-instead-and-ensure-attendance-statistics-calculations-continue-to-correctly-classify-existing-stored-records-that-may-still-contain-weekday-as-mid-week-records",
+      "featureTitle": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+      "files": [
+        "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
+        "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
+        "frontend/src/pages/FieldServiceGroupProfile.tsx",
+        "frontend/src/utils/meetingAttendanceStats.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

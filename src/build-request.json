@@ -1,56 +1,89 @@
 {
   "kind": "build_request",
-  "title": "Darken Field Service Group 3 green and align Publisher table Overseer/Assistant badges",
+  "title": "Rename meeting type terminology from “Weekday” to “Mid-week” across attendance UI",
+  "projectName": "Field Service Tracker",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the centralized Field Service Group color mapping so Group 3 uses the darker green hex color #0B6623, and ensure this new color is reflected everywhere Field Service Group colors are consumed (including Field Service Groups main page colored bars/group text/icons and Field Service Group profile pages heading text/colored bars/Record Visit button).",
+      "text": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Change Group 3 (Green) to a darker shade: - #0B6623 (Dark Green)\n\nUpdate these colors everywhere they appear:\n   - Field Service Groups main page (colored bars, group text, icons)\n   - Group profile pages (heading text, colored bars, Record Visit button)"
+          "In the Record Attendance modal, change the dropdown option from \"Weekday Meeting\" to \"Mid-week Meeting\"."
         ]
       },
       "acceptanceCriteria": [
-        "In frontend/src/utils/fieldServiceGroupColors.ts, Group 3 color is exactly '#0B6623' (hex) and other group colors remain unchanged.",
-        "On the Field Service Groups main page, Group 3’s top bar, group label text, and icon render using #0B6623.",
-        "On the Field Service Group profile page for Group 3, the page heading, the group leadership colored section, and the Record Visit button use #0B6623.",
-        "No other styling or behavior changes occur outside of Group 3’s color update."
+        "When opening the Record Attendance modal, the meeting type dropdown shows \"Mid-week Meeting\" and \"Weekend Meeting\" options.",
+        "Selecting \"Mid-week Meeting\" submits/saves the meetingType value as exactly \"Mid-week Meeting\".",
+        "No other labels, validation messages, or behaviors in the modal change."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "On the Publishers page table, update the Overseer and Assistant badges so their styling (background + text + hover behavior) matches the badge styling used for Overseer and Assistant on the Field Service Group profile page.",
+      "text": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4"
         ],
         "quotes": [
-          "Update the Overseer and Assistant badge on the Publisher page in the table so that it looks similar to the the color the badges have in the Field Service Groups profile page."
+          "In the attendance statistics section, change \"Average weekday attendance\" to \"Average mid-week attendance\"."
         ]
       },
       "acceptanceCriteria": [
-        "In the Publishers table rows, the Overseer badge uses the same Tailwind classes as the Field Service Group profile’s Overseer badge (currently black background with white text, including matching hover styling).",
-        "In the Publishers table rows, the Assistant badge uses the same Tailwind classes as the Field Service Group profile’s Assistant badge (currently gray background with white text, including matching hover styling).",
-        "Badge text remains 'Overseer' and 'Assistant' and appears only when the corresponding boolean flags are true.",
-        "No other Publisher table styling, sorting, filtering, or CRUD behavior is changed."
+        "The attendance statistics section displays \"Average mid-week attendance\" (and continues to display the weekend label unchanged).",
+        "No other statistics wording, calculations, or layout changes occur."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "In the attendance record cards, change \"Weekday Meeting\" to \"Mid-week Meeting\"."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Attendance record cards never display the phrase \"Weekday Meeting\".",
+        "Cards display \"Mid-week Meeting\" in its place, while leaving other card fields (date badge, counts, names, actions) unchanged."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Update anywhere else that displays \"Weekday\" to say \"Mid-week\" instead."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A sweep of the frontend UI finds no remaining user-visible occurrences of the word \"Weekday\".",
+        "Mid-week average calculations and any mid-week filtering/aggregation continue to include both legacy \"Weekday\" records and new \"Mid-week\" records so historical data remains reflected in the mid-week stats.",
+        "Weekend calculations remain unchanged."
       ]
     }
   ],
   "constraints": [
-    "Keep everything else unchanged outside the specified color/badge styling updates.",
-    "Do not edit files under frontend/src/components/ui (compose existing components instead).",
-    "Do not change backend behavior or data models for this request."
+    "Keep everything else unchanged besides replacing the specified terminology.",
+    "Do not edit files under frontend/src/components/ui or any other immutable paths listed in SYSTEM_CONTEXT.",
+    "Do not introduce backend state/schema changes unless strictly required for this terminology update."
   ],
   "nonGoals": [
-    "Changing Group 1, Group 2, or Group 4 colors.",
-    "Redesigning the Field Service Groups pages or Publishers page beyond the specified color/badge adjustments.",
-    "Changing privilege badge colors for Elder/Ministerial Servant (only Overseer/Assistant badges on the Publishers table are in scope)."
+    "No redesign or visual restyling beyond the text replacements.",
+    "No changes to authentication, permissions, or data model beyond what is necessary to support the terminology update.",
+    "No data migration of existing records is required if the app can remain compatible with existing stored \"Weekday\" values."
   ],
   "imageRequirements": {
     "required": [],

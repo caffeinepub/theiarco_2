@@ -1,4 +1,3 @@
-// Complete updated Motoko code
 import Map "mo:core/Map";
 import Array "mo:core/Array";
 import Runtime "mo:core/Runtime";
@@ -11,8 +10,6 @@ import Int "mo:core/Int";
 import Order "mo:core/Order";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-
-
 
 actor {
   // AccessControl state and authorization system
@@ -1381,4 +1378,101 @@ actor {
     checkUserPermission(caller, #user);
     groupVisits.values().toArray().filter(func(visit) { visit.groupNumber == group });
   };
+
+  /// Persistent Meeting Attendance Domain ///
+  public type MeetingAttendance = {
+    id : Text;
+    groupNumber : Nat;
+    meetingDate : Int;
+    meetingType : Text; // "Weekday Meeting" or "Weekend Meeting"
+    publishersPresent : [Text];
+    publisherNamesPresent : [Text];
+    createdAt : Int;
+  };
+
+  // Stable data structure and in-memory map for MeetingAttendance
+  let meetingAttendanceStorage = Map.empty<Text, MeetingAttendance>();
+  var nextMeetingAttendanceId = 1;
+
+  public shared ({ caller }) func addMeetingAttendance(
+    groupNumber : Nat,
+    meetingDate : Int,
+    meetingType : Text,
+    publishersPresent : [Text],
+    publisherNamesPresent : [Text],
+  ) : async MeetingAttendance {
+    checkUserPermission(caller, #user);
+
+    let id = "ma-" # nextMeetingAttendanceId.toText();
+    nextMeetingAttendanceId += 1;
+
+    let newAttendance : MeetingAttendance = {
+      id;
+      groupNumber;
+      meetingDate;
+      meetingType;
+      publishersPresent;
+      publisherNamesPresent;
+      createdAt = Time.now();
+    };
+
+    meetingAttendanceStorage.add(id, newAttendance);
+    newAttendance;
+  };
+
+  /// New persistent query method for complete meeting record access
+  public query ({ caller }) func getMeetingAttendance(groupNumber : ?Nat) : async [MeetingAttendance] {
+    checkUserPermission(caller, #user);
+    // Filter by optional groupNumber and sort by meetingDate descending (most recent first)
+    let filtered = switch (groupNumber) {
+      case (null) { meetingAttendanceStorage.values().toArray() };
+      case (?group) {
+        meetingAttendanceStorage.values().toArray().filter(
+          func(attendance) { attendance.groupNumber == group }
+        );
+      };
+    };
+    filtered.reverse();
+  };
+
+  /// New method for updating MeetingAttendance ///
+  public shared ({ caller }) func updateMeetingAttendance(
+    id : Text,
+    meetingDate : Int,
+    meetingType : Text,
+    publishersPresent : [Text],
+    publisherNamesPresent : [Text],
+  ) : async MeetingAttendance {
+    checkUserPermission(caller, #user);
+
+    let existingAttendance = switch (meetingAttendanceStorage.get(id)) {
+      case (null) { Runtime.trap("MeetingAttendance not found for update: " # id) };
+      case (?attendance) { attendance };
+    };
+
+    let updatedAttendance : MeetingAttendance = {
+      existingAttendance with
+      meetingDate;
+      meetingType;
+      publishersPresent;
+      publisherNamesPresent;
+    };
+
+    meetingAttendanceStorage.add(id, updatedAttendance);
+    updatedAttendance;
+  };
+
+  /// New persistent backend method: Delete Meeting Attendance ///
+  public shared ({ caller }) func deleteMeetingAttendance(id : Text) : async Bool {
+    checkUserPermission(caller, #user);
+
+    switch (meetingAttendanceStorage.get(id)) {
+      case (null) { false };
+      case (?_) {
+        meetingAttendanceStorage.remove(id);
+        true;
+      };
+    };
+  };
 };
+

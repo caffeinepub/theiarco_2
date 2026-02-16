@@ -18,6 +18,15 @@ export const AddGroupVisitInput = IDL.Record({
   'discussionTopics' : IDL.Text,
   'nextPlannedVisitDate' : IDL.Opt(IDL.Int),
 });
+export const MeetingAttendance = IDL.Record({
+  'id' : IDL.Text,
+  'groupNumber' : IDL.Nat,
+  'createdAt' : IDL.Int,
+  'meetingDate' : IDL.Int,
+  'meetingType' : IDL.Text,
+  'publisherNamesPresent' : IDL.Vec(IDL.Text),
+  'publishersPresent' : IDL.Vec(IDL.Text),
+});
 export const CreatePioneerMonthlyHoursInput = IDL.Record({
   'month' : IDL.Text,
   'serviceYear' : IDL.Text,
@@ -225,6 +234,11 @@ export const UpdateTrainedPublisherInput = IDL.Record({
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addGroupVisit' : IDL.Func([AddGroupVisitInput], [IDL.Text], []),
+  'addMeetingAttendance' : IDL.Func(
+      [IDL.Nat, IDL.Int, IDL.Text, IDL.Vec(IDL.Text), IDL.Vec(IDL.Text)],
+      [MeetingAttendance],
+      [],
+    ),
   'addPioneerHours' : IDL.Func(
       [CreatePioneerMonthlyHoursInput],
       [IDL.Text],
@@ -287,6 +301,7 @@ export const idlService = IDL.Service({
   'deleteCheckoutRecord' : IDL.Func([IDL.Text, PublisherId, IDL.Int], [], []),
   'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
   'deleteGroupVisit' : IDL.Func([IDL.Text], [], []),
+  'deleteMeetingAttendance' : IDL.Func([IDL.Text], [IDL.Bool], []),
   'deletePioneer' : IDL.Func([IDL.Text], [], []),
   'deletePioneerHours' : IDL.Func([IDL.Text], [], []),
   'deletePublisher' : IDL.Func([PublisherId], [], []),
@@ -339,6 +354,11 @@ export const idlService = IDL.Service({
   'getGroupVisitsForGroup' : IDL.Func(
       [IDL.Nat],
       [IDL.Vec(GroupVisit)],
+      ['query'],
+    ),
+  'getMeetingAttendance' : IDL.Func(
+      [IDL.Opt(IDL.Nat)],
+      [IDL.Vec(MeetingAttendance)],
       ['query'],
     ),
   'getPioneer' : IDL.Func([IDL.Text], [IDL.Opt(Pioneer)], ['query']),
@@ -432,6 +452,11 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'updateMeetingAttendance' : IDL.Func(
+      [IDL.Text, IDL.Int, IDL.Text, IDL.Vec(IDL.Text), IDL.Vec(IDL.Text)],
+      [MeetingAttendance],
+      [],
+    ),
   'updatePioneerHours' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Text],
       [],
@@ -491,6 +516,15 @@ export const idlFactory = ({ IDL }) => {
     'publishersPresent' : IDL.Vec(IDL.Text),
     'discussionTopics' : IDL.Text,
     'nextPlannedVisitDate' : IDL.Opt(IDL.Int),
+  });
+  const MeetingAttendance = IDL.Record({
+    'id' : IDL.Text,
+    'groupNumber' : IDL.Nat,
+    'createdAt' : IDL.Int,
+    'meetingDate' : IDL.Int,
+    'meetingType' : IDL.Text,
+    'publisherNamesPresent' : IDL.Vec(IDL.Text),
+    'publishersPresent' : IDL.Vec(IDL.Text),
   });
   const CreatePioneerMonthlyHoursInput = IDL.Record({
     'month' : IDL.Text,
@@ -699,6 +733,11 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addGroupVisit' : IDL.Func([AddGroupVisitInput], [IDL.Text], []),
+    'addMeetingAttendance' : IDL.Func(
+        [IDL.Nat, IDL.Int, IDL.Text, IDL.Vec(IDL.Text), IDL.Vec(IDL.Text)],
+        [MeetingAttendance],
+        [],
+      ),
     'addPioneerHours' : IDL.Func(
         [CreatePioneerMonthlyHoursInput],
         [IDL.Text],
@@ -761,6 +800,7 @@ export const idlFactory = ({ IDL }) => {
     'deleteCheckoutRecord' : IDL.Func([IDL.Text, PublisherId, IDL.Int], [], []),
     'deleteGlobalNote' : IDL.Func([IDL.Nat], [], []),
     'deleteGroupVisit' : IDL.Func([IDL.Text], [], []),
+    'deleteMeetingAttendance' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'deletePioneer' : IDL.Func([IDL.Text], [], []),
     'deletePioneerHours' : IDL.Func([IDL.Text], [], []),
     'deletePublisher' : IDL.Func([PublisherId], [], []),
@@ -813,6 +853,11 @@ export const idlFactory = ({ IDL }) => {
     'getGroupVisitsForGroup' : IDL.Func(
         [IDL.Nat],
         [IDL.Vec(GroupVisit)],
+        ['query'],
+      ),
+    'getMeetingAttendance' : IDL.Func(
+        [IDL.Opt(IDL.Nat)],
+        [IDL.Vec(MeetingAttendance)],
         ['query'],
       ),
     'getPioneer' : IDL.Func([IDL.Text], [IDL.Opt(Pioneer)], ['query']),
@@ -908,6 +953,11 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(IDL.Int),
         ],
         [],
+        [],
+      ),
+    'updateMeetingAttendance' : IDL.Func(
+        [IDL.Text, IDL.Int, IDL.Text, IDL.Vec(IDL.Text), IDL.Vec(IDL.Text)],
+        [MeetingAttendance],
         [],
       ),
     'updatePioneerHours' : IDL.Func(

@@ -1,10 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Darken Field Service Group 3’s green across the app and make the Publishers table Overseer/Assistant badges visually match the badges used on Field Service Group profile pages.
+**Goal:** Rename meeting type terminology across the attendance UI from “Weekday” to “Mid-week” while keeping weekend terminology unchanged and preserving historical data behavior.
 
 **Planned changes:**
-- Update the centralized Field Service Group color mapping so Group 3 uses hex `#0B6623`, ensuring all UI consumers of Group 3’s color reflect the change (main Field Service Groups page and Group 3 profile page elements, including the Record Visit button).
-- Update the Publishers page table’s Overseer and Assistant badges to use the same Tailwind classes (background, text, hover behavior) as the corresponding badges on the Field Service Group profile page.
+- Update the Record Attendance modal meeting type dropdown to show “Mid-week Meeting” (and save/submit the meetingType value as exactly “Mid-week Meeting”) while leaving “Weekend Meeting” unchanged.
+- Change the attendance statistics summary label from “Average weekday attendance” to “Average mid-week attendance” without altering calculations or layout.
+- Update meeting attendance record cards to display “Mid-week Meeting” wherever “Weekday Meeting” appears.
+- Sweep the frontend for any remaining user-facing “Weekday” text and replace it with “Mid-week”, and ensure mid-week stats/filters/aggregations include both legacy “Weekday” records and new “Mid-week” records.
 
-**User-visible outcome:** Group 3 displays with a darker green everywhere its color is used, and Overseer/Assistant badges in the Publishers table look consistent with the badge styling on Field Service Group profile pages.
+**User-visible outcome:** Users see “Mid-week” terminology everywhere in the attendance UI, and mid-week attendance statistics continue to include both older “Weekday” records and new “Mid-week” records.

@@ -158,6 +158,15 @@ export interface CreateTaskInput {
     notes?: string;
     category: string;
 }
+export interface MeetingAttendance {
+    id: string;
+    groupNumber: bigint;
+    createdAt: bigint;
+    meetingDate: bigint;
+    meetingType: string;
+    publisherNamesPresent: Array<string>;
+    publishersPresent: Array<string>;
+}
 export interface GroupVisit {
     id: string;
     groupNumber: bigint;
@@ -222,6 +231,7 @@ export enum UserRole {
 }
 export interface backendInterface {
     addGroupVisit(input: AddGroupVisitInput): Promise<string>;
+    addMeetingAttendance(groupNumber: bigint, meetingDate: bigint, meetingType: string, publishersPresent: Array<string>, publisherNamesPresent: Array<string>): Promise<MeetingAttendance>;
     addPioneerHours(input: CreatePioneerMonthlyHoursInput): Promise<string>;
     addPublisher(fullName: string, fieldServiceGroup: bigint, privileges: {
         servant: boolean;
@@ -241,6 +251,10 @@ export interface backendInterface {
     deleteCheckoutRecord(territoryId: string, publisherId: PublisherId, dateCheckedOut: bigint): Promise<void>;
     deleteGlobalNote(id: bigint): Promise<void>;
     deleteGroupVisit(id: string): Promise<void>;
+    /**
+     * / New persistent backend method: Delete Meeting Attendance ///
+     */
+    deleteMeetingAttendance(id: string): Promise<boolean>;
     deletePioneer(id: string): Promise<void>;
     deletePioneerHours(id: string): Promise<void>;
     deletePublisher(id: PublisherId): Promise<void>;
@@ -267,6 +281,10 @@ export interface backendInterface {
     getGroupVisit(id: string): Promise<GroupVisit | null>;
     getGroupVisitsByGroupNumber(groupNumber: bigint): Promise<Array<GroupVisit>>;
     getGroupVisitsForGroup(group: bigint): Promise<Array<GroupVisit>>;
+    /**
+     * / New persistent query method for complete meeting record access
+     */
+    getMeetingAttendance(groupNumber: bigint | null): Promise<Array<MeetingAttendance>>;
     getPioneer(id: string): Promise<Pioneer | null>;
     getPioneerHours(id: string): Promise<PioneerMonthlyHours | null>;
     getPioneerHoursForServiceYear(pioneerId: string, serviceYear: string): Promise<Array<PioneerMonthlyHours>>;
@@ -292,6 +310,10 @@ export interface backendInterface {
     updateCheckoutRecord(territoryId: string, originalPublisherId: PublisherId, originalDateCheckedOut: bigint, newPublisherId: PublisherId, newDateCheckedOut: bigint, newDateReturned: bigint | null, newIsCampaign: boolean): Promise<void>;
     updateGlobalNote(id: bigint, title: string, content: string, category: string, attachedPublisher: PublisherId | null): Promise<void>;
     updateGroupVisit(id: string, groupNumber: bigint, visitDate: bigint, discussionTopics: string, publishersPresent: Array<string>, publisherNamesPresent: Array<string>, notesForOverseer: string, notesForAssistant: string, nextPlannedVisitDate: bigint | null): Promise<void>;
+    /**
+     * / New method for updating MeetingAttendance ///
+     */
+    updateMeetingAttendance(id: string, meetingDate: bigint, meetingType: string, publishersPresent: Array<string>, publisherNamesPresent: Array<string>): Promise<MeetingAttendance>;
     updatePioneerHours(id: string, pioneerId: string, month: string, hours: bigint, serviceYear: string): Promise<void>;
     updatePublisher(id: PublisherId, fullName: string, fieldServiceGroup: bigint, privileges: {
         servant: boolean;

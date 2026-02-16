@@ -1,24 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "App UI theming updates for Field Service Groups and Publisher pages (color adjustments and badge styling consistency).",
-  "architectural_notes": [],
+  "summary": "New project",
+  "architectural_notes": [
+    "Meeting type terminology should be consistent across UI: replace \"Weekday\" with \"Mid-week\" everywhere it appears (including modal options, statistics labels, and record cards)."
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-centralized-field-service-group-color-mapping-so-group-3-uses-the-darker-green-hex-color-0b6623-and-ensure-this-new-color-is-reflected-everywhere-field-service-group-colors-are-consumed-including-field-service-groups-main-page-colored-bars-group-text-icons-and-field-service-group-profile-pages-heading-text-colored-bars-record-visit-button",
-      "title": "Update the centralized Field Service Group color mapping so Group 3 uses the darker green hex color #0B6623, and ensure this new color is reflected everywhere Field Service Group colors are consumed (including Field Service Groups main page colored bars/group text/icons and Field Service Group profile pages heading text/colored bars/Record Visit button).",
+      "id": "feature-in-the-record-attendance-modal-meeting-type-dropdown-replace-the-option-label-and-stored-value-weekday-meeting-with-mid-week-meeting-while-keeping-the-weekend-meeting-option-unchanged",
+      "title": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-on-the-publishers-page-table-update-the-overseer-and-assistant-badges-so-their-styling-background-text-hover-behavior-matches-the-badge-styling-used-for-overseer-and-assistant-on-the-field-service-group-profile-page",
-      "title": "On the Publishers page table, update the Overseer and Assistant badges so their styling (background + text + hover behavior) matches the badge styling used for Overseer and Assistant on the Field Service Group profile page.",
+      "id": "feature-in-the-attendance-statistics-summary-ui-change-the-user-facing-label-text-from-average-weekday-attendance-to-average-mid-week-attendance",
+      "title": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
       "reqIds": [
         "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-meeting-attendance-record-cards-list-replace-the-displayed-meeting-type-text-weekday-meeting-with-mid-week-meeting-wherever-it-appears",
+      "title": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-any-other-user-facing-ui-text-across-the-frontend-that-contains-weekday-to-use-mid-week-instead-and-ensure-attendance-statistics-calculations-continue-to-correctly-classify-existing-stored-records-that-may-still-contain-weekday-as-mid-week-records",
+      "title": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+      "reqIds": [
+        "REQ-4"
       ],
       "version": 1
     }
@@ -26,18 +44,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Update Field Service Group 3 (Green) color to #0B6623 across all UI instances (main page bars/text/icons; profile headings/bars/Record Visit button).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Adjust Overseer and Assistant badges on the Publisher page table to match the badge color styling used on Field Service Group profile pages.",
+      "summary": "Rename meeting type terminology from \"Weekday\" to \"Mid-week\" across the app (Record Attendance modal dropdown, statistics labels, record cards, and any other occurrences)",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Darken Field Service Group 3 green and align Publisher table Overseer/Assistant badges",
+  "projectName": "Field Service Tracker",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
