@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T21:12:31.167Z",
+  "generatedAt": "2026-02-16T22:42:27.279Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,52 +12,46 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
+        "summary": "Update the Dashboard page to include a new \"Notes\" overview stat card placed in the second row, positioned next to the existing \"Meeting Attendance\" stat card (so the second row contains two stat cards side-by-side below the first four cards).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/fieldService/RecordAttendanceModal.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/fieldService/RecordAttendanceModal.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
+        "summary": "Implement the \"Notes\" stat card UI to match the existing stat card sizing and hover/click behavior, with these specifics: title text \"Notes\"; a note/document-style icon from the existing icon set; dark grey background (#374151 or #4B5563); white text for contrast; show the total global notes count across the entire app formatted like \"12 notes\" with the numeric count displayed large.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+        "summary": "Wire the Notes stat card to navigate to the Notes page route \"/notes\" when clicked, using the same routing approach as the other dashboard stat cards.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+        "summary": "Fetch the global notes list on the Dashboard using the existing global notes query hook and use it to compute the Notes stat card total; include the notes query loading state in the Dashboard loading gate so the card does not render stale/undefined counts while data is still loading.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/meetingAttendanceStats.ts",
-          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
-          "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/meetingAttendanceStats.ts",
-          "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
-          "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
-          "frontend/src/pages/FieldServiceGroupProfile.tsx"
+          "frontend/src/pages/Dashboard.tsx"
         ]
       }
     ]
@@ -67,10 +61,7 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
-    "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
-    "frontend/src/pages/FieldServiceGroupProfile.tsx",
-    "frontend/src/utils/meetingAttendanceStats.ts",
+    "frontend/src/pages/Dashboard.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

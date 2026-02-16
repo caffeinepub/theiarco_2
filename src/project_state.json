@@ -1,40 +1,38 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [
-    "Meeting type terminology should be consistent across UI: replace \"Weekday\" with \"Mid-week\" everywhere it appears (including modal options, statistics labels, and record cards)."
-  ],
+  "summary": "Dashboard enhancement: add a Notes overview stat card that displays total global notes and links to /notes.",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-in-the-record-attendance-modal-meeting-type-dropdown-replace-the-option-label-and-stored-value-weekday-meeting-with-mid-week-meeting-while-keeping-the-weekend-meeting-option-unchanged",
-      "title": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
+      "id": "feature-update-the-dashboard-page-to-include-a-new-notes-overview-stat-card-placed-in-the-second-row-positioned-next-to-the-existing-meeting-attendance-stat-card-so-the-second-row-contains-two-stat-cards-side-by-side-below-the-first-four-cards",
+      "title": "Update the Dashboard page to include a new \"Notes\" overview stat card placed in the second row, positioned next to the existing \"Meeting Attendance\" stat card (so the second row contains two stat cards side-by-side below the first four cards).",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-in-the-attendance-statistics-summary-ui-change-the-user-facing-label-text-from-average-weekday-attendance-to-average-mid-week-attendance",
-      "title": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
+      "id": "feature-implement-the-notes-stat-card-ui-to-match-the-existing-stat-card-sizing-and-hover-click-behavior-with-these-specifics-title-text-notes-a-note-document-style-icon-from-the-existing-icon-set-dark-grey-background-374151-or-4b5563-white-text-for-contrast-show-the-total-global-notes-count-across-the-entire-app-formatted-like-12-notes-with-the-numeric-count-displayed-large",
+      "title": "Implement the \"Notes\" stat card UI to match the existing stat card sizing and hover/click behavior, with these specifics: title text \"Notes\"; a note/document-style icon from the existing icon set; dark grey background (#374151 or #4B5563); white text for contrast; show the total global notes count across the entire app formatted like \"12 notes\" with the numeric count displayed large.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-in-the-meeting-attendance-record-cards-list-replace-the-displayed-meeting-type-text-weekday-meeting-with-mid-week-meeting-wherever-it-appears",
-      "title": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+      "id": "feature-wire-the-notes-stat-card-to-navigate-to-the-notes-page-route-notes-when-clicked-using-the-same-routing-approach-as-the-other-dashboard-stat-cards",
+      "title": "Wire the Notes stat card to navigate to the Notes page route \"/notes\" when clicked, using the same routing approach as the other dashboard stat cards.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-any-other-user-facing-ui-text-across-the-frontend-that-contains-weekday-to-use-mid-week-instead-and-ensure-attendance-statistics-calculations-continue-to-correctly-classify-existing-stored-records-that-may-still-contain-weekday-as-mid-week-records",
-      "title": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+      "id": "feature-fetch-the-global-notes-list-on-the-dashboard-using-the-existing-global-notes-query-hook-and-use-it-to-compute-the-notes-stat-card-total-include-the-notes-query-loading-state-in-the-dashboard-loading-gate-so-the-card-does-not-render-stale-undefined-counts-while-data-is-still-loading",
+      "title": "Fetch the global notes list on the Dashboard using the existing global notes query hook and use it to compute the Notes stat card total; include the notes query loading state in the Dashboard loading gate so the card does not render stale/undefined counts while data is still loading.",
       "reqIds": [
         "REQ-4"
       ],
@@ -44,7 +42,7 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Rename meeting type terminology from \"Weekday\" to \"Mid-week\" across the app (Record Attendance modal dropdown, statistics labels, record cards, and any other occurrences)",
+      "summary": "Add a sixth dashboard stat card for Notes showing total global notes, styled like other stat cards, and linking to /notes",
       "reqIds": [],
       "status": "pending"
     }

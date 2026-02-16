@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Rename meeting type terminology across the attendance UI from “Weekday” to “Mid-week” while keeping weekend terminology unchanged and preserving historical data behavior.
+**Goal:** Add a new “Notes” overview stat card to the Dashboard, displayed alongside the existing “Meeting Attendance” stat card in a second row.
 
 **Planned changes:**
-- Update the Record Attendance modal meeting type dropdown to show “Mid-week Meeting” (and save/submit the meetingType value as exactly “Mid-week Meeting”) while leaving “Weekend Meeting” unchanged.
-- Change the attendance statistics summary label from “Average weekday attendance” to “Average mid-week attendance” without altering calculations or layout.
-- Update meeting attendance record cards to display “Mid-week Meeting” wherever “Weekday Meeting” appears.
-- Sweep the frontend for any remaining user-facing “Weekday” text and replace it with “Mid-week”, and ensure mid-week stats/filters/aggregations include both legacy “Weekday” records and new “Mid-week” records.
+- Update the Dashboard stat card grid layout so the first row shows 4 cards and the second row shows 2 cards side-by-side (Meeting Attendance + new Notes card) on supported screen sizes.
+- Add a new “Notes” stat card matching existing stat card size and hover/click behavior, using a note/document icon, dark grey background (#374151 or #4B5563), and white text.
+- Fetch global notes on the Dashboard via the existing global notes query hook, compute the total count (notes.length), and include this query’s loading state in the Dashboard loading gate.
+- Make the Notes stat card navigate to the Notes page route (`/notes`) when clicked, using the same Link-based routing pattern as other stat cards.
 
-**User-visible outcome:** Users see “Mid-week” terminology everywhere in the attendance UI, and mid-week attendance statistics continue to include both older “Weekday” records and new “Mid-week” records.
+**User-visible outcome:** The Dashboard shows a new Notes stat card in the second row next to Meeting Attendance; it displays the total global notes count (e.g., “12 notes”) and clicking it navigates to `/notes`.

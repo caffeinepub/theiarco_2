@@ -1,82 +1,69 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Rename “Weekday” to “Mid-week” terminology across attendance UI (frontend-only)",
+  "title": "Add Notes stat card to Dashboard second row",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update the Record Attendance modal meeting type dropdown to use “Mid-week Meeting” (label + stored value) while preserving compatibility with legacy “Weekday Meeting” records.",
+      "summary": "Adjust the Dashboard stats grid so the second row contains two stat cards (Meeting Attendance + Notes) side-by-side under the first four cards.",
       "acceptanceCriteria": [
-        "When opening the Record Attendance modal, the meeting type dropdown shows \"Mid-week Meeting\" and \"Weekend Meeting\" options.",
-        "Selecting \"Mid-week Meeting\" submits/saves the meetingType value as exactly \"Mid-week Meeting\".",
-        "No other labels, validation messages, or behaviors in the modal change."
+        "The Dashboard shows 4 stat cards in the first row and 2 stat cards in the second row.",
+        "In the second row, the Notes stat card appears next to (side-by-side with) the Meeting Attendance stat card on screen sizes where the grid supports multiple columns (e.g., sm and up).",
+        "The two second-row cards are evenly spaced using the same grid gap behavior as the other stat cards."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
+          "path": "frontend/src/pages/Dashboard.tsx",
           "operation": "modify",
-          "description": "Replace the SelectItem option label/value \"Weekday Meeting\" with \"Mid-week Meeting\" (keeping \"Weekend Meeting\" unchanged), and normalize edit-mode prefill so legacy stored values of \"Weekday Meeting\" are treated as \"Mid-week Meeting\" for selection + save behavior."
+          "description": "Update the second-row stats grid layout so it renders exactly two cards (Meeting Attendance and the new Notes card) and uses the same grid gap behavior as other stat cards while showing them side-by-side at sm and up."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Change attendance statistics summary wording from “Average weekday attendance” to “Average mid-week attendance” without altering calculations or layout.",
+      "summary": "Create the Notes stat card UI with matching sizing/hover behavior, dark grey background, white content, and a computed global notes count with proper pluralization.",
       "acceptanceCriteria": [
-        "The attendance statistics section displays \"Average mid-week attendance\" (and continues to display the weekend label unchanged).",
-        "No other statistics wording, calculations, or layout changes occur."
+        "The Notes card uses the same outer classes as the other stat cards (rounded, padding, shadow, hover:shadow-xl, hover:brightness-110, cursor-pointer) so its size and hover effect match.",
+        "The Notes card background color is exactly #374151 or exactly #4B5563, and all text/icons on the card are white (or white with opacity consistent with the other cards).",
+        "The card displays the global notes total count derived from the app’s global notes data (not hard-coded).",
+        "The card displays the count in a large font, and the text shows the format \"<count> note\"/\"<count> notes\" (e.g., \"12 notes\")."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
+          "path": "frontend/src/pages/Dashboard.tsx",
           "operation": "modify",
-          "description": "Update the rendered label text from \"Average weekday attendance\" to \"Average mid-week attendance\" and leave the weekend label and all rendering/calculation behavior unchanged."
+          "description": "Add a new Notes stat card component alongside the existing Meeting Attendance card, using a note/document-style icon from the existing lucide-react icon set, matching existing stat card outer classes and hover behavior, setting the background to exactly #374151 or exactly #4B5563 with white text/icons, and rendering the computed total notes count (large number + \"note/notes\" label with correct pluralization)."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Ensure meeting attendance record cards display “Mid-week Meeting” wherever “Weekday Meeting” appears, without changing other card fields.",
+      "summary": "Make the Notes stat card navigate to the Notes page at /notes using the same Link pattern as other dashboard cards.",
       "acceptanceCriteria": [
-        "Attendance record cards never display the phrase \"Weekday Meeting\".",
-        "Cards display \"Mid-week Meeting\" in its place, while leaving other card fields (date badge, counts, names, actions) unchanged."
+        "Clicking anywhere on the Notes stat card navigates to /notes.",
+        "Navigation uses the existing <Link to=\"/notes\"> pattern consistent with other dashboard cards."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
+          "path": "frontend/src/pages/Dashboard.tsx",
           "operation": "modify",
-          "description": "Adjust the attendance record card title rendering so that when a record's meetingType is the legacy \"Weekday Meeting\" value it displays as \"Mid-week Meeting\", while leaving all other rendered fields and actions unchanged."
+          "description": "Wrap the Notes stat card in the existing @tanstack/react-router Link component using to=\"/notes\" so the entire card area is clickable and navigation behavior matches the other dashboard stat cards."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Remove remaining user-facing “Weekday” wording across the frontend and keep mid-week stats/filters compatible with both legacy “Weekday” and new “Mid-week” stored values.",
+      "summary": "Load global notes on the Dashboard via the existing global notes query hook, compute notes.length for the Notes card, and include its loading state in the Dashboard loading gate.",
       "acceptanceCriteria": [
-        "A sweep of the frontend UI finds no remaining user-visible occurrences of the word \"Weekday\".",
-        "Mid-week average calculations and any mid-week filtering/aggregation continue to include both legacy \"Weekday\" records and new \"Mid-week\" records so historical data remains reflected in the mid-week stats.",
-        "Weekend calculations remain unchanged."
+        "Dashboard uses the existing global notes React Query hook to obtain the notes array and compute the total count as notes.length.",
+        "The Dashboard loading spinner state accounts for the global notes query loading state in the same way it already accounts for other dashboard data queries.",
+        "No other Dashboard sections (cards, recent activity, alerts) change behavior or content aside from adding the Notes stat card."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/meetingAttendanceStats.ts",
+          "path": "frontend/src/pages/Dashboard.tsx",
           "operation": "modify",
-          "description": "Update mid-week (currently \"weekday\") attendance classification logic so it includes both legacy \"Weekday\" meetingType strings and new \"Mid-week\" meetingType strings, while keeping weekend classification unchanged."
-        },
-        {
-          "path": "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
-          "operation": "modify",
-          "description": "Confirm no remaining user-visible \"Weekday\" text remains in this component after the label change (ensure weekend wording remains unchanged)."
-        },
-        {
-          "path": "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
-          "operation": "modify",
-          "description": "Confirm no remaining user-visible \"Weekday\" text remains in the modal UI after updating the dropdown option, while keeping all validation messages and behaviors unchanged."
-        },
-        {
-          "path": "frontend/src/pages/FieldServiceGroupProfile.tsx",
-          "operation": "modify",
-          "description": "Confirm no remaining user-visible \"Weekday\" text is rendered in attendance cards after applying legacy-to-new display mapping, while leaving weekend rendering unchanged."
+          "description": "Import and use the existing useGetAllGlobalNotes hook to fetch the global notes array, compute the notes total as notes.length for the Notes stat card, and include the notes query isLoading state in the Dashboard's combined isLoading gate to avoid rendering undefined/stale counts."
         }
       ]
     }

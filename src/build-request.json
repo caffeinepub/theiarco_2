@@ -1,89 +1,92 @@
 {
   "kind": "build_request",
-  "title": "Rename meeting type terminology from “Weekday” to “Mid-week” across attendance UI",
+  "title": "Add Notes stat card to Dashboard second row",
   "projectName": "Field Service Tracker",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
+      "text": "Update the Dashboard page to include a new \"Notes\" overview stat card placed in the second row, positioned next to the existing \"Meeting Attendance\" stat card (so the second row contains two stat cards side-by-side below the first four cards).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "In the Record Attendance modal, change the dropdown option from \"Weekday Meeting\" to \"Mid-week Meeting\"."
+          "Add a sixth stat card next to the Meeting Attendance card (both in the second row below the first four cards)."
         ]
       },
       "acceptanceCriteria": [
-        "When opening the Record Attendance modal, the meeting type dropdown shows \"Mid-week Meeting\" and \"Weekend Meeting\" options.",
-        "Selecting \"Mid-week Meeting\" submits/saves the meetingType value as exactly \"Mid-week Meeting\".",
-        "No other labels, validation messages, or behaviors in the modal change."
+        "The Dashboard shows 4 stat cards in the first row and 2 stat cards in the second row.",
+        "In the second row, the Notes stat card appears next to (side-by-side with) the Meeting Attendance stat card on screen sizes where the grid supports multiple columns (e.g., sm and up).",
+        "The two second-row cards are evenly spaced using the same grid gap behavior as the other stat cards."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
+      "text": "Implement the \"Notes\" stat card UI to match the existing stat card sizing and hover/click behavior, with these specifics: title text \"Notes\"; a note/document-style icon from the existing icon set; dark grey background (#374151 or #4B5563); white text for contrast; show the total global notes count across the entire app formatted like \"12 notes\" with the numeric count displayed large.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "In the attendance statistics section, change \"Average weekday attendance\" to \"Average mid-week attendance\"."
+          "The Notes card should show:\n   - Title: \"Notes\"\n   - Icon: A note or document icon\n   - Total number of global notes across the entire app\n   - Format like: \"12 notes\" with the count displayed large\n   - Background color: Dark Grey (#374151 or #4B5563)\n   - White text for good contrast",
+          "Make sure the Notes card:\n   - Is the same size as the other stat cards\n   - Has the same clickable hover effect"
         ]
       },
       "acceptanceCriteria": [
-        "The attendance statistics section displays \"Average mid-week attendance\" (and continues to display the weekend label unchanged).",
-        "No other statistics wording, calculations, or layout changes occur."
+        "The Notes card uses the same outer classes as the other stat cards (rounded, padding, shadow, hover:shadow-xl, hover:brightness-110, cursor-pointer) so its size and hover effect match.",
+        "The Notes card background color is exactly #374151 or exactly #4B5563, and all text/icons on the card are white (or white with opacity consistent with the other cards).",
+        "The card displays the global notes total count derived from the app’s global notes data (not hard-coded).",
+        "The card displays the count in a large font, and the text shows the format \"<count> note\"/\"<count> notes\" (e.g., \"12 notes\")."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+      "text": "Wire the Notes stat card to navigate to the Notes page route \"/notes\" when clicked, using the same routing approach as the other dashboard stat cards.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "In the attendance record cards, change \"Weekday Meeting\" to \"Mid-week Meeting\"."
+          "When the Notes card is clicked, navigate to the Notes page (/notes)."
         ]
       },
       "acceptanceCriteria": [
-        "Attendance record cards never display the phrase \"Weekday Meeting\".",
-        "Cards display \"Mid-week Meeting\" in its place, while leaving other card fields (date badge, counts, names, actions) unchanged."
+        "Clicking anywhere on the Notes stat card navigates to /notes.",
+        "Navigation uses the existing <Link to=\"/notes\"> pattern consistent with other dashboard cards."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+      "text": "Fetch the global notes list on the Dashboard using the existing global notes query hook and use it to compute the Notes stat card total; include the notes query loading state in the Dashboard loading gate so the card does not render stale/undefined counts while data is still loading.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "Update anywhere else that displays \"Weekday\" to say \"Mid-week\" instead."
+          "Total number of global notes across the entire app",
+          "Keep everything else unchanged."
         ]
       },
       "acceptanceCriteria": [
-        "A sweep of the frontend UI finds no remaining user-visible occurrences of the word \"Weekday\".",
-        "Mid-week average calculations and any mid-week filtering/aggregation continue to include both legacy \"Weekday\" records and new \"Mid-week\" records so historical data remains reflected in the mid-week stats.",
-        "Weekend calculations remain unchanged."
+        "Dashboard uses the existing global notes React Query hook to obtain the notes array and compute the total count as notes.length.",
+        "The Dashboard loading spinner state accounts for the global notes query loading state in the same way it already accounts for other dashboard data queries.",
+        "No other Dashboard sections (cards, recent activity, alerts) change behavior or content aside from adding the Notes stat card."
       ]
     }
   ],
   "constraints": [
-    "Keep everything else unchanged besides replacing the specified terminology.",
-    "Do not edit files under frontend/src/components/ui or any other immutable paths listed in SYSTEM_CONTEXT.",
-    "Do not introduce backend state/schema changes unless strictly required for this terminology update."
+    "Keep all existing Dashboard behavior and styling unchanged except for adding the new Notes stat card and adjusting the second-row layout to accommodate it.",
+    "Do not edit files in frontend immutable paths (e.g., frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui/*)."
   ],
   "nonGoals": [
-    "No redesign or visual restyling beyond the text replacements.",
-    "No changes to authentication, permissions, or data model beyond what is necessary to support the terminology update.",
-    "No data migration of existing records is required if the app can remain compatible with existing stored \"Weekday\" values."
+    "Do not change the Notes page functionality, filters, CRUD behavior, or styling.",
+    "Do not add new backend endpoints or modify backend data schema/state for this change.",
+    "Do not change the existing Meeting Attendance stat card calculations, styling, color, or navigation."
   ],
   "imageRequirements": {
     "required": [],

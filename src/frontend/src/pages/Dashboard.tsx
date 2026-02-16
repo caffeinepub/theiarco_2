@@ -2,11 +2,14 @@ import { useGetAllPublishers } from '../hooks/useQueries';
 import { useGetAllTerritories } from '../hooks/useTerritories';
 import { useGetTasks } from '../hooks/useTasks';
 import { useGetAllShepherdingVisits } from '../hooks/useShepherdingVisits';
+import { useGetAllGlobalNotes } from '../hooks/useGlobalNotes';
 import { usePioneersOnTrack } from '../hooks/usePioneersOnTrack';
+import { useGetMeetingAttendance } from '../hooks/useMeetingAttendance';
 import { TaskStatus, Territory, CheckoutRecord } from '../backend';
-import { Users, Map, ListTodo, AlertCircle, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Users, Map, ListTodo, AlertCircle, AlertTriangle, TrendingUp, ClipboardList, FileText } from 'lucide-react';
 import { formatVisitDate } from '../utils/formatters';
 import { getCurrentServiceYear } from '../utils/serviceYear';
+import { computeMeetingAttendanceOverview } from '../utils/meetingAttendanceStats';
 import { Link } from '@tanstack/react-router';
 import { getPageThemeColor } from '../theme/pageTheme';
 
@@ -15,6 +18,8 @@ export default function Dashboard() {
   const { data: territories = [], isLoading: territoriesLoading } = useGetAllTerritories();
   const { data: tasks = [], isLoading: tasksLoading } = useGetTasks(TaskStatus.all);
   const { data: shepherdingVisits = [], isLoading: visitsLoading } = useGetAllShepherdingVisits();
+  const { data: globalNotes = [], isLoading: notesLoading } = useGetAllGlobalNotes();
+  const { data: allAttendanceRecords = [], isLoading: attendanceLoading } = useGetMeetingAttendance();
   
   // Get current service year and pioneers on track count
   const currentServiceYear = getCurrentServiceYear();
@@ -36,6 +41,15 @@ export default function Dashboard() {
     const dueDate = typeof task.dueDate === 'bigint' ? Number(task.dueDate) : task.dueDate;
     return dueDate < nowSeconds;
   }).length;
+
+  // Calculate meeting attendance overview stats
+  const { totalRecords, averagePercentage } = computeMeetingAttendanceOverview(
+    allAttendanceRecords,
+    publishers
+  );
+
+  // Calculate total notes count
+  const totalNotesCount = globalNotes.length;
 
   // Helper to get the active checkout record (most recent with dateReturned = null)
   const getActiveCheckoutRecord = (territory: Territory): CheckoutRecord | null => {
@@ -84,7 +98,7 @@ export default function Dashboard() {
     })
     .slice(0, 5);
 
-  const isLoading = publishersLoading || territoriesLoading || tasksLoading || visitsLoading || pioneersOnTrackLoading;
+  const isLoading = publishersLoading || territoriesLoading || tasksLoading || visitsLoading || pioneersOnTrackLoading || attendanceLoading || notesLoading;
 
   if (isLoading) {
     return (
@@ -105,7 +119,7 @@ export default function Dashboard() {
         <p className="text-muted-foreground mt-1">Overview of your congregation's activities</p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - First Row (4 cards) */}
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Active Publishers Card */}
         <Link
@@ -164,6 +178,54 @@ export default function Dashboard() {
           <div className="space-y-1">
             <p className="text-5xl font-bold">{pioneersOnTrackCount}</p>
             <p className="text-lg font-medium opacity-90">Pioneers On Track</p>
+          </div>
+        </Link>
+      </div>
+
+      {/* Stats Cards - Second Row (Meeting Attendance + Notes) */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Meeting Attendance Card */}
+        <Link
+          to="/field-service-groups"
+          className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          style={{ backgroundColor: '#14b8a6' }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <ClipboardList className="h-8 w-8 opacity-80" />
+          </div>
+          <div className="space-y-3">
+            <div>
+              <p className="text-5xl font-bold">{totalRecords}</p>
+              <p className="text-lg font-medium opacity-90">Meeting Attendance</p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="opacity-90">{averagePercentage}% average attendance</span>
+              </div>
+              <div className="h-2 w-full rounded-full bg-white/30 overflow-hidden">
+                <div
+                  className="h-full bg-white rounded-full transition-all"
+                  style={{ width: `${Math.min(averagePercentage, 100)}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Notes Card */}
+        <Link
+          to="/notes"
+          className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
+          style={{ backgroundColor: '#374151' }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <FileText className="h-8 w-8 opacity-80" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-5xl font-bold">{totalNotesCount}</p>
+            <p className="text-lg font-medium opacity-90">
+              {totalNotesCount === 1 ? 'Note' : 'Notes'}
+            </p>
           </div>
         </Link>
       </div>

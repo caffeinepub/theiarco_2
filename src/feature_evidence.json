@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-the-record-attendance-modal-meeting-type-dropdown-replace-the-option-label-and-stored-value-weekday-meeting-with-mid-week-meeting-while-keeping-the-weekend-meeting-option-unchanged",
-      "featureTitle": "In the Record Attendance modal meeting type dropdown, replace the option label and stored value \"Weekday Meeting\" with \"Mid-week Meeting\", while keeping the \"Weekend Meeting\" option unchanged.",
+      "featureId": "feature-update-the-dashboard-page-to-include-a-new-notes-overview-stat-card-placed-in-the-second-row-positioned-next-to-the-existing-meeting-attendance-stat-card-so-the-second-row-contains-two-stat-cards-side-by-side-below-the-first-four-cards",
+      "featureTitle": "Update the Dashboard page to include a new \"Notes\" overview stat card placed in the second row, positioned next to the existing \"Meeting Attendance\" stat card (so the second row contains two stat cards side-by-side below the first four cards).",
       "files": [
-        "frontend/src/components/fieldService/RecordAttendanceModal.tsx"
+        "frontend/src/pages/Dashboard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,10 +21,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-in-the-attendance-statistics-summary-ui-change-the-user-facing-label-text-from-average-weekday-attendance-to-average-mid-week-attendance",
-      "featureTitle": "In the attendance statistics summary UI, change the user-facing label text from \"Average weekday attendance\" to \"Average mid-week attendance\".",
+      "featureId": "feature-implement-the-notes-stat-card-ui-to-match-the-existing-stat-card-sizing-and-hover-click-behavior-with-these-specifics-title-text-notes-a-note-document-style-icon-from-the-existing-icon-set-dark-grey-background-374151-or-4b5563-white-text-for-contrast-show-the-total-global-notes-count-across-the-entire-app-formatted-like-12-notes-with-the-numeric-count-displayed-large",
+      "featureTitle": "Implement the \"Notes\" stat card UI to match the existing stat card sizing and hover/click behavior, with these specifics: title text \"Notes\"; a note/document-style icon from the existing icon set; dark grey background (#374151 or #4B5563); white text for contrast; show the total global notes count across the entire app formatted like \"12 notes\" with the numeric count displayed large.",
       "files": [
-        "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx"
+        "frontend/src/pages/Dashboard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -40,10 +40,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-in-the-meeting-attendance-record-cards-list-replace-the-displayed-meeting-type-text-weekday-meeting-with-mid-week-meeting-wherever-it-appears",
-      "featureTitle": "In the meeting attendance record cards list, replace the displayed meeting type text \"Weekday Meeting\" with \"Mid-week Meeting\" wherever it appears.",
+      "featureId": "feature-wire-the-notes-stat-card-to-navigate-to-the-notes-page-route-notes-when-clicked-using-the-same-routing-approach-as-the-other-dashboard-stat-cards",
+      "featureTitle": "Wire the Notes stat card to navigate to the Notes page route \"/notes\" when clicked, using the same routing approach as the other dashboard stat cards.",
       "files": [
-        "frontend/src/pages/FieldServiceGroupProfile.tsx"
+        "frontend/src/pages/Dashboard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -59,13 +59,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-any-other-user-facing-ui-text-across-the-frontend-that-contains-weekday-to-use-mid-week-instead-and-ensure-attendance-statistics-calculations-continue-to-correctly-classify-existing-stored-records-that-may-still-contain-weekday-as-mid-week-records",
-      "featureTitle": "Update any other user-facing UI text across the frontend that contains \"Weekday\" to use \"Mid-week\" instead, and ensure attendance statistics calculations continue to correctly classify existing stored records that may still contain \"Weekday\" as mid-week records.",
+      "featureId": "feature-fetch-the-global-notes-list-on-the-dashboard-using-the-existing-global-notes-query-hook-and-use-it-to-compute-the-notes-stat-card-total-include-the-notes-query-loading-state-in-the-dashboard-loading-gate-so-the-card-does-not-render-stale-undefined-counts-while-data-is-still-loading",
+      "featureTitle": "Fetch the global notes list on the Dashboard using the existing global notes query hook and use it to compute the Notes stat card total; include the notes query loading state in the Dashboard loading gate so the card does not render stale/undefined counts while data is still loading.",
       "files": [
-        "frontend/src/components/fieldService/AttendanceStatsSummaryCard.tsx",
-        "frontend/src/components/fieldService/RecordAttendanceModal.tsx",
-        "frontend/src/pages/FieldServiceGroupProfile.tsx",
-        "frontend/src/utils/meetingAttendanceStats.ts"
+        "frontend/src/pages/Dashboard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
