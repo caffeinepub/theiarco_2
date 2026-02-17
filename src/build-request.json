@@ -1,92 +1,89 @@
 {
   "kind": "build_request",
-  "title": "Add Notes stat card to Dashboard second row",
-  "projectName": "Field Service Tracker",
+  "title": "Add LDC and Food Service task categories and fix build",
+  "projectName": "Tasks Module",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the Dashboard page to include a new \"Notes\" overview stat card placed in the second row, positioned next to the existing \"Meeting Attendance\" stat card (so the second row contains two stat cards side-by-side below the first four cards).",
+      "text": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Add Task modal, without changing, removing, or renaming any existing category options.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Add a sixth stat card next to the Meeting Attendance card (both in the second row below the first four cards)."
+          "Add two new task categories to the Tasks module:\n\n1. Add \"LDC\" as a new category option in the task category dropdown.\n\n2. Add \"Food Service\" as a new category option in the task category dropdown.\n\n3. Make sure these new categories appear in:\n   - The \"Add Task\" modal category dropdown\n   - The \"Edit Task\" modal category dropdown\n   - Any category filter dropdowns on the Tasks page\n\n4. Keep all existing categories exactly as they are - just add the two new ones.\n\nKeep everything else unchanged."
         ]
       },
       "acceptanceCriteria": [
-        "The Dashboard shows 4 stat cards in the first row and 2 stat cards in the second row.",
-        "In the second row, the Notes stat card appears next to (side-by-side with) the Meeting Attendance stat card on screen sizes where the grid supports multiple columns (e.g., sm and up).",
-        "The two second-row cards are evenly spaced using the same grid gap behavior as the other stat cards."
+        "In the Add Task modal (frontend/src/components/tasks/AddTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
+        "All existing category options remain present and unchanged in label and value.",
+        "Selecting \"LDC\" or \"Food Service\" allows a task to be submitted successfully."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement the \"Notes\" stat card UI to match the existing stat card sizing and hover/click behavior, with these specifics: title text \"Notes\"; a note/document-style icon from the existing icon set; dark grey background (#374151 or #4B5563); white text for contrast; show the total global notes count across the entire app formatted like \"12 notes\" with the numeric count displayed large.",
+      "text": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Edit Task modal, without changing, removing, or renaming any existing category options.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "The Notes card should show:\n   - Title: \"Notes\"\n   - Icon: A note or document icon\n   - Total number of global notes across the entire app\n   - Format like: \"12 notes\" with the count displayed large\n   - Background color: Dark Grey (#374151 or #4B5563)\n   - White text for good contrast",
-          "Make sure the Notes card:\n   - Is the same size as the other stat cards\n   - Has the same clickable hover effect"
+          "Make sure these new categories appear in:\n   - The \"Edit Task\" modal category dropdown"
         ]
       },
       "acceptanceCriteria": [
-        "The Notes card uses the same outer classes as the other stat cards (rounded, padding, shadow, hover:shadow-xl, hover:brightness-110, cursor-pointer) so its size and hover effect match.",
-        "The Notes card background color is exactly #374151 or exactly #4B5563, and all text/icons on the card are white (or white with opacity consistent with the other cards).",
-        "The card displays the global notes total count derived from the app’s global notes data (not hard-coded).",
-        "The card displays the count in a large font, and the text shows the format \"<count> note\"/\"<count> notes\" (e.g., \"12 notes\")."
+        "In the Edit Task modal (frontend/src/components/tasks/EditTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
+        "All existing category options remain present and unchanged in label and value.",
+        "A task whose category is set to \"LDC\" or \"Food Service\" can be saved successfully from the Edit Task modal."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Wire the Notes stat card to navigate to the Notes page route \"/notes\" when clicked, using the same routing approach as the other dashboard stat cards.",
+      "text": "Ensure any category filter dropdowns on the Tasks page include the new category options \"LDC\" and \"Food Service\" (if such dropdowns exist), while keeping all existing filter options unchanged.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "When the Notes card is clicked, navigate to the Notes page (/notes)."
+          "Make sure these new categories appear in:\n   - Any category filter dropdowns on the Tasks page"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking anywhere on the Notes stat card navigates to /notes.",
-        "Navigation uses the existing <Link to=\"/notes\"> pattern consistent with other dashboard cards."
+        "If the Tasks page has any category filter dropdown UI, it includes both \"LDC\" and \"Food Service\" options.",
+        "No existing filter options are changed or removed."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Fetch the global notes list on the Dashboard using the existing global notes query hook and use it to compute the Notes stat card total; include the notes query loading state in the Dashboard loading gate so the card does not render stale/undefined counts while data is still loading.",
+      "text": "Resolve the current build failure related to the Tasks category change and ensure the app builds successfully after adding the new categories.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-2"
         ],
         "quotes": [
-          "Total number of global notes across the entire app",
-          "Keep everything else unchanged."
+          "❌ Failed to build your app",
+          "Yes run it again."
         ]
       },
       "acceptanceCriteria": [
-        "Dashboard uses the existing global notes React Query hook to obtain the notes array and compute the total count as notes.length.",
-        "The Dashboard loading spinner state accounts for the global notes query loading state in the same way it already accounts for other dashboard data queries.",
-        "No other Dashboard sections (cards, recent activity, alerts) change behavior or content aside from adding the Notes stat card."
+        "The frontend TypeScript build completes successfully after adding the new categories (no type errors from CategoryOption unions or Select value typing).",
+        "The Tasks page, Add Task modal, and Edit Task modal load without runtime errors and show the updated category options."
       ]
     }
   ],
   "constraints": [
-    "Keep all existing Dashboard behavior and styling unchanged except for adding the new Notes stat card and adjusting the second-row layout to accommodate it.",
-    "Do not edit files in frontend immutable paths (e.g., frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui/*)."
+    "Keep all existing task categories exactly as they are; only add \"LDC\" and \"Food Service\".",
+    "Keep everything else in the Tasks module unchanged aside from what is necessary to add the two new category options and fix the build."
   ],
   "nonGoals": [
-    "Do not change the Notes page functionality, filters, CRUD behavior, or styling.",
-    "Do not add new backend endpoints or modify backend data schema/state for this change.",
-    "Do not change the existing Meeting Attendance stat card calculations, styling, color, or navigation."
+    "Do not add new backend storage fields or change the backend schema for tasks.",
+    "Do not change task status filtering behavior (All/Completed/Uncompleted buttons).",
+    "Do not change CSV export columns or formatting."
   ],
   "imageRequirements": {
     "required": [],

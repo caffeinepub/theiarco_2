@@ -27,7 +27,7 @@ interface EditTaskModalProps {
   task: Task;
 }
 
-type CategoryOption = 'Territory' | 'Pioneers' | 'Meeting' | 'General' | 'Publisher' | 'Public Witnessing';
+type CategoryOption = 'Territory' | 'Pioneers' | 'Meeting' | 'General' | 'Publisher' | 'Public Witnessing' | 'LDC' | 'Food Service';
 
 export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalProps) {
   const [title, setTitle] = useState('');
@@ -157,6 +157,8 @@ export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalPr
                 <SelectItem value="General">General</SelectItem>
                 <SelectItem value="Publisher">Publisher</SelectItem>
                 <SelectItem value="Public Witnessing">Public Witnessing</SelectItem>
+                <SelectItem value="LDC">LDC</SelectItem>
+                <SelectItem value="Food Service">Food Service</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -1,69 +1,72 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add Notes stat card to Dashboard second row",
+  "title": "Add LDC & Food Service task categories and restore successful build",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Adjust the Dashboard stats grid so the second row contains two stat cards (Meeting Attendance + Notes) side-by-side under the first four cards.",
+      "summary": "Add “LDC” and “Food Service” to the Add Task modal category dropdown while keeping all existing categories unchanged.",
       "acceptanceCriteria": [
-        "The Dashboard shows 4 stat cards in the first row and 2 stat cards in the second row.",
-        "In the second row, the Notes stat card appears next to (side-by-side with) the Meeting Attendance stat card on screen sizes where the grid supports multiple columns (e.g., sm and up).",
-        "The two second-row cards are evenly spaced using the same grid gap behavior as the other stat cards."
+        "In the Add Task modal (frontend/src/components/tasks/AddTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
+        "All existing category options remain present and unchanged in label and value.",
+        "Selecting \"LDC\" or \"Food Service\" allows a task to be submitted successfully."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Dashboard.tsx",
+          "path": "frontend/src/components/tasks/AddTaskModal.tsx",
           "operation": "modify",
-          "description": "Update the second-row stats grid layout so it renders exactly two cards (Meeting Attendance and the new Notes card) and uses the same grid gap behavior as other stat cards while showing them side-by-side at sm and up."
+          "description": "Extend the local CategoryOption union to include \"LDC\" and \"Food Service\", and add corresponding SelectItem entries to the category dropdown without altering existing options."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Create the Notes stat card UI with matching sizing/hover behavior, dark grey background, white content, and a computed global notes count with proper pluralization.",
+      "summary": "Add “LDC” and “Food Service” to the Edit Task modal category dropdown while keeping all existing categories unchanged.",
       "acceptanceCriteria": [
-        "The Notes card uses the same outer classes as the other stat cards (rounded, padding, shadow, hover:shadow-xl, hover:brightness-110, cursor-pointer) so its size and hover effect match.",
-        "The Notes card background color is exactly #374151 or exactly #4B5563, and all text/icons on the card are white (or white with opacity consistent with the other cards).",
-        "The card displays the global notes total count derived from the app’s global notes data (not hard-coded).",
-        "The card displays the count in a large font, and the text shows the format \"<count> note\"/\"<count> notes\" (e.g., \"12 notes\")."
+        "In the Edit Task modal (frontend/src/components/tasks/EditTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
+        "All existing category options remain present and unchanged in label and value.",
+        "A task whose category is set to \"LDC\" or \"Food Service\" can be saved successfully from the Edit Task modal."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Dashboard.tsx",
+          "path": "frontend/src/components/tasks/EditTaskModal.tsx",
           "operation": "modify",
-          "description": "Add a new Notes stat card component alongside the existing Meeting Attendance card, using a note/document-style icon from the existing lucide-react icon set, matching existing stat card outer classes and hover behavior, setting the background to exactly #374151 or exactly #4B5563 with white text/icons, and rendering the computed total notes count (large number + \"note/notes\" label with correct pluralization)."
+          "description": "Extend the local CategoryOption union to include \"LDC\" and \"Food Service\", and add corresponding SelectItem entries to the category dropdown without altering existing options."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Make the Notes stat card navigate to the Notes page at /notes using the same Link pattern as other dashboard cards.",
+      "summary": "Ensure any Tasks page category filter dropdown (if present) includes “LDC” and “Food Service” while keeping all existing filter options unchanged.",
       "acceptanceCriteria": [
-        "Clicking anywhere on the Notes stat card navigates to /notes.",
-        "Navigation uses the existing <Link to=\"/notes\"> pattern consistent with other dashboard cards."
+        "If the Tasks page has any category filter dropdown UI, it includes both \"LDC\" and \"Food Service\" options.",
+        "No existing filter options are changed or removed."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Dashboard.tsx",
+          "path": "frontend/src/pages/Tasks.tsx",
           "operation": "modify",
-          "description": "Wrap the Notes stat card in the existing @tanstack/react-router Link component using to=\"/notes\" so the entire card area is clickable and navigation behavior matches the other dashboard stat cards."
+          "description": "Audit the Tasks page for any category filter dropdown UI; if a category filter exists, add \"LDC\" and \"Food Service\" options while preserving all existing options and behavior. If no category filter exists, keep behavior unchanged."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Load global notes on the Dashboard via the existing global notes query hook, compute notes.length for the Notes card, and include its loading state in the Dashboard loading gate.",
+      "summary": "Fix frontend build/type issues introduced by adding the new task categories and ensure Tasks UI loads without errors.",
       "acceptanceCriteria": [
-        "Dashboard uses the existing global notes React Query hook to obtain the notes array and compute the total count as notes.length.",
-        "The Dashboard loading spinner state accounts for the global notes query loading state in the same way it already accounts for other dashboard data queries.",
-        "No other Dashboard sections (cards, recent activity, alerts) change behavior or content aside from adding the Notes stat card."
+        "The frontend TypeScript build completes successfully after adding the new categories (no type errors from CategoryOption unions or Select value typing).",
+        "The Tasks page, Add Task modal, and Edit Task modal load without runtime errors and show the updated category options."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Dashboard.tsx",
+          "path": "frontend/src/components/tasks/AddTaskModal.tsx",
           "operation": "modify",
-          "description": "Import and use the existing useGetAllGlobalNotes hook to fetch the global notes array, compute the notes total as notes.length for the Notes stat card, and include the notes query isLoading state in the Dashboard's combined isLoading gate to avoid rendering undefined/stale counts."
+          "description": "Adjust CategoryOption typing and Select value/onValueChange typing (as needed) so TypeScript builds cleanly with the added \"LDC\" and \"Food Service\" options."
+        },
+        {
+          "path": "frontend/src/components/tasks/EditTaskModal.tsx",
+          "operation": "modify",
+          "description": "Adjust CategoryOption typing and task.category initialization/casting (as needed) so TypeScript builds cleanly with the added \"LDC\" and \"Food Service\" options and the modal initializes/saves without runtime errors."
         }
       ]
     }

@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-dashboard-page-to-include-a-new-notes-overview-stat-card-placed-in-the-second-row-positioned-next-to-the-existing-meeting-attendance-stat-card-so-the-second-row-contains-two-stat-cards-side-by-side-below-the-first-four-cards",
-      "featureTitle": "Update the Dashboard page to include a new \"Notes\" overview stat card placed in the second row, positioned next to the existing \"Meeting Attendance\" stat card (so the second row contains two stat cards side-by-side below the first four cards).",
+      "featureId": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-add-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
+      "featureTitle": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Add Task modal, without changing, removing, or renaming any existing category options.",
       "files": [
-        "frontend/src/pages/Dashboard.tsx"
+        "frontend/src/components/tasks/AddTaskModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,10 +21,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-the-notes-stat-card-ui-to-match-the-existing-stat-card-sizing-and-hover-click-behavior-with-these-specifics-title-text-notes-a-note-document-style-icon-from-the-existing-icon-set-dark-grey-background-374151-or-4b5563-white-text-for-contrast-show-the-total-global-notes-count-across-the-entire-app-formatted-like-12-notes-with-the-numeric-count-displayed-large",
-      "featureTitle": "Implement the \"Notes\" stat card UI to match the existing stat card sizing and hover/click behavior, with these specifics: title text \"Notes\"; a note/document-style icon from the existing icon set; dark grey background (#374151 or #4B5563); white text for contrast; show the total global notes count across the entire app formatted like \"12 notes\" with the numeric count displayed large.",
+      "featureId": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-edit-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
+      "featureTitle": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Edit Task modal, without changing, removing, or renaming any existing category options.",
       "files": [
-        "frontend/src/pages/Dashboard.tsx"
+        "frontend/src/components/tasks/EditTaskModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -40,29 +40,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-wire-the-notes-stat-card-to-navigate-to-the-notes-page-route-notes-when-clicked-using-the-same-routing-approach-as-the-other-dashboard-stat-cards",
-      "featureTitle": "Wire the Notes stat card to navigate to the Notes page route \"/notes\" when clicked, using the same routing approach as the other dashboard stat cards.",
+      "featureId": "feature-resolve-the-current-build-failure-related-to-the-tasks-category-change-and-ensure-the-app-builds-successfully-after-adding-the-new-categories",
+      "featureTitle": "Resolve the current build failure related to the Tasks category change and ensure the app builds successfully after adding the new categories.",
       "files": [
-        "frontend/src/pages/Dashboard.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-fetch-the-global-notes-list-on-the-dashboard-using-the-existing-global-notes-query-hook-and-use-it-to-compute-the-notes-stat-card-total-include-the-notes-query-loading-state-in-the-dashboard-loading-gate-so-the-card-does-not-render-stale-undefined-counts-while-data-is-still-loading",
-      "featureTitle": "Fetch the global notes list on the Dashboard using the existing global notes query hook and use it to compute the Notes stat card total; include the notes query loading state in the Dashboard loading gate so the card does not render stale/undefined counts while data is still loading.",
-      "files": [
-        "frontend/src/pages/Dashboard.tsx"
+        "frontend/src/components/tasks/AddTaskModal.tsx",
+        "frontend/src/components/tasks/EditTaskModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",

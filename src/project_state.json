@@ -1,38 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Dashboard enhancement: add a Notes overview stat card that displays total global notes and links to /notes.",
+  "summary": "Add two new task categories (\"LDC\" and \"Food Service\") to the Tasks module category dropdowns and filters, keeping all existing categories unchanged.",
   "architectural_notes": [],
-  "known_issues": [],
+  "known_issues": [
+    "Build failed when attempting to implement new task categories; user requested re-run."
+  ],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-dashboard-page-to-include-a-new-notes-overview-stat-card-placed-in-the-second-row-positioned-next-to-the-existing-meeting-attendance-stat-card-so-the-second-row-contains-two-stat-cards-side-by-side-below-the-first-four-cards",
-      "title": "Update the Dashboard page to include a new \"Notes\" overview stat card placed in the second row, positioned next to the existing \"Meeting Attendance\" stat card (so the second row contains two stat cards side-by-side below the first four cards).",
+      "id": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-add-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
+      "title": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Add Task modal, without changing, removing, or renaming any existing category options.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-the-notes-stat-card-ui-to-match-the-existing-stat-card-sizing-and-hover-click-behavior-with-these-specifics-title-text-notes-a-note-document-style-icon-from-the-existing-icon-set-dark-grey-background-374151-or-4b5563-white-text-for-contrast-show-the-total-global-notes-count-across-the-entire-app-formatted-like-12-notes-with-the-numeric-count-displayed-large",
-      "title": "Implement the \"Notes\" stat card UI to match the existing stat card sizing and hover/click behavior, with these specifics: title text \"Notes\"; a note/document-style icon from the existing icon set; dark grey background (#374151 or #4B5563); white text for contrast; show the total global notes count across the entire app formatted like \"12 notes\" with the numeric count displayed large.",
+      "id": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-edit-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
+      "title": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Edit Task modal, without changing, removing, or renaming any existing category options.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-wire-the-notes-stat-card-to-navigate-to-the-notes-page-route-notes-when-clicked-using-the-same-routing-approach-as-the-other-dashboard-stat-cards",
-      "title": "Wire the Notes stat card to navigate to the Notes page route \"/notes\" when clicked, using the same routing approach as the other dashboard stat cards.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-fetch-the-global-notes-list-on-the-dashboard-using-the-existing-global-notes-query-hook-and-use-it-to-compute-the-notes-stat-card-total-include-the-notes-query-loading-state-in-the-dashboard-loading-gate-so-the-card-does-not-render-stale-undefined-counts-while-data-is-still-loading",
-      "title": "Fetch the global notes list on the Dashboard using the existing global notes query hook and use it to compute the Notes stat card total; include the notes query loading state in the Dashboard loading gate so the card does not render stale/undefined counts while data is still loading.",
+      "id": "feature-resolve-the-current-build-failure-related-to-the-tasks-category-change-and-ensure-the-app-builds-successfully-after-adding-the-new-categories",
+      "title": "Resolve the current build failure related to the Tasks category change and ensure the app builds successfully after adding the new categories.",
       "reqIds": [
         "REQ-4"
       ],
@@ -42,12 +36,20 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add a sixth dashboard stat card for Notes showing total global notes, styled like other stat cards, and linking to /notes",
+      "summary": "Add \"LDC\" and \"Food Service\" as new task category options across Add Task/Edit Task modals and any category filter dropdowns on the Tasks page; keep existing categories unchanged.",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Ensure any category filter dropdowns on the Tasks page include the new category options \"LDC\" and \"Food Service\" (if such dropdowns exist), while keeping all existing filter options unchanged.",
+      "reqIds": [
+        "REQ-3"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Field Service Tracker",
+  "projectName": "Tasks Module",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
