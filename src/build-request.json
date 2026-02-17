@@ -1,89 +1,72 @@
 {
   "kind": "build_request",
-  "title": "Add LDC and Food Service task categories and fix build",
-  "projectName": "Tasks Module",
+  "title": "Add four new Note categories across Notes filters and Add/Edit Note modal",
+  "projectName": "Notes Module",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Add Task modal, without changing, removing, or renaming any existing category options.",
+      "text": "Update the Notes page category filter tabs to include four new categories: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", displayed alongside the existing tabs (All, General, Publishers, Territories, Service, Other) and styled identically to the existing category tabs.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Add two new task categories to the Tasks module:\n\n1. Add \"LDC\" as a new category option in the task category dropdown.\n\n2. Add \"Food Service\" as a new category option in the task category dropdown.\n\n3. Make sure these new categories appear in:\n   - The \"Add Task\" modal category dropdown\n   - The \"Edit Task\" modal category dropdown\n   - Any category filter dropdowns on the Tasks page\n\n4. Keep all existing categories exactly as they are - just add the two new ones.\n\nKeep everything else unchanged."
+          "Add four new note categories to the Notes page:\n\n1. Add these new category filter tabs on the Notes page (next to the existing All, General, Publishers, Territories, Service, Other tabs):\n   - \"LDC\"\n   - \"Food Service\"\n   - \"Personal\"\n   - \"Family\"\n\n4. Style the new category tabs to match the existing ones."
         ]
       },
       "acceptanceCriteria": [
-        "In the Add Task modal (frontend/src/components/tasks/AddTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
-        "All existing category options remain present and unchanged in label and value.",
-        "Selecting \"LDC\" or \"Food Service\" allows a task to be submitted successfully."
+        "On the Notes page, the category filter tab row includes: All, General, Publishers, Territories, Service, Other, LDC, Food Service, Personal, Family.",
+        "Clicking each new tab filters the notes list to only notes whose category exactly matches that tab name (e.g., \"Food Service\").",
+        "The new tabs use the same Button variants, spacing, hover behavior, and active styling logic as existing tabs.",
+        "All existing tabs remain present and unchanged in label and behavior."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Edit Task modal, without changing, removing, or renaming any existing category options.",
+      "text": "Update the Add Note modal category dropdown to include four new selectable category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", without changing, removing, or renaming any existing category options.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Make sure these new categories appear in:\n   - The \"Edit Task\" modal category dropdown"
+          "2. Make sure these new categories appear in:\n   - The \"Add Note\" modal category dropdown\n\n3. Keep all existing categories exactly as they are - just add the four new ones."
         ]
       },
       "acceptanceCriteria": [
-        "In the Edit Task modal (frontend/src/components/tasks/EditTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
-        "All existing category options remain present and unchanged in label and value.",
-        "A task whose category is set to \"LDC\" or \"Food Service\" can be saved successfully from the Edit Task modal."
+        "In the Add Note modal, the Category select includes options for: LDC, Food Service, Personal, Family.",
+        "All pre-existing Category options remain present and unchanged.",
+        "A user can create a note with each of the new categories selected, and the note saves successfully."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Ensure any category filter dropdowns on the Tasks page include the new category options \"LDC\" and \"Food Service\" (if such dropdowns exist), while keeping all existing filter options unchanged.",
+      "text": "Ensure the Edit Note modal category dropdown (when editing an existing note) includes the same four new category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", and that existing notes with these categories can be viewed and saved without category validation/type errors.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Make sure these new categories appear in:\n   - Any category filter dropdowns on the Tasks page"
+          "2. Make sure these new categories appear in:\n   - The \"Edit Note\" modal category dropdown (if it exists)"
         ]
       },
       "acceptanceCriteria": [
-        "If the Tasks page has any category filter dropdown UI, it includes both \"LDC\" and \"Food Service\" options.",
-        "No existing filter options are changed or removed."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Resolve the current build failure related to the Tasks category change and ensure the app builds successfully after adding the new categories.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "❌ Failed to build your app",
-          "Yes run it again."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The frontend TypeScript build completes successfully after adding the new categories (no type errors from CategoryOption unions or Select value typing).",
-        "The Tasks page, Add Task modal, and Edit Task modal load without runtime errors and show the updated category options."
+        "When editing a note, the Category select includes options for: LDC, Food Service, Personal, Family.",
+        "If an existing note has category \"LDC\", \"Food Service\", \"Personal\", or \"Family\", opening the Edit Note modal preselects and displays that category correctly.",
+        "Saving an edited note with any of the new categories succeeds."
       ]
     }
   ],
   "constraints": [
-    "Keep all existing task categories exactly as they are; only add \"LDC\" and \"Food Service\".",
-    "Keep everything else in the Tasks module unchanged aside from what is necessary to add the two new category options and fix the build."
+    "Keep all existing note categories exactly as they are; do not rename, remove, or reorder existing category labels beyond appending the four new ones.",
+    "Keep everything else on the Notes page and Add/Edit Note modal unchanged aside from adding the four new category options/tabs."
   ],
   "nonGoals": [
-    "Do not add new backend storage fields or change the backend schema for tasks.",
-    "Do not change task status filtering behavior (All/Completed/Uncompleted buttons).",
-    "Do not change CSV export columns or formatting."
+    "Adding or changing backend schemas or validation rules for note categories.",
+    "Changing category badge colors or other visual elements unrelated to the filter tabs and category dropdown options."
   ],
   "imageRequirements": {
     "required": [],

@@ -22,7 +22,7 @@ import { getPageThemeColor } from '@/theme/pageTheme';
 import { getContrastColor } from '@/theme/colorUtils';
 import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
 
-type CategoryFilter = 'All' | 'General' | 'Publishers' | 'Territories' | 'Service' | 'Other';
+type CategoryFilter = 'All' | 'General' | 'Publishers' | 'Territories' | 'Service' | 'Other' | 'LDC' | 'Food Service' | 'Personal' | 'Family';
 
 export default function Notes() {
   const routerState = useRouterState();
@@ -84,7 +84,7 @@ export default function Notes() {
     return publisher?.fullName;
   };
 
-  const categories: CategoryFilter[] = ['All', 'General', 'Publishers', 'Territories', 'Service', 'Other'];
+  const categories: CategoryFilter[] = ['All', 'General', 'Publishers', 'Territories', 'Service', 'Other', 'LDC', 'Food Service', 'Personal', 'Family'];
 
   return (
     <div className="p-6 space-y-6">

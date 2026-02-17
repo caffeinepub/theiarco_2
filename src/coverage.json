@@ -1,57 +1,46 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T22:42:31.655Z",
+  "generatedAt": "2026-02-17T23:08:24.164Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
+    "total": 3,
     "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Add Task modal, without changing, removing, or renaming any existing category options.",
+        "summary": "Update the Notes page category filter tabs to include four new categories: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", displayed alongside the existing tabs (All, General, Publishers, Territories, Service, Other) and styled identically to the existing category tabs.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/tasks/AddTaskModal.tsx"
+          "frontend/src/pages/Notes.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/tasks/AddTaskModal.tsx"
+          "frontend/src/pages/Notes.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Edit Task modal, without changing, removing, or renaming any existing category options.",
+        "summary": "Update the Add Note modal category dropdown to include four new selectable category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", without changing, removing, or renaming any existing category options.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/tasks/EditTaskModal.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/tasks/EditTaskModal.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Ensure any category filter dropdowns on the Tasks page include the new category options \"LDC\" and \"Food Service\" (if such dropdowns exist), while keeping all existing filter options unchanged.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/pages/Tasks.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Resolve the current build failure related to the Tasks category change and ensure the app builds successfully after adding the new categories.",
+        "summary": "Ensure the Edit Note modal category dropdown (when editing an existing note) includes the same four new category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", and that existing notes with these categories can be viewed and saved without category validation/type errors.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/tasks/AddTaskModal.tsx",
-          "frontend/src/components/tasks/EditTaskModal.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/tasks/AddTaskModal.tsx",
-          "frontend/src/components/tasks/EditTaskModal.tsx"
+          "frontend/src/components/notes/AddGlobalNoteModal.tsx"
         ]
       }
     ]
@@ -61,8 +50,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/tasks/AddTaskModal.tsx",
-    "frontend/src/components/tasks/EditTaskModal.tsx",
+    "frontend/src/components/notes/AddGlobalNoteModal.tsx",
+    "frontend/src/pages/Notes.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

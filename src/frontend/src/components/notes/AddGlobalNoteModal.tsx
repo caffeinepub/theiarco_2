@@ -29,7 +29,7 @@ interface AddGlobalNoteModalProps {
   noteToEdit?: GlobalNote | null;
 }
 
-type CategoryOption = 'None' | 'Publishers' | 'Territory' | 'Shepherding' | 'Elder' | 'General';
+type CategoryOption = 'None' | 'Publishers' | 'Territory' | 'Shepherding' | 'Elder' | 'General' | 'LDC' | 'Food Service' | 'Personal' | 'Family';
 
 export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddGlobalNoteModalProps) {
   const [title, setTitle] = useState('');
@@ -201,6 +201,10 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
                 <SelectItem value="Shepherding">Shepherding</SelectItem>
                 <SelectItem value="Elder">Elder</SelectItem>
                 <SelectItem value="General">General</SelectItem>
+                <SelectItem value="LDC">LDC</SelectItem>
+                <SelectItem value="Food Service">Food Service</SelectItem>
+                <SelectItem value="Personal">Personal</SelectItem>
+                <SelectItem value="Family">Family</SelectItem>
               </SelectContent>
             </Select>
           </div>

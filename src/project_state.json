@@ -1,34 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Add two new task categories (\"LDC\" and \"Food Service\") to the Tasks module category dropdowns and filters, keeping all existing categories unchanged.",
+  "summary": "Project to update the Notes page by adding four new note categories across category tabs and Add/Edit Note modals while keeping existing categories unchanged.",
   "architectural_notes": [],
-  "known_issues": [
-    "Build failed when attempting to implement new task categories; user requested re-run."
-  ],
+  "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-add-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
-      "title": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Add Task modal, without changing, removing, or renaming any existing category options.",
+      "id": "feature-update-the-notes-page-category-filter-tabs-to-include-four-new-categories-ldc-food-service-personal-and-family-displayed-alongside-the-existing-tabs-all-general-publishers-territories-service-other-and-styled-identically-to-the-existing-category-tabs",
+      "title": "Update the Notes page category filter tabs to include four new categories: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", displayed alongside the existing tabs (All, General, Publishers, Territories, Service, Other) and styled identically to the existing category tabs.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-edit-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
-      "title": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Edit Task modal, without changing, removing, or renaming any existing category options.",
+      "id": "feature-update-the-add-note-modal-category-dropdown-to-include-four-new-selectable-category-options-ldc-food-service-personal-and-family-without-changing-removing-or-renaming-any-existing-category-options",
+      "title": "Update the Add Note modal category dropdown to include four new selectable category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", without changing, removing, or renaming any existing category options.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-resolve-the-current-build-failure-related-to-the-tasks-category-change-and-ensure-the-app-builds-successfully-after-adding-the-new-categories",
-      "title": "Resolve the current build failure related to the Tasks category change and ensure the app builds successfully after adding the new categories.",
+      "id": "feature-ensure-the-edit-note-modal-category-dropdown-when-editing-an-existing-note-includes-the-same-four-new-category-options-ldc-food-service-personal-and-family-and-that-existing-notes-with-these-categories-can-be-viewed-and-saved-without-category-validation-type-errors",
+      "title": "Ensure the Edit Note modal category dropdown (when editing an existing note) includes the same four new category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", and that existing notes with these categories can be viewed and saved without category validation/type errors.",
       "reqIds": [
-        "REQ-4"
+        "REQ-3"
       ],
       "version": 1
     }
@@ -36,20 +34,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add \"LDC\" and \"Food Service\" as new task category options across Add Task/Edit Task modals and any category filter dropdowns on the Tasks page; keep existing categories unchanged.",
+      "summary": "Add four new note categories (LDC, Food Service, Personal, Family) to Notes page category tabs and Add/Edit Note modal dropdowns, matching existing tab styling and keeping existing categories unchanged.",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Ensure any category filter dropdowns on the Tasks page include the new category options \"LDC\" and \"Food Service\" (if such dropdowns exist), while keeping all existing filter options unchanged.",
-      "reqIds": [
-        "REQ-3"
-      ],
       "status": "pending"
     }
   ],
-  "projectName": "Tasks Module",
+  "projectName": "Notes Module",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

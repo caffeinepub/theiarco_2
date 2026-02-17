@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-add-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
-      "featureTitle": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Add Task modal, without changing, removing, or renaming any existing category options.",
+      "featureId": "feature-update-the-notes-page-category-filter-tabs-to-include-four-new-categories-ldc-food-service-personal-and-family-displayed-alongside-the-existing-tabs-all-general-publishers-territories-service-other-and-styled-identically-to-the-existing-category-tabs",
+      "featureTitle": "Update the Notes page category filter tabs to include four new categories: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", displayed alongside the existing tabs (All, General, Publishers, Territories, Service, Other) and styled identically to the existing category tabs.",
       "files": [
-        "frontend/src/components/tasks/AddTaskModal.tsx"
+        "frontend/src/pages/Notes.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,10 +21,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-two-new-task-category-options-ldc-and-food-service-to-the-category-dropdown-in-the-edit-task-modal-without-changing-removing-or-renaming-any-existing-category-options",
-      "featureTitle": "Add two new task category options, \"LDC\" and \"Food Service\", to the category dropdown in the Edit Task modal, without changing, removing, or renaming any existing category options.",
+      "featureId": "feature-update-the-add-note-modal-category-dropdown-to-include-four-new-selectable-category-options-ldc-food-service-personal-and-family-without-changing-removing-or-renaming-any-existing-category-options",
+      "featureTitle": "Update the Add Note modal category dropdown to include four new selectable category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", without changing, removing, or renaming any existing category options.",
       "files": [
-        "frontend/src/components/tasks/EditTaskModal.tsx"
+        "frontend/src/components/notes/AddGlobalNoteModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -40,11 +40,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-resolve-the-current-build-failure-related-to-the-tasks-category-change-and-ensure-the-app-builds-successfully-after-adding-the-new-categories",
-      "featureTitle": "Resolve the current build failure related to the Tasks category change and ensure the app builds successfully after adding the new categories.",
+      "featureId": "feature-ensure-the-edit-note-modal-category-dropdown-when-editing-an-existing-note-includes-the-same-four-new-category-options-ldc-food-service-personal-and-family-and-that-existing-notes-with-these-categories-can-be-viewed-and-saved-without-category-validation-type-errors",
+      "featureTitle": "Ensure the Edit Note modal category dropdown (when editing an existing note) includes the same four new category options: \"LDC\", \"Food Service\", \"Personal\", and \"Family\", and that existing notes with these categories can be viewed and saved without category validation/type errors.",
       "files": [
-        "frontend/src/components/tasks/AddTaskModal.tsx",
-        "frontend/src/components/tasks/EditTaskModal.tsx"
+        "frontend/src/components/notes/AddGlobalNoteModal.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -55,7 +54,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-4"
+        "REQ-3"
       ],
       "confidence": "high"
     }

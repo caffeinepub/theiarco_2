@@ -1,72 +1,54 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add LDC & Food Service task categories and restore successful build",
+  "title": "Add four new Note categories to Notes filters and Add/Edit Note modal",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add “LDC” and “Food Service” to the Add Task modal category dropdown while keeping all existing categories unchanged.",
+      "summary": "Append four new category filter tabs (LDC, Food Service, Personal, Family) to the Notes page and ensure filtering matches categories exactly.",
       "acceptanceCriteria": [
-        "In the Add Task modal (frontend/src/components/tasks/AddTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
-        "All existing category options remain present and unchanged in label and value.",
-        "Selecting \"LDC\" or \"Food Service\" allows a task to be submitted successfully."
+        "On the Notes page, the category filter tab row includes: All, General, Publishers, Territories, Service, Other, LDC, Food Service, Personal, Family.",
+        "Clicking each new tab filters the notes list to only notes whose category exactly matches that tab name (e.g., \"Food Service\").",
+        "The new tabs use the same Button variants, spacing, hover behavior, and active styling logic as existing tabs.",
+        "All existing tabs remain present and unchanged in label and behavior."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/tasks/AddTaskModal.tsx",
+          "path": "frontend/src/pages/Notes.tsx",
           "operation": "modify",
-          "description": "Extend the local CategoryOption union to include \"LDC\" and \"Food Service\", and add corresponding SelectItem entries to the category dropdown without altering existing options."
+          "description": "Extend the Notes page category filter union/type and the categories array by appending \"LDC\", \"Food Service\", \"Personal\", and \"Family\" after the existing tabs, keeping existing labels/order unchanged. Ensure the tab rendering continues to use the existing shadcn-ui Button styling/active-state logic for identical look and behavior. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add “LDC” and “Food Service” to the Edit Task modal category dropdown while keeping all existing categories unchanged.",
+      "summary": "Append four new categories (LDC, Food Service, Personal, Family) to the Add Note modal Category dropdown without changing existing options.",
       "acceptanceCriteria": [
-        "In the Edit Task modal (frontend/src/components/tasks/EditTaskModal.tsx), the category Select dropdown includes \"LDC\" and \"Food Service\" in addition to all existing options.",
-        "All existing category options remain present and unchanged in label and value.",
-        "A task whose category is set to \"LDC\" or \"Food Service\" can be saved successfully from the Edit Task modal."
+        "In the Add Note modal, the Category select includes options for: LDC, Food Service, Personal, Family.",
+        "All pre-existing Category options remain present and unchanged.",
+        "A user can create a note with each of the new categories selected, and the note saves successfully."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/tasks/EditTaskModal.tsx",
+          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
           "operation": "modify",
-          "description": "Extend the local CategoryOption union to include \"LDC\" and \"Food Service\", and add corresponding SelectItem entries to the category dropdown without altering existing options."
+          "description": "Update the CategoryOption type and the Category SelectContent to append new SelectItem options for \"LDC\", \"Food Service\", \"Personal\", and \"Family\" while keeping all existing options unchanged. Continue using the existing shadcn-ui Select component patterns to preserve styling/behavior. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Ensure any Tasks page category filter dropdown (if present) includes “LDC” and “Food Service” while keeping all existing filter options unchanged.",
+      "summary": "Ensure Edit Note modal supports the same four new categories and can preselect and save them without type/validation errors.",
       "acceptanceCriteria": [
-        "If the Tasks page has any category filter dropdown UI, it includes both \"LDC\" and \"Food Service\" options.",
-        "No existing filter options are changed or removed."
+        "When editing a note, the Category select includes options for: LDC, Food Service, Personal, Family.",
+        "If an existing note has category \"LDC\", \"Food Service\", \"Personal\", or \"Family\", opening the Edit Note modal preselects and displays that category correctly.",
+        "Saving an edited note with any of the new categories succeeds."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Tasks.tsx",
+          "path": "frontend/src/components/notes/AddGlobalNoteModal.tsx",
           "operation": "modify",
-          "description": "Audit the Tasks page for any category filter dropdown UI; if a category filter exists, add \"LDC\" and \"Food Service\" options while preserving all existing options and behavior. If no category filter exists, keep behavior unchanged."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Fix frontend build/type issues introduced by adding the new task categories and ensure Tasks UI loads without errors.",
-      "acceptanceCriteria": [
-        "The frontend TypeScript build completes successfully after adding the new categories (no type errors from CategoryOption unions or Select value typing).",
-        "The Tasks page, Add Task modal, and Edit Task modal load without runtime errors and show the updated category options."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/tasks/AddTaskModal.tsx",
-          "operation": "modify",
-          "description": "Adjust CategoryOption typing and Select value/onValueChange typing (as needed) so TypeScript builds cleanly with the added \"LDC\" and \"Food Service\" options."
-        },
-        {
-          "path": "frontend/src/components/tasks/EditTaskModal.tsx",
-          "operation": "modify",
-          "description": "Adjust CategoryOption typing and task.category initialization/casting (as needed) so TypeScript builds cleanly with the added \"LDC\" and \"Food Service\" options and the modal initializes/saves without runtime errors."
+          "description": "Ensure edit-mode initialization and CategoryOption typing include the four new categories so notes with those categories are correctly set as Select value and can be re-saved without type/validation issues, keeping the rest of the modal unchanged. Verify the component's usage instructions before implementing."
         }
       ]
     }
