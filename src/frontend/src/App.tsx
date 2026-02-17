@@ -2,7 +2,6 @@ import { createRouter, createRoute, createRootRoute, RouterProvider } from '@tan
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import Login from './pages/Login';
 import AppLayout from './components/layout/AppLayout';
-import ComingSoon from './pages/ComingSoon';
 import Dashboard from './pages/Dashboard';
 import Publishers from './pages/Publishers';
 import PublisherProfile from './pages/PublisherProfile';
@@ -11,12 +10,15 @@ import Tasks from './pages/Tasks';
 import Territories from './pages/Territories';
 import TerritoryProfile from './pages/TerritoryProfile';
 import Pioneers from './pages/Pioneers';
+import PioneerProfile from './pages/PioneerProfile';
 import Shepherding from './pages/Shepherding';
 import ShepherdingVisitProfile from './pages/ShepherdingVisitProfile';
 import ServiceMeetingConductors from './pages/ServiceMeetingConductors';
+import ConductorProfile from './pages/ConductorProfile';
 import PublicWitnessing from './pages/PublicWitnessing';
 import FieldServiceGroups from './pages/FieldServiceGroups';
 import FieldServiceGroupProfile from './pages/FieldServiceGroupProfile';
+import GroupVisitProfile from './pages/GroupVisitProfile';
 import UserProfile from './pages/UserProfile';
 
 // Root component that handles auth state
@@ -75,6 +77,12 @@ const pioneersRoute = createRoute({
   component: Pioneers
 });
 
+const pioneerProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/pioneers/$id',
+  component: PioneerProfile
+});
+
 const territoriesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/territories',
@@ -99,10 +107,16 @@ const shepherdingVisitProfileRoute = createRoute({
   component: ShepherdingVisitProfile
 });
 
-const conductorsRoute = createRoute({
+const serviceMeetingConductorsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/conductors',
   component: ServiceMeetingConductors
+});
+
+const conductorProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/conductors/$id',
+  component: ConductorProfile
 });
 
 const publicWitnessingRoute = createRoute({
@@ -123,6 +137,12 @@ const fieldServiceGroupProfileRoute = createRoute({
   component: FieldServiceGroupProfile
 });
 
+const groupVisitProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/field-service-groups/$groupNumber/visits/$visitId',
+  component: GroupVisitProfile
+});
+
 const notesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/notes',
@@ -141,29 +161,32 @@ const userProfileRoute = createRoute({
   component: UserProfile
 });
 
-// Create route tree
+// Create the route tree
 const routeTree = rootRoute.addChildren([
   dashboardRoute,
   publishersRoute,
   publisherProfileRoute,
   pioneersRoute,
+  pioneerProfileRoute,
   territoriesRoute,
   territoryProfileRoute,
   shepherdingRoute,
   shepherdingVisitProfileRoute,
-  conductorsRoute,
+  serviceMeetingConductorsRoute,
+  conductorProfileRoute,
   publicWitnessingRoute,
   fieldServiceGroupsRoute,
   fieldServiceGroupProfileRoute,
+  groupVisitProfileRoute,
   notesRoute,
   tasksRoute,
   userProfileRoute
 ]);
 
-// Create router
+// Create the router
 const router = createRouter({ routeTree });
 
-// Register router for type safety
+// Register the router for type safety
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;

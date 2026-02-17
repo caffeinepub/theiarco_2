@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHeader } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useGetAllTrainedPublishers } from '../hooks/useTrainedPublishers';
@@ -8,8 +8,16 @@ import TrainedPublisherModal from '../components/publicWitnessing/TrainedPublish
 import DeleteTrainedPublisherDialog from '../components/publicWitnessing/DeleteTrainedPublisherDialog';
 import { formatTrainingDate } from '../utils/formatters';
 import type { TrainedPublisher } from '../backend';
+import { useRouterState } from '@tanstack/react-router';
+import { getPageThemeColor } from '@/theme/pageTheme';
+import { getContrastColor } from '@/theme/colorUtils';
+import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
+import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
 
 export default function PublicWitnessing() {
+  const routerState = useRouterState();
+  const themeColor = getPageThemeColor(routerState.location.pathname);
+  
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingPublisher, setEditingPublisher] = useState<TrainedPublisher | null>(null);
   const [deletingPublisherId, setDeletingPublisherId] = useState<string | null>(null);
@@ -31,18 +39,19 @@ export default function PublicWitnessing() {
     setDeletingPublisherId(id);
   };
 
+  const headerTextColor = getContrastColor(themeColor);
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Public Witnessing</h1>
-        <Button
+        <ThemedPrimaryButton
+          themeColor={themeColor}
           onClick={() => setIsAddModalOpen(true)}
-          style={{ backgroundColor: '#43587A', color: 'white' }}
-          className="hover:opacity-90"
         >
           Add Trained Publisher
-        </Button>
+        </ThemedPrimaryButton>
       </div>
 
       {/* Table */}
@@ -58,16 +67,17 @@ export default function PublicWitnessing() {
         <div className="border rounded-lg">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Publisher Name</TableHead>
-                <TableHead>Training Date</TableHead>
-                <TableHead>Authorization Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
+              <ThemedTableHeaderRow themeColor={themeColor}>
+                <ThemedTableHead themeColor={themeColor}>Publisher Name</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Training Date</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>Authorization Status</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>S-148 Form</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor} className="text-right">Actions</ThemedTableHead>
+              </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {sortedPublishers.map((publisher) => (
-                <TableRow key={publisher.id}>
+                <tr key={publisher.id}>
                   <TableCell className="font-medium">{publisher.publisherName}</TableCell>
                   <TableCell>{formatTrainingDate(publisher.trainingDate)}</TableCell>
                   <TableCell>
@@ -75,6 +85,13 @@ export default function PublicWitnessing() {
                       <Badge className="bg-green-600 hover:bg-green-700">Authorized</Badge>
                     ) : (
                       <Badge variant="destructive">Pending</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {publisher.hasS148Received ? (
+                      <Badge className="bg-green-600 hover:bg-green-700">Received</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-gray-400 hover:bg-gray-500 text-white">Not Received</Badge>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -95,7 +112,7 @@ export default function PublicWitnessing() {
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
+                </tr>
               ))}
             </TableBody>
           </Table>
