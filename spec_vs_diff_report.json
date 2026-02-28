@@ -1,64 +1,46 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T18:24:20.453Z",
-  "summary": "The diff modifies the three PDF export utility files (pioneersPdfExport.ts, tasksPdfExport.ts, notesPdfExport.ts) with styled HTML content and print window approach. However, the implementation uses window.open() with a print window rather than a programmatic file download mechanism, and the page files (Pioneers.tsx, Tasks.tsx, Notes.tsx) do not appear to have been modified to add Export to PDF buttons.",
+  "generatedAt": "2026-02-28T20:07:14.792Z",
+  "summary": "All three PDF export utilities were rewritten, but the implementation uses HTML Blob downloads (via URL.createObjectURL and an anchor click) rather than jsPDF's save() method with built-in fonts as explicitly required. The build request and all three REQs specifically mandate using jsPDF with built-in fonts (helvetica) and jsPDF's save() method. The diff shows no jsPDF import or usage in any of the three files.",
   "missing_requirements": [
     {
-      "id": "REQ-4",
-      "requirement": "On the existing Pioneers.tsx page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Export to CSV' and 'Add Pioneer' buttons.",
-      "reason": "The diff does not show any changes to frontend/src/pages/Pioneers.tsx. No Export to PDF button was added to the Pioneers page.",
-      "evidence": []
-    },
-    {
-      "id": "REQ-5",
-      "requirement": "On the existing Tasks.tsx page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Export to CSV' and 'Add Task' buttons.",
-      "reason": "The diff does not show any changes to frontend/src/pages/Tasks.tsx. No Export to PDF button was added to the Tasks page.",
-      "evidence": []
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "On the existing Notes.tsx page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Add Note' button.",
-      "reason": "The diff does not show any changes to frontend/src/pages/Notes.tsx. No Export to PDF button was added to the Notes page.",
-      "evidence": []
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "Implement the actual file download mechanism so that clicking Export to PDF initiates a file download with the correct filename without requiring the user to manually rename it from a print dialog.",
-      "reason": "All three utilities use window.open() and openPrintWindow() which opens a browser print dialog. This does not automatically download a file named 'pioneers-report.pdf', 'tasks-report.pdf', or 'notes-report.pdf'. No jsPDF or blob-based anchor download mechanism is implemented.",
-      "evidence": [
-        "frontend/src/utils/pioneersPdfExport.ts",
-        "frontend/src/utils/tasksPdfExport.ts",
-        "frontend/src/utils/notesPdfExport.ts"
-      ]
-    },
-    {
       "id": "REQ-1",
-      "requirement": "The PDF must be downloaded as 'pioneers-report.pdf' rather than opened in a print window.",
-      "reason": "The pioneersPdfExport.ts still uses the openPrintWindow approach, which does not produce a file named 'pioneers-report.pdf' automatically downloaded.",
+      "requirement": "Use jsPDF with only built-in fonts (e.g., 'helvetica'), no custom font loading, and trigger download synchronously using jsPDF's built-in save() method.",
+      "reason": "The rewritten pioneersPdfExport.ts generates an HTML document and downloads it as a Blob via URL.createObjectURL + anchor click. There is no jsPDF import, no jsPDF instantiation, no use of helvetica font via jsPDF, and no call to jsPDF's save() method. The output file is HTML, not a true PDF.",
       "evidence": [
         "frontend/src/utils/pioneersPdfExport.ts"
       ]
     },
     {
       "id": "REQ-2",
-      "requirement": "The PDF must be downloaded as 'tasks-report.pdf' rather than opened in a print window.",
-      "reason": "The tasksPdfExport.ts still uses the openPrintWindow approach, which does not produce a file named 'tasks-report.pdf' automatically downloaded.",
+      "requirement": "Use jsPDF with only built-in fonts, no external resource loading, and trigger download synchronously using jsPDF's save() method.",
+      "reason": "The rewritten tasksPdfExport.ts generates an HTML document and downloads it as a Blob. There is no jsPDF import or usage and no call to jsPDF's save() method.",
       "evidence": [
         "frontend/src/utils/tasksPdfExport.ts"
       ]
     },
     {
       "id": "REQ-3",
-      "requirement": "The PDF must be downloaded as 'notes-report.pdf' rather than opened in a print window.",
-      "reason": "The notesPdfExport.ts still uses the openPrintWindow approach, which does not produce a file named 'notes-report.pdf' automatically downloaded.",
+      "requirement": "Use jsPDF with only built-in fonts, no external resource loading, and trigger download synchronously using jsPDF's save() method.",
+      "reason": "The rewritten notesPdfExport.ts generates an HTML document and downloads it as a Blob. There is no jsPDF import or usage and no call to jsPDF's save() method.",
       "evidence": [
         "frontend/src/utils/notesPdfExport.ts"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.85,
+  "hallucinated_features": [
+    {
+      "description": "HTML Blob download approach: all three utilities generate HTML strings and download them as Blob objects via URL.createObjectURL and a programmatic anchor click, producing HTML files instead of PDF files.",
+      "reason": "The build request explicitly requires using jsPDF's save() method to produce actual PDF files. Generating HTML blobs was not requested and does not satisfy the requirement for true PDF output.",
+      "evidence": [
+        "frontend/src/utils/pioneersPdfExport.ts",
+        "frontend/src/utils/tasksPdfExport.ts",
+        "frontend/src/utils/notesPdfExport.ts"
+      ]
+    }
+  ],
+  "confidence": 0.97,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/utils/notesPdfExport.ts",

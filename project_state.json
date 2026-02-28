@@ -1,82 +1,41 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Theiarco app with Pioneers, Tasks, and Notes pages. Adding Export to PDF functionality to all three pages using jsPDF or similar library, with branded headers (app name, report title, date) using primary color #43587A.",
+  "summary": "Project with PDF export functionality using jsPDF. Focus on fixing 'bad URL' errors by using built-in fonts only, no external resources, and direct synchronous download via jsPDF's save() method.",
   "architectural_notes": [
-    "Primary brand color: #43587A (used for PDF headers/accents)",
-    "PDF files named: pioneers-report.pdf, tasks-report.pdf, notes-report.pdf",
-    "PDF header includes: app name 'Theiarco', report title, and current date"
+    "PDF export uses jsPDF with built-in fonts only — no custom font loading or external image/asset requests",
+    "PDF download triggered synchronously from button click using jsPDF save() method; no window.open() or new windows to avoid popup blockers"
   ],
   "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-update-the-existing-frontend-src-utils-pioneerspdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-pioneers-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-pioneers-report-title-and-the-current-date-a-professional-table-with-columns-for-name-service-year-total-hours-average-hours-current-status-and-monthly-hours-header-accent-colors-using-43587a-black-text-on-white-background-landscape-orientation-for-the-wide-table",
-      "title": "Update the existing `frontend/src/utils/pioneersPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'pioneers-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Pioneers Report' title, and the current date; a professional table with columns for Name, Service Year, Total Hours, Average Hours, Current Status, and Monthly Hours; header/accent colors using #43587A; black text on white background; landscape orientation for the wide table.",
+      "id": "feature-rewrite-the-pioneers-pdf-export-utility-frontend-src-utils-pioneerspdfexport-ts-to-use-jspdf-with-only-built-in-fonts-e-g-helvetica-no-custom-font-loading-no-external-image-or-asset-loading-and-no-window-open-calls-generate-the-pdf-entirely-from-in-memory-data-and-trigger-the-download-synchronously-using-jspdf-s-built-in-save-method-the-output-should-be-a-clean-functional-pdf-with-black-text-on-a-white-background-and-a-basic-bordered-table-layout-showing-monthly-hours-totals-averages-and-status-per-pioneer",
+      "title": "Rewrite the pioneers PDF export utility (frontend/src/utils/pioneersPdfExport.ts) to use jsPDF with only built-in fonts (e.g., 'helvetica'), no custom font loading, no external image or asset loading, and no window.open() calls. Generate the PDF entirely from in-memory data and trigger the download synchronously using jsPDF's built-in save() method. The output should be a clean, functional PDF with black text on a white background and a basic bordered table layout showing monthly hours, totals, averages, and status per pioneer.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-existing-frontend-src-utils-taskspdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-tasks-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-tasks-report-title-and-the-current-date-a-professional-table-with-columns-for-title-due-date-category-status-and-notes-header-accent-colors-using-43587a-black-text-on-white-background-completed-tasks-shown-with-strikethrough-styling",
-      "title": "Update the existing `frontend/src/utils/tasksPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'tasks-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Tasks Report' title, and the current date; a professional table with columns for Title, Due Date, Category, Status, and Notes; header/accent colors using #43587A; black text on white background; completed tasks shown with strikethrough styling.",
+      "id": "feature-rewrite-the-tasks-pdf-export-utility-frontend-src-utils-taskspdfexport-ts-to-use-jspdf-with-only-built-in-fonts-no-external-resource-loading-and-no-window-open-calls-trigger-the-download-synchronously-using-jspdf-s-save-method-output-a-clean-pdf-with-black-text-on-white-background-and-a-basic-bordered-table-layout-showing-task-title-due-date-category-status-and-notes",
+      "title": "Rewrite the tasks PDF export utility (frontend/src/utils/tasksPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background and a basic bordered table layout showing task title, due date, category, status, and notes.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-existing-frontend-src-utils-notespdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-notes-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-notes-report-title-and-the-current-date-notes-organized-by-category-with-category-headers-styled-in-43587a-each-note-showing-its-title-content-and-creation-date-black-text-on-white-background",
-      "title": "Update the existing `frontend/src/utils/notesPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'notes-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Notes Report' title, and the current date; notes organized by category with category headers styled in #43587A; each note showing its title, content, and creation date; black text on white background.",
+      "id": "feature-rewrite-the-notes-pdf-export-utility-frontend-src-utils-notespdfexport-ts-to-use-jspdf-with-only-built-in-fonts-no-external-resource-loading-and-no-window-open-calls-trigger-the-download-synchronously-using-jspdf-s-save-method-output-a-clean-pdf-with-black-text-on-white-background-grouping-notes-by-category-with-basic-section-headers-and-a-simple-layout",
+      "title": "Rewrite the notes PDF export utility (frontend/src/utils/notesPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background, grouping notes by category with basic section headers and a simple layout.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Export to PDF buttons on Pioneers, Tasks, and Notes pages generating formatted downloadable PDFs with Theiarco branding, #43587A accents, and print-friendly layout",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "On the existing `frontend/src/pages/Pioneers.tsx` page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Export to CSV' and 'Add Pioneer' buttons. The button must call the updated `exportPioneersToPdf` utility passing the currently loaded pioneer data. Style the button to visually match the existing export buttons on the page. Do not alter any other part of the Pioneers page.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "On the existing `frontend/src/pages/Tasks.tsx` page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Export to CSV' and 'Add Task' buttons. The button must call the updated `exportTasksToPdf` utility passing the currently loaded task data. Style the button to visually match the existing export buttons on the page. Do not alter any other part of the Tasks page.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "On the existing `frontend/src/pages/Notes.tsx` page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Add Note' button. The button must call the updated `exportNotesToPdf` utility passing the currently loaded notes data. Style the button to visually match the existing buttons on the page. Do not alter any other part of the Notes page.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Implement the actual file download mechanism in the three PDF export utilities (`pioneersPdfExport.ts`, `tasksPdfExport.ts`, `notesPdfExport.ts`). Use the browser's print-to-PDF approach via a hidden iframe or a new window with `window.print()`, OR use a client-side PDF library (such as jsPDF with jsPDF-AutoTable) to programmatically generate a Blob and trigger a browser download via a temporary anchor element (`<a download='filename.pdf'>`). The chosen approach must result in the file being saved with the correct filename without requiring the user to manually rename it from a print dialog.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "status": "pending"
-    }
-  ],
-  "gameProjectType": "none",
-  "projectName": "Theiarco",
+  "new_feature_requests": [],
+  "projectName": "Fix PDF export to use built-in fonts, no external resources, and direct synchronous download",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

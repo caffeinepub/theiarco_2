@@ -2,8 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-existing-frontend-src-utils-pioneerspdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-pioneers-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-pioneers-report-title-and-the-current-date-a-professional-table-with-columns-for-name-service-year-total-hours-average-hours-current-status-and-monthly-hours-header-accent-colors-using-43587a-black-text-on-white-background-landscape-orientation-for-the-wide-table",
-      "featureTitle": "Update the existing `frontend/src/utils/pioneersPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'pioneers-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Pioneers Report' title, and the current date; a professional table with columns for Name, Service Year, Total Hours, Average Hours, Current Status, and Monthly Hours; header/accent colors using #43587A; black text on white background; landscape orientation for the wide table.",
+      "featureId": "feature-rewrite-the-pioneers-pdf-export-utility-frontend-src-utils-pioneerspdfexport-ts-to-use-jspdf-with-only-built-in-fonts-e-g-helvetica-no-custom-font-loading-no-external-image-or-asset-loading-and-no-window-open-calls-generate-the-pdf-entirely-from-in-memory-data-and-trigger-the-download-synchronously-using-jspdf-s-built-in-save-method-the-output-should-be-a-clean-functional-pdf-with-black-text-on-a-white-background-and-a-basic-bordered-table-layout-showing-monthly-hours-totals-averages-and-status-per-pioneer",
+      "featureTitle": "Rewrite the pioneers PDF export utility (frontend/src/utils/pioneersPdfExport.ts) to use jsPDF with only built-in fonts (e.g., 'helvetica'), no custom font loading, no external image or asset loading, and no window.open() calls. Generate the PDF entirely from in-memory data and trigger the download synchronously using jsPDF's built-in save() method. The output should be a clean, functional PDF with black text on a white background and a basic bordered table layout showing monthly hours, totals, averages, and status per pioneer.",
       "files": [
         "frontend/src/utils/pioneersPdfExport.ts"
       ],
@@ -21,8 +21,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-existing-frontend-src-utils-taskspdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-tasks-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-tasks-report-title-and-the-current-date-a-professional-table-with-columns-for-title-due-date-category-status-and-notes-header-accent-colors-using-43587a-black-text-on-white-background-completed-tasks-shown-with-strikethrough-styling",
-      "featureTitle": "Update the existing `frontend/src/utils/tasksPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'tasks-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Tasks Report' title, and the current date; a professional table with columns for Title, Due Date, Category, Status, and Notes; header/accent colors using #43587A; black text on white background; completed tasks shown with strikethrough styling.",
+      "featureId": "feature-rewrite-the-tasks-pdf-export-utility-frontend-src-utils-taskspdfexport-ts-to-use-jspdf-with-only-built-in-fonts-no-external-resource-loading-and-no-window-open-calls-trigger-the-download-synchronously-using-jspdf-s-save-method-output-a-clean-pdf-with-black-text-on-white-background-and-a-basic-bordered-table-layout-showing-task-title-due-date-category-status-and-notes",
+      "featureTitle": "Rewrite the tasks PDF export utility (frontend/src/utils/tasksPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background and a basic bordered table layout showing task title, due date, category, status, and notes.",
       "files": [
         "frontend/src/utils/tasksPdfExport.ts"
       ],
@@ -40,8 +40,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-existing-frontend-src-utils-notespdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-notes-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-notes-report-title-and-the-current-date-notes-organized-by-category-with-category-headers-styled-in-43587a-each-note-showing-its-title-content-and-creation-date-black-text-on-white-background",
-      "featureTitle": "Update the existing `frontend/src/utils/notesPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'notes-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Notes Report' title, and the current date; notes organized by category with category headers styled in #43587A; each note showing its title, content, and creation date; black text on white background.",
+      "featureId": "feature-rewrite-the-notes-pdf-export-utility-frontend-src-utils-notespdfexport-ts-to-use-jspdf-with-only-built-in-fonts-no-external-resource-loading-and-no-window-open-calls-trigger-the-download-synchronously-using-jspdf-s-save-method-output-a-clean-pdf-with-black-text-on-white-background-grouping-notes-by-category-with-basic-section-headers-and-a-simple-layout",
+      "featureTitle": "Rewrite the notes PDF export utility (frontend/src/utils/notesPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background, grouping notes by category with basic section headers and a simple layout.",
       "files": [
         "frontend/src/utils/notesPdfExport.ts"
       ],

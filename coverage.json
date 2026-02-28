@@ -1,18 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T18:24:20.457Z",
+  "generatedAt": "2026-02-28T20:07:14.796Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 7,
+    "total": 3,
     "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the existing `frontend/src/utils/pioneersPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'pioneers-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Pioneers Report' title, and the current date; a professional table with columns for Name, Service Year, Total Hours, Average Hours, Current Status, and Monthly Hours; header/accent colors using #43587A; black text on white background; landscape orientation for the wide table.",
+        "summary": "Rewrite the pioneers PDF export utility (frontend/src/utils/pioneersPdfExport.ts) to use jsPDF with only built-in fonts (e.g., 'helvetica'), no custom font loading, no external image or asset loading, and no window.open() calls. Generate the PDF entirely from in-memory data and trigger the download synchronously using jsPDF's built-in save() method. The output should be a clean, functional PDF with black text on a white background and a basic bordered table layout showing monthly hours, totals, averages, and status per pioneer.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/utils/pioneersPdfExport.ts"
@@ -23,7 +23,7 @@
       },
       {
         "id": "REQ-2",
-        "summary": "Update the existing `frontend/src/utils/tasksPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'tasks-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Tasks Report' title, and the current date; a professional table with columns for Title, Due Date, Category, Status, and Notes; header/accent colors using #43587A; black text on white background; completed tasks shown with strikethrough styling.",
+        "summary": "Rewrite the tasks PDF export utility (frontend/src/utils/tasksPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background and a basic bordered table layout showing task title, due date, category, status, and notes.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/utils/tasksPdfExport.ts"
@@ -34,7 +34,7 @@
       },
       {
         "id": "REQ-3",
-        "summary": "Update the existing `frontend/src/utils/notesPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'notes-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Notes Report' title, and the current date; notes organized by category with category headers styled in #43587A; each note showing its title, content, and creation date; black text on white background.",
+        "summary": "Rewrite the notes PDF export utility (frontend/src/utils/notesPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background, grouping notes by category with basic section headers and a simple layout.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/utils/notesPdfExport.ts"
@@ -42,42 +42,6 @@
         "matchedFiles": [
           "frontend/src/utils/notesPdfExport.ts"
         ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "On the existing `frontend/src/pages/Pioneers.tsx` page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Export to CSV' and 'Add Pioneer' buttons. The button must call the updated `exportPioneersToPdf` utility passing the currently loaded pioneer data. Style the button to visually match the existing export buttons on the page. Do not alter any other part of the Pioneers page.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/pages/Pioneers.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-5",
-        "summary": "On the existing `frontend/src/pages/Tasks.tsx` page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Export to CSV' and 'Add Task' buttons. The button must call the updated `exportTasksToPdf` utility passing the currently loaded task data. Style the button to visually match the existing export buttons on the page. Do not alter any other part of the Tasks page.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/pages/Tasks.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-6",
-        "summary": "On the existing `frontend/src/pages/Notes.tsx` page, ensure there is an 'Export to PDF' button positioned in the top-right action area next to the existing 'Add Note' button. The button must call the updated `exportNotesToPdf` utility passing the currently loaded notes data. Style the button to visually match the existing buttons on the page. Do not alter any other part of the Notes page.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/pages/Notes.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-7",
-        "summary": "Implement the actual file download mechanism in the three PDF export utilities (`pioneersPdfExport.ts`, `tasksPdfExport.ts`, `notesPdfExport.ts`). Use the browser's print-to-PDF approach via a hidden iframe or a new window with `window.print()`, OR use a client-side PDF library (such as jsPDF with jsPDF-AutoTable) to programmatically generate a Blob and trigger a browser download via a temporary anchor element (`<a download='filename.pdf'>`). The chosen approach must result in the file being saved with the correct filename without requiring the user to manually rename it from a print dialog.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/package.json"
-        ],
-        "matchedFiles": []
       }
     ]
   },
