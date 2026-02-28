@@ -1,0 +1,62 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-update-the-existing-frontend-src-utils-pioneerspdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-pioneers-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-pioneers-report-title-and-the-current-date-a-professional-table-with-columns-for-name-service-year-total-hours-average-hours-current-status-and-monthly-hours-header-accent-colors-using-43587a-black-text-on-white-background-landscape-orientation-for-the-wide-table",
+      "featureTitle": "Update the existing `frontend/src/utils/pioneersPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'pioneers-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Pioneers Report' title, and the current date; a professional table with columns for Name, Service Year, Total Hours, Average Hours, Current Status, and Monthly Hours; header/accent colors using #43587A; black text on white background; landscape orientation for the wide table.",
+      "files": [
+        "frontend/src/utils/pioneersPdfExport.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-existing-frontend-src-utils-taskspdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-tasks-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-tasks-report-title-and-the-current-date-a-professional-table-with-columns-for-title-due-date-category-status-and-notes-header-accent-colors-using-43587a-black-text-on-white-background-completed-tasks-shown-with-strikethrough-styling",
+      "featureTitle": "Update the existing `frontend/src/utils/tasksPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'tasks-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Tasks Report' title, and the current date; a professional table with columns for Title, Due Date, Category, Status, and Notes; header/accent colors using #43587A; black text on white background; completed tasks shown with strikethrough styling.",
+      "files": [
+        "frontend/src/utils/tasksPdfExport.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-existing-frontend-src-utils-notespdfexport-ts-utility-to-generate-a-downloadable-pdf-file-downloaded-as-notes-report-pdf-instead-of-opening-a-print-window-the-pdf-must-include-a-header-with-theiarco-app-name-notes-report-title-and-the-current-date-notes-organized-by-category-with-category-headers-styled-in-43587a-each-note-showing-its-title-content-and-creation-date-black-text-on-white-background",
+      "featureTitle": "Update the existing `frontend/src/utils/notesPdfExport.ts` utility to generate a downloadable PDF file (downloaded as 'notes-report.pdf') instead of opening a print window. The PDF must include: a header with 'Theiarco' app name, 'Notes Report' title, and the current date; notes organized by category with category headers styled in #43587A; each note showing its title, content, and creation date; black text on white background.",
+      "files": [
+        "frontend/src/utils/notesPdfExport.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
