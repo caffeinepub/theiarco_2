@@ -39,12 +39,13 @@ type FilterType = 'all' | 'completed' | 'uncompleted';
 export default function Tasks() {
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   // Map filter to backend TaskStatus enum
   const getTaskStatus = (filter: FilterType): TaskStatus => {
@@ -73,14 +74,6 @@ export default function Tasks() {
     } catch (error) {
       console.error('Failed to update task completion:', error);
     }
-  };
-
-  const handleAddTaskClick = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const handleCloseAddModal = () => {
-    setIsAddModalOpen(false);
   };
 
   const handleEditClick = (task: Task) => {
@@ -132,22 +125,20 @@ export default function Tasks() {
     }
   };
 
-  const handleExportPdf = () => {
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true);
     try {
-      exportTasksToPdf(allTasks);
-      toast.success('PDF opened for printing/saving', {
-        duration: 3000,
-        className: 'bg-green-600 text-white',
-      });
+      await exportTasksToPdf(allTasks);
     } catch (error) {
       console.error('Failed to export tasks PDF:', error);
       toast.error('Failed to export PDF. Please try again.');
+    } finally {
+      setIsExportingPdf(false);
     }
   };
 
   // Show loading state during initial load or refetch
   const showLoading = isLoading || isFetching;
-  const headerTextColor = getContrastColor(themeColor);
 
   return (
     <div className="flex h-full flex-col p-6 space-y-6">
@@ -166,14 +157,19 @@ export default function Tasks() {
           <Button
             variant="outline"
             onClick={handleExportPdf}
+            disabled={isExportingPdf}
             className="gap-2"
           >
-            <FileText className="h-4 w-4" />
-            Export to PDF
+            {isExportingPdf ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="h-4 w-4" />
+            )}
+            {isExportingPdf ? 'Exporting...' : 'Export to PDF'}
           </Button>
           <ThemedPrimaryButton
             themeColor={themeColor}
-            onClick={handleAddTaskClick}
+            onClick={() => setIsAddModalOpen(true)}
           >
             Add Task
           </ThemedPrimaryButton>
@@ -268,8 +264,18 @@ export default function Tasks() {
                       disabled={updateCompletionMutation.isPending}
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{task.title}</TableCell>
-                  <TableCell>{formatTaskDate(task.dueDate)}</TableCell>
+                  <TableCell
+                    className={
+                      task.isCompleted
+                        ? 'line-through text-muted-foreground'
+                        : 'font-medium'
+                    }
+                  >
+                    {task.title}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {formatTaskDate(task.dueDate)}
+                  </TableCell>
                   <TableCell>{task.category}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -277,19 +283,19 @@ export default function Tasks() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditClick(task)}
-                        className="h-8 gap-2"
+                        className="h-8 w-8 p-0"
                       >
                         <Pencil className="h-4 w-4" />
-                        Edit
+                        <span className="sr-only">Edit</span>
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteClick(task)}
-                        className="h-8 gap-2 text-destructive hover:text-destructive"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
-                        Delete
+                        <span className="sr-only">Delete</span>
                       </Button>
                     </div>
                   </TableCell>
@@ -300,10 +306,12 @@ export default function Tasks() {
         )}
       </div>
 
-      {/* Add Task Modal */}
-      <AddTaskModal isOpen={isAddModalOpen} onClose={handleCloseAddModal} />
+      {/* Modals */}
+      <AddTaskModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
 
-      {/* Edit Task Modal */}
       {selectedTask && (
         <EditTaskModal
           isOpen={isEditModalOpen}
@@ -313,7 +321,10 @@ export default function Tasks() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!taskToDelete} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={!!taskToDelete}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this task?</AlertDialogTitle>
@@ -324,10 +335,7 @@ export default function Tasks() {
               onClick={handleDeleteConfirm}
               disabled={deleteTaskMutation.isPending}
             >
-              {deleteTaskMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : null}
-              Yes
+              {deleteTaskMutation.isPending ? 'Deleting...' : 'Yes'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

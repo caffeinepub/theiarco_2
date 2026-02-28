@@ -1,33 +1,32 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project with PDF export functionality using jsPDF. Focus on fixing 'bad URL' errors by using built-in fonts only, no external resources, and direct synchronous download via jsPDF's save() method.",
+  "summary": "Project with a Pioneers page featuring PDF export functionality using jsPDF library.",
   "architectural_notes": [
-    "PDF export uses jsPDF with built-in fonts only — no custom font loading or external image/asset requests",
-    "PDF download triggered synchronously from button click using jsPDF save() method; no window.open() or new windows to avoid popup blockers"
+    "PDF export uses jsPDF with jspdf-autotable; import jsPDF from 'jspdf', create instance with new jsPDF(), use doc.text()/doc.autoTable(), save with doc.save('filename.pdf')"
   ],
   "known_issues": [],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-rewrite-the-pioneers-pdf-export-utility-frontend-src-utils-pioneerspdfexport-ts-to-use-jspdf-with-only-built-in-fonts-e-g-helvetica-no-custom-font-loading-no-external-image-or-asset-loading-and-no-window-open-calls-generate-the-pdf-entirely-from-in-memory-data-and-trigger-the-download-synchronously-using-jspdf-s-built-in-save-method-the-output-should-be-a-clean-functional-pdf-with-black-text-on-a-white-background-and-a-basic-bordered-table-layout-showing-monthly-hours-totals-averages-and-status-per-pioneer",
-      "title": "Rewrite the pioneers PDF export utility (frontend/src/utils/pioneersPdfExport.ts) to use jsPDF with only built-in fonts (e.g., 'helvetica'), no custom font loading, no external image or asset loading, and no window.open() calls. Generate the PDF entirely from in-memory data and trigger the download synchronously using jsPDF's built-in save() method. The output should be a clean, functional PDF with black text on a white background and a basic bordered table layout showing monthly hours, totals, averages, and status per pioneer.",
+      "id": "feature-rewrite-frontend-src-utils-pioneerspdfexport-ts-to-use-jspdf-correctly-import-jspdf-from-jspdf-and-import-jspdf-autotable-create-a-new-jspdf-instance-add-a-title-using-doc-text-add-the-pioneers-table-using-doc-autotable-with-columns-for-name-service-year-total-hours-average-hours-and-status-and-save-the-file-using-doc-save-pioneers-report-pdf-remove-all-html-generation-and-blob-anchor-download-logic",
+      "title": "Rewrite frontend/src/utils/pioneersPdfExport.ts to use jsPDF correctly: import jsPDF from 'jspdf' and import 'jspdf-autotable', create a new jsPDF instance, add a title using doc.text(), add the pioneers table using doc.autoTable() with columns for Name, Service Year, Total Hours, Average Hours, and Status, and save the file using doc.save('pioneers-report.pdf'). Remove all HTML generation and blob/anchor download logic.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-rewrite-the-tasks-pdf-export-utility-frontend-src-utils-taskspdfexport-ts-to-use-jspdf-with-only-built-in-fonts-no-external-resource-loading-and-no-window-open-calls-trigger-the-download-synchronously-using-jspdf-s-save-method-output-a-clean-pdf-with-black-text-on-white-background-and-a-basic-bordered-table-layout-showing-task-title-due-date-category-status-and-notes",
-      "title": "Rewrite the tasks PDF export utility (frontend/src/utils/tasksPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background and a basic bordered table layout showing task title, due date, category, status, and notes.",
+      "id": "feature-rewrite-frontend-src-utils-taskspdfexport-ts-to-use-jspdf-correctly-import-jspdf-from-jspdf-and-import-jspdf-autotable-create-a-new-jspdf-instance-add-a-title-using-doc-text-add-the-tasks-table-using-doc-autotable-with-appropriate-columns-title-due-date-category-status-notes-and-save-using-doc-save-tasks-report-pdf-remove-all-html-generation-and-blob-anchor-download-logic",
+      "title": "Rewrite frontend/src/utils/tasksPdfExport.ts to use jsPDF correctly: import jsPDF from 'jspdf' and import 'jspdf-autotable', create a new jsPDF instance, add a title using doc.text(), add the tasks table using doc.autoTable() with appropriate columns (Title, Due Date, Category, Status, Notes), and save using doc.save('tasks-report.pdf'). Remove all HTML generation and blob/anchor download logic.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-rewrite-the-notes-pdf-export-utility-frontend-src-utils-notespdfexport-ts-to-use-jspdf-with-only-built-in-fonts-no-external-resource-loading-and-no-window-open-calls-trigger-the-download-synchronously-using-jspdf-s-save-method-output-a-clean-pdf-with-black-text-on-white-background-grouping-notes-by-category-with-basic-section-headers-and-a-simple-layout",
-      "title": "Rewrite the notes PDF export utility (frontend/src/utils/notesPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background, grouping notes by category with basic section headers and a simple layout.",
+      "id": "feature-rewrite-frontend-src-utils-notespdfexport-ts-to-use-jspdf-correctly-import-jspdf-from-jspdf-and-import-jspdf-autotable-create-a-new-jspdf-instance-add-a-title-using-doc-text-add-the-notes-content-using-doc-autotable-or-doc-text-as-appropriate-and-save-using-doc-save-notes-report-pdf-remove-all-html-generation-and-blob-anchor-download-logic",
+      "title": "Rewrite frontend/src/utils/notesPdfExport.ts to use jsPDF correctly: import jsPDF from 'jspdf' and import 'jspdf-autotable', create a new jsPDF instance, add a title using doc.text(), add the notes content using doc.autoTable() or doc.text() as appropriate, and save using doc.save('notes-report.pdf'). Remove all HTML generation and blob/anchor download logic.",
       "reqIds": [
         "REQ-3"
       ],
@@ -35,7 +34,8 @@
     }
   ],
   "new_feature_requests": [],
-  "projectName": "Fix PDF export to use built-in fonts, no external resources, and direct synchronous download",
+  "gameProjectType": "none",
+  "projectName": "Fix PDF export to generate actual PDF files using jsPDF",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

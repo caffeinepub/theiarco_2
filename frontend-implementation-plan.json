@@ -1,61 +1,63 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix PDF export to use built-in fonts, no external resources, and direct synchronous download",
+  "title": "Fix PDF export to generate actual PDF files using jsPDF",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Rewrite the pioneers PDF export utility to use jsPDF with only built-in fonts, no external resource loading, and synchronous download via jsPDF's save() method",
+      "summary": "Rewrite pioneersPdfExport.ts to use jsPDF correctly with autoTable for generating actual PDF files",
       "acceptanceCriteria": [
-        "Clicking the PDF export button on the Pioneers page triggers an immediate file download without opening a new window or tab",
-        "No 'bad URL' errors appear in the browser console during export",
-        "No popup blocker warnings are triggered",
-        "The generated PDF uses only jsPDF built-in fonts (helvetica or equivalent)",
-        "No external HTTP requests are made during PDF generation",
-        "The PDF contains a bordered table with pioneer data (monthly hours, totals, averages, status)",
-        "PDF has black text on a white background"
+        "pioneersPdfExport.ts imports jsPDF from 'jspdf' and imports 'jspdf-autotable'",
+        "A new jsPDF instance is created with `new jsPDF()`",
+        "A title is added to the PDF using doc.text()",
+        "Pioneer data is added as a table using doc.autoTable() with the correct column headers",
+        "The file is saved via doc.save('pioneers-report.pdf')",
+        "No HTML string generation or blob-based download logic remains in the file",
+        "Clicking the Export to PDF button on the Pioneers page downloads an actual .pdf file that opens in a PDF viewer"
       ],
       "file_operations": [
         {
           "path": "frontend/src/utils/pioneersPdfExport.ts",
           "operation": "modify",
-          "description": "Replace the current browser print API implementation with jsPDF library. Use only jsPDF built-in fonts (helvetica, times, courier). Generate the PDF entirely from in-memory pioneer data arrays without loading any external resources (images, fonts, assets). Create a bordered table layout showing monthly hours (September through August), totals, averages, and status per pioneer with black text on white background. Call jsPDF's save() method directly to trigger synchronous download. Remove all window.open(), window.print(), and external URL references. Handle errors gracefully without blocking the UI."
+          "description": "Replace the entire HTML-based export implementation with jsPDF library usage. Import jsPDF from 'jspdf' and 'jspdf-autotable' at the top. Create a new jsPDF instance, add a title using doc.text('Pioneers Report', x, y), format pioneer data into rows with columns for Name, Service Year, Total Hours, Average Hours, and Status, then call doc.autoTable() with proper column definitions and body data. Finally, save the file using doc.save('pioneers-report.pdf'). Remove all HTML string generation, createHTMLContent function, blob creation, and anchor-based download logic. Keep the existing data preparation logic that calculates total hours and averages."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Rewrite the tasks PDF export utility to use jsPDF with only built-in fonts, no external resource loading, and synchronous download via jsPDF's save() method",
+      "summary": "Rewrite tasksPdfExport.ts to use jsPDF correctly with autoTable for generating actual PDF files",
       "acceptanceCriteria": [
-        "Clicking the PDF export button on the Tasks page triggers an immediate file download without opening a new window or tab",
-        "No 'bad URL' errors appear in the browser console during export",
-        "No popup blocker warnings are triggered",
-        "The generated PDF uses only jsPDF built-in fonts",
-        "The PDF contains a bordered table with task data (title, due date, category, status, notes)"
+        "tasksPdfExport.ts imports jsPDF from 'jspdf' and imports 'jspdf-autotable'",
+        "A new jsPDF instance is created with `new jsPDF()`",
+        "Task data is added as a table via doc.autoTable() with correct column headers",
+        "The file is saved via doc.save('tasks-report.pdf')",
+        "No HTML string generation or blob-based download logic remains in the file",
+        "Clicking Export to PDF on the Tasks page downloads an actual .pdf file"
       ],
       "file_operations": [
         {
           "path": "frontend/src/utils/tasksPdfExport.ts",
           "operation": "modify",
-          "description": "Replace the current browser print API implementation with jsPDF library. Use only jsPDF built-in fonts (helvetica, times, courier). Generate the PDF entirely from in-memory task data arrays without loading any external resources. Create a bordered table layout showing task title, due date, category, status, and notes with black text on white background. Call jsPDF's save() method directly to trigger synchronous download. Remove all window.open(), window.print(), and external URL references. Handle errors gracefully without blocking the UI."
+          "description": "Replace the entire HTML-based export implementation with jsPDF library usage. Import jsPDF from 'jspdf' and 'jspdf-autotable' at the top. Create a new jsPDF instance, add a title using doc.text('Tasks Report', x, y), format task data into rows with columns for Title, Due Date, Category, Status, and Notes, then call doc.autoTable() with proper column definitions and body data. Finally, save the file using doc.save('tasks-report.pdf'). Remove all HTML string generation, createHTMLContent function, blob creation, and anchor-based download logic. Keep the existing formatTaskDueDate utility for date formatting."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Rewrite the notes PDF export utility to use jsPDF with only built-in fonts, no external resource loading, and synchronous download via jsPDF's save() method",
+      "summary": "Rewrite notesPdfExport.ts to use jsPDF correctly with autoTable or text methods for generating actual PDF files",
       "acceptanceCriteria": [
-        "Clicking the PDF export button on the Notes page triggers an immediate file download without opening a new window or tab",
-        "No 'bad URL' errors appear in the browser console during export",
-        "No popup blocker warnings are triggered",
-        "The generated PDF uses only jsPDF built-in fonts",
-        "Notes are grouped by category with readable section headers"
+        "notesPdfExport.ts imports jsPDF from 'jspdf' and imports 'jspdf-autotable'",
+        "A new jsPDF instance is created with `new jsPDF()`",
+        "Notes content is rendered into the PDF document using jsPDF methods",
+        "The file is saved via doc.save('notes-report.pdf')",
+        "No HTML string generation or blob-based download logic remains in the file",
+        "Clicking Export to PDF on the Notes page downloads an actual .pdf file"
       ],
       "file_operations": [
         {
           "path": "frontend/src/utils/notesPdfExport.ts",
           "operation": "modify",
-          "description": "Replace the current browser print API implementation with jsPDF library. Use only jsPDF built-in fonts (helvetica, times, courier). Generate the PDF entirely from in-memory GlobalNote data arrays without loading any external resources (images, logos, fonts). Group notes by category with basic section headers using different font sizes or bold text. Use black text on white background with simple layout. Call jsPDF's save() method directly to trigger synchronous download. Remove all window.open(), window.print(), and external URL references. Handle errors gracefully without blocking the UI."
+          "description": "Replace the entire HTML-based export implementation with jsPDF library usage. Import jsPDF from 'jspdf' and 'jspdf-autotable' at the top. Create a new jsPDF instance, add a title using doc.text('Notes Report', x, y). Group notes by category as in the current implementation. For each category section, add a category heading with doc.text(), then use doc.autoTable() to render note details (title, content, creation date, attached publisher if present) in a clean table format. Finally, save the file using doc.save('notes-report.pdf'). Remove all HTML string generation, createHTMLContent function, blob creation, and anchor-based download logic. Keep the existing formatNoteDate utility and category grouping logic."
         }
       ]
     }

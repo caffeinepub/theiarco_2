@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-28T20:07:14.796Z",
+  "generatedAt": "2026-02-28T20:47:28.201Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,7 +12,7 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Rewrite the pioneers PDF export utility (frontend/src/utils/pioneersPdfExport.ts) to use jsPDF with only built-in fonts (e.g., 'helvetica'), no custom font loading, no external image or asset loading, and no window.open() calls. Generate the PDF entirely from in-memory data and trigger the download synchronously using jsPDF's built-in save() method. The output should be a clean, functional PDF with black text on a white background and a basic bordered table layout showing monthly hours, totals, averages, and status per pioneer.",
+        "summary": "Rewrite frontend/src/utils/pioneersPdfExport.ts to use jsPDF correctly: import jsPDF from 'jspdf' and import 'jspdf-autotable', create a new jsPDF instance, add a title using doc.text(), add the pioneers table using doc.autoTable() with columns for Name, Service Year, Total Hours, Average Hours, and Status, and save the file using doc.save('pioneers-report.pdf'). Remove all HTML generation and blob/anchor download logic.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/utils/pioneersPdfExport.ts"
@@ -23,7 +23,7 @@
       },
       {
         "id": "REQ-2",
-        "summary": "Rewrite the tasks PDF export utility (frontend/src/utils/tasksPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background and a basic bordered table layout showing task title, due date, category, status, and notes.",
+        "summary": "Rewrite frontend/src/utils/tasksPdfExport.ts to use jsPDF correctly: import jsPDF from 'jspdf' and import 'jspdf-autotable', create a new jsPDF instance, add a title using doc.text(), add the tasks table using doc.autoTable() with appropriate columns (Title, Due Date, Category, Status, Notes), and save using doc.save('tasks-report.pdf'). Remove all HTML generation and blob/anchor download logic.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/utils/tasksPdfExport.ts"
@@ -34,7 +34,7 @@
       },
       {
         "id": "REQ-3",
-        "summary": "Rewrite the notes PDF export utility (frontend/src/utils/notesPdfExport.ts) to use jsPDF with only built-in fonts, no external resource loading, and no window.open() calls. Trigger the download synchronously using jsPDF's save() method. Output a clean PDF with black text on white background, grouping notes by category with basic section headers and a simple layout.",
+        "summary": "Rewrite frontend/src/utils/notesPdfExport.ts to use jsPDF correctly: import jsPDF from 'jspdf' and import 'jspdf-autotable', create a new jsPDF instance, add a title using doc.text(), add the notes content using doc.autoTable() or doc.text() as appropriate, and save using doc.save('notes-report.pdf'). Remove all HTML generation and blob/anchor download logic.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/utils/notesPdfExport.ts"
@@ -50,6 +50,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/pages/Notes.tsx",
+    "frontend/src/pages/Pioneers.tsx",
+    "frontend/src/pages/Tasks.tsx",
     "frontend/src/utils/notesPdfExport.ts",
     "frontend/src/utils/pioneersPdfExport.ts",
     "frontend/src/utils/tasksPdfExport.ts",

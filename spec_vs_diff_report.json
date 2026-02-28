@@ -1,29 +1,29 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-28T20:07:14.792Z",
-  "summary": "All three PDF export utilities were rewritten, but the implementation uses HTML Blob downloads (via URL.createObjectURL and an anchor click) rather than jsPDF's save() method with built-in fonts as explicitly required. The build request and all three REQs specifically mandate using jsPDF with built-in fonts (helvetica) and jsPDF's save() method. The diff shows no jsPDF import or usage in any of the three files.",
+  "generatedAt": "2026-02-28T20:47:28.197Z",
+  "summary": "All three PDF export utility files have been rewritten to generate actual PDF files. However, the implementation uses a CDN-based dynamic script loading approach (window.jspdf) rather than the ES module imports specified in the requirements. The core functionality (jsPDF instance creation, doc.text() for titles, doc.autoTable() for tables, doc.save() with .pdf extension, no HTML/blob logic) is correctly implemented. The column headers and file names match the requirements.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Use jsPDF with only built-in fonts (e.g., 'helvetica'), no custom font loading, and trigger download synchronously using jsPDF's built-in save() method.",
-      "reason": "The rewritten pioneersPdfExport.ts generates an HTML document and downloads it as a Blob via URL.createObjectURL + anchor click. There is no jsPDF import, no jsPDF instantiation, no use of helvetica font via jsPDF, and no call to jsPDF's save() method. The output file is HTML, not a true PDF.",
+      "requirement": "pioneersPdfExport.ts must import jsPDF from 'jspdf' and import 'jspdf-autotable'",
+      "reason": "The implementation dynamically loads jsPDF from CDN via script injection and accesses it via (window as any).jspdf, rather than using ES module imports: import jsPDF from 'jspdf' and import 'jspdf-autotable'.",
       "evidence": [
         "frontend/src/utils/pioneersPdfExport.ts"
       ]
     },
     {
       "id": "REQ-2",
-      "requirement": "Use jsPDF with only built-in fonts, no external resource loading, and trigger download synchronously using jsPDF's save() method.",
-      "reason": "The rewritten tasksPdfExport.ts generates an HTML document and downloads it as a Blob. There is no jsPDF import or usage and no call to jsPDF's save() method.",
+      "requirement": "tasksPdfExport.ts must import jsPDF from 'jspdf' and import 'jspdf-autotable'",
+      "reason": "The implementation dynamically loads jsPDF from CDN via script injection and accesses it via (window as any).jspdf, rather than using ES module imports: import jsPDF from 'jspdf' and import 'jspdf-autotable'.",
       "evidence": [
         "frontend/src/utils/tasksPdfExport.ts"
       ]
     },
     {
       "id": "REQ-3",
-      "requirement": "Use jsPDF with only built-in fonts, no external resource loading, and trigger download synchronously using jsPDF's save() method.",
-      "reason": "The rewritten notesPdfExport.ts generates an HTML document and downloads it as a Blob. There is no jsPDF import or usage and no call to jsPDF's save() method.",
+      "requirement": "notesPdfExport.ts must import jsPDF from 'jspdf' and import 'jspdf-autotable'",
+      "reason": "The implementation dynamically loads jsPDF from CDN via script injection and accesses it via (window as any).jspdf, rather than using ES module imports: import jsPDF from 'jspdf' and import 'jspdf-autotable'.",
       "evidence": [
         "frontend/src/utils/notesPdfExport.ts"
       ]
@@ -31,18 +31,42 @@
   ],
   "hallucinated_features": [
     {
-      "description": "HTML Blob download approach: all three utilities generate HTML strings and download them as Blob objects via URL.createObjectURL and a programmatic anchor click, producing HTML files instead of PDF files.",
-      "reason": "The build request explicitly requires using jsPDF's save() method to produce actual PDF files. Generating HTML blobs was not requested and does not satisfy the requirement for true PDF output.",
+      "description": "CDN-based dynamic script loading (loadScript) for jsPDF and jspdf-autotable via Cloudflare CDN URLs",
+      "reason": "The build request explicitly requires using npm package imports. The dynamic CDN script injection pattern was not requested and replaces the specified import mechanism.",
       "evidence": [
         "frontend/src/utils/pioneersPdfExport.ts",
         "frontend/src/utils/tasksPdfExport.ts",
         "frontend/src/utils/notesPdfExport.ts"
       ]
+    },
+    {
+      "description": "Monthly hours breakdown columns (Sep through Aug) added to the pioneers PDF table",
+      "reason": "The requirements specify only Name, Service Year, Total Hours, Average Hours, and Status columns. Adding monthly breakdown columns is explicitly listed as a non-goal.",
+      "evidence": [
+        "frontend/src/utils/pioneersPdfExport.ts"
+      ]
+    },
+    {
+      "description": "Color-coded status text in pioneers PDF via didParseCell callback",
+      "reason": "This styling enhancement was not requested in the requirements or acceptance criteria.",
+      "evidence": [
+        "frontend/src/utils/pioneersPdfExport.ts"
+      ]
+    },
+    {
+      "description": "Color-coded status and title text in tasks PDF via didParseCell callback",
+      "reason": "This styling enhancement was not requested in the requirements or acceptance criteria.",
+      "evidence": [
+        "frontend/src/utils/tasksPdfExport.ts"
+      ]
     }
   ],
-  "confidence": 0.97,
+  "confidence": 0.82,
   "changed_files": [
     "frontend-file-summaries.txt",
+    "frontend/src/pages/Notes.tsx",
+    "frontend/src/pages/Pioneers.tsx",
+    "frontend/src/pages/Tasks.tsx",
     "frontend/src/utils/notesPdfExport.ts",
     "frontend/src/utils/pioneersPdfExport.ts",
     "frontend/src/utils/tasksPdfExport.ts",

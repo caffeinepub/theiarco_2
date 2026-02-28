@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableHead, TableHeader } from '@/components/ui/table';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, Loader2 } from 'lucide-react';
 import { useGetAllPioneers } from '../hooks/usePioneers';
 import { useGetAllPublishers } from '../hooks/useQueries';
 import { useActor } from '../hooks/useActor';
@@ -15,7 +15,6 @@ import { exportPioneersToPdf } from '../utils/pioneersPdfExport';
 import { toast } from 'sonner';
 import type { Pioneer } from '../backend';
 import { getPageThemeColor } from '@/theme/pageTheme';
-import { getContrastColor } from '@/theme/colorUtils';
 import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
 import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
 
@@ -23,7 +22,7 @@ export default function Pioneers() {
   const navigate = useNavigate();
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const { actor } = useActor();
   const { data: pioneers, isLoading } = useGetAllPioneers();
   const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
@@ -33,10 +32,6 @@ export default function Pioneers() {
   const [selectedPioneer, setSelectedPioneer] = useState<Pioneer | null>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
-
-  const handleAddPioneer = () => {
-    setIsAddModalOpen(true);
-  };
 
   const handleEditPioneer = (pioneer: Pioneer) => {
     setSelectedPioneer(pioneer);
@@ -118,8 +113,7 @@ export default function Pioneers() {
     try {
       const pioneersData = await fetchPioneersData();
       if (!pioneersData) return;
-      exportPioneersToPdf(pioneersData);
-      toast.success('PDF opened for printing/saving');
+      await exportPioneersToPdf(pioneersData);
     } catch (error) {
       console.error('PDF export error:', error);
       toast.error('Failed to export PDF');
@@ -132,8 +126,6 @@ export default function Pioneers() {
   const sortedPioneers = pioneers
     ? [...pioneers].sort((a, b) => a.publisherName.localeCompare(b.publisherName))
     : [];
-
-  const headerTextColor = getContrastColor(themeColor);
 
   return (
     <div className="p-6 space-y-6">
@@ -156,12 +148,16 @@ export default function Pioneers() {
             variant="outline"
             className="flex items-center gap-2"
           >
-            <FileText className="h-4 w-4" />
+            {isExportingPdf ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="h-4 w-4" />
+            )}
             {isExportingPdf ? 'Exporting...' : 'Export to PDF'}
           </Button>
           <ThemedPrimaryButton
             themeColor={themeColor}
-            onClick={handleAddPioneer}
+            onClick={() => setIsAddModalOpen(true)}
           >
             Add Pioneer
           </ThemedPrimaryButton>

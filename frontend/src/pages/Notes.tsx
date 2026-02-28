@@ -28,11 +28,12 @@ type CategoryFilter = 'All' | 'General' | 'Publishers' | 'Territories' | 'Servic
 export default function Notes() {
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<GlobalNote | null>(null);
   const [noteToDelete, setNoteToDelete] = useState<GlobalNote | null>(null);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('All');
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   const { data: notes = [], isLoading } = useGetAllGlobalNotes();
   const { data: publishers = [] } = useGetAllPublishers();
@@ -78,16 +79,15 @@ export default function Notes() {
     setNoteToDelete(null);
   };
 
-  const handleExportPdf = () => {
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true);
     try {
-      exportNotesToPdf(notes);
-      toast.success('PDF opened for printing/saving', {
-        duration: 3000,
-        className: 'bg-green-600 text-white',
-      });
+      await exportNotesToPdf(notes);
     } catch (error) {
       console.error('Failed to export notes PDF:', error);
       toast.error('Failed to export PDF. Please try again.');
+    } finally {
+      setIsExportingPdf(false);
     }
   };
 
@@ -109,11 +109,15 @@ export default function Notes() {
           <Button
             variant="outline"
             onClick={handleExportPdf}
-            disabled={notes.length === 0}
+            disabled={notes.length === 0 || isExportingPdf}
             className="flex items-center gap-2"
           >
-            <Download className="h-4 w-4" />
-            Export to PDF
+            {isExportingPdf ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            {isExportingPdf ? 'Exporting...' : 'Export to PDF'}
           </Button>
           <ThemedPrimaryButton
             themeColor={themeColor}
@@ -169,7 +173,7 @@ export default function Notes() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedNotes.map((note) => (
             <GlobalNoteCard
-              key={note.id}
+              key={note.id.toString()}
               note={note}
               attachedPublisherName={getPublisherName(note.attachedPublisher)}
               onEdit={() => handleEditClick(note)}
