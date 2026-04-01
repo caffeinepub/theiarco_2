@@ -118,7 +118,7 @@ export default function FieldServiceGroups() {
                           key={publisher.id.toString()}
                           className="text-foreground"
                         >
-                          \u2022 {publisher.fullName}
+                          {publisher.fullName}
                         </li>
                       ))}
                     </ul>
