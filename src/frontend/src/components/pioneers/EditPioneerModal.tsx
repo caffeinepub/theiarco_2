@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useUpdatePioneer } from '../../hooks/useUpdatePioneer';
-import { toast } from 'sonner';
-import type { Publisher, Pioneer } from '../../backend';
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { Pioneer, Publisher } from "../../backend";
+import { useUpdatePioneer } from "../../hooks/useUpdatePioneer";
 
 interface EditPioneerModalProps {
   isOpen: boolean;
@@ -34,8 +34,8 @@ export default function EditPioneerModal({
   publishers,
   publishersLoading,
 }: EditPioneerModalProps) {
-  const [selectedPublisherId, setSelectedPublisherId] = useState<string>('');
-  const [serviceYear, setServiceYear] = useState<string>('');
+  const [selectedPublisherId, setSelectedPublisherId] = useState<string>("");
+  const [serviceYear, setServiceYear] = useState<string>("");
 
   const updatePioneerMutation = useUpdatePioneer();
 
@@ -59,17 +59,17 @@ export default function EditPioneerModal({
 
     // Validate required fields
     if (!selectedPublisherId || !serviceYear) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
     // Find the selected publisher to get their name
     const selectedPublisher = activePublishers.find(
-      (p) => p.id.toString() === selectedPublisherId
+      (p) => p.id.toString() === selectedPublisherId,
     );
 
     if (!selectedPublisher) {
-      toast.error('Selected publisher not found');
+      toast.error("Selected publisher not found");
       return;
     }
 
@@ -84,19 +84,19 @@ export default function EditPioneerModal({
       });
 
       // Success - show toast and close modal
-      toast.success('Pioneer updated successfully!', {
+      toast.success("Pioneer updated successfully!", {
         duration: 3000,
         style: {
-          background: 'oklch(0.7 0.15 145)',
-          color: 'white',
+          background: "oklch(0.7 0.15 145)",
+          color: "white",
         },
       });
 
       onClose();
     } catch (error) {
       // Error - keep modal open, show error toast
-      console.error('Failed to update pioneer:', error);
-      toast.error('Failed to update pioneer. Please try again.');
+      console.error("Failed to update pioneer:", error);
+      toast.error("Failed to update pioneer. Please try again.");
     }
   };
 
@@ -128,7 +128,10 @@ export default function EditPioneerModal({
               </SelectTrigger>
               <SelectContent>
                 {activePublishers.map((publisher) => (
-                  <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
+                  <SelectItem
+                    key={publisher.id.toString()}
+                    value={publisher.id.toString()}
+                  >
                     {publisher.fullName}
                   </SelectItem>
                 ))}
@@ -164,11 +167,15 @@ export default function EditPioneerModal({
             </Button>
             <Button
               type="submit"
-              disabled={updatePioneerMutation.isPending || !selectedPublisherId || !serviceYear}
-              style={{ backgroundColor: '#43587A' }}
+              disabled={
+                updatePioneerMutation.isPending ||
+                !selectedPublisherId ||
+                !serviceYear
+              }
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
-              {updatePioneerMutation.isPending ? 'Saving...' : 'Save'}
+              {updatePioneerMutation.isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>

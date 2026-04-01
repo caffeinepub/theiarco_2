@@ -7,10 +7,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useDeleteTerritoryNote } from '../../hooks/useTerritoryNotes';
-import type { TerritoryNote } from '../../backend';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import type { TerritoryNote } from "../../backend";
+import { useDeleteTerritoryNote } from "../../hooks/useTerritoryNotes";
 
 interface DeleteTerritoryNoteDialogProps {
   open: boolean;
@@ -31,15 +31,15 @@ export function DeleteTerritoryNoteDialog({
     try {
       await deleteNote.mutateAsync(note.id);
 
-      toast.success('Note deleted successfully!', {
+      toast.success("Note deleted successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to delete note:', error);
-      toast.error('Failed to delete note');
+      console.error("Failed to delete note:", error);
+      toast.error("Failed to delete note");
     }
   };
 

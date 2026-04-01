@@ -7,9 +7,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useDeleteGroupVisit } from '../../hooks/useDeleteGroupVisit';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { useDeleteGroupVisit } from "../../hooks/useDeleteGroupVisit";
 
 interface DeleteGroupVisitDialogProps {
   open: boolean;
@@ -31,14 +31,14 @@ export function DeleteGroupVisitDialog({
   const handleConfirm = async () => {
     try {
       await deleteGroupVisit.mutateAsync({ visitId, groupNumber });
-      toast.success('Group visit deleted successfully');
+      toast.success("Group visit deleted successfully");
       onOpenChange(false);
       if (onDeleted) {
         onDeleted();
       }
     } catch (error: any) {
-      console.error('Delete group visit error:', error);
-      toast.error(error.message || 'Failed to delete group visit');
+      console.error("Delete group visit error:", error);
+      toast.error(error.message || "Failed to delete group visit");
     }
   };
 
@@ -48,7 +48,8 @@ export function DeleteGroupVisitDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete this group visit?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the group visit record.
+            This action cannot be undone. This will permanently delete the group
+            visit record.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -58,7 +59,7 @@ export function DeleteGroupVisitDialog({
             disabled={deleteGroupVisit.isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {deleteGroupVisit.isPending ? 'Deleting...' : 'Yes'}
+            {deleteGroupVisit.isPending ? "Deleting..." : "Yes"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

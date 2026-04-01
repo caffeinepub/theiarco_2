@@ -1,8 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { PublisherId } from '../backend';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { PublisherId } from "../backend";
+import { useActor } from "./useActor";
 
-type PrivilegeOption = 'Unbaptized Publisher' | 'Publisher' | 'Ministerial Servant' | 'Elder';
+type PrivilegeOption =
+  | "Unbaptized Publisher"
+  | "Publisher"
+  | "Ministerial Servant"
+  | "Elder";
 
 interface UpdatePublisherInput {
   id: PublisherId;
@@ -17,13 +21,13 @@ interface UpdatePublisherInput {
 // Map UI privilege selection to backend privilege object
 function mapPrivilegesToBackend(privilege: PrivilegeOption) {
   switch (privilege) {
-    case 'Unbaptized Publisher':
+    case "Unbaptized Publisher":
       return { publisher: false, servant: false, elder: false };
-    case 'Publisher':
+    case "Publisher":
       return { publisher: true, servant: false, elder: false };
-    case 'Ministerial Servant':
+    case "Ministerial Servant":
       return { publisher: true, servant: true, elder: false };
-    case 'Elder':
+    case "Elder":
       return { publisher: true, servant: false, elder: true };
   }
 }
@@ -34,7 +38,7 @@ export function useUpdatePublisher() {
 
   return useMutation({
     mutationFn: async (input: UpdatePublisherInput) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
 
       const privilegesObject = mapPrivilegesToBackend(input.privileges);
 
@@ -45,12 +49,12 @@ export function useUpdatePublisher() {
         privilegesObject,
         input.isGroupOverseer,
         input.isGroupAssistant,
-        input.isActive
+        input.isActive,
       );
     },
     onSuccess: () => {
       // Invalidate publishers list query to refresh the table
-      queryClient.invalidateQueries({ queryKey: ['publishers'] });
+      queryClient.invalidateQueries({ queryKey: ["publishers"] });
     },
   });
 }

@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
-import { useGetAllPublishers } from '../../hooks/useQueries';
-import { useUpdateCheckoutRecord } from '../../hooks/useUpdateCheckoutRecord';
-import type { CheckoutRecord, PublisherId } from '../../backend';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
-import { normalizeTimestampToMs } from '@/utils/territoryTime';
+} from "@/components/ui/select";
+import { normalizeTimestampToMs } from "@/utils/territoryTime";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { CheckoutRecord, PublisherId } from "../../backend";
+import { useGetAllPublishers } from "../../hooks/useQueries";
+import { useUpdateCheckoutRecord } from "../../hooks/useUpdateCheckoutRecord";
 
 interface EditCheckoutRecordModalProps {
   open: boolean;
@@ -36,14 +36,14 @@ function timestampToDateString(timestamp: bigint): string {
   const ms = normalizeTimestampToMs(timestamp);
   const date = new Date(ms);
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
 // Helper to convert YYYY-MM-DD string to seconds timestamp
 function dateStringToSeconds(dateString: string): bigint {
-  const date = new Date(dateString + 'T00:00:00');
+  const date = new Date(`${dateString}T00:00:00`);
   return BigInt(Math.floor(date.getTime() / 1000));
 }
 
@@ -53,12 +53,13 @@ export function EditCheckoutRecordModal({
   territoryId,
   record,
 }: EditCheckoutRecordModalProps) {
-  const [selectedPublisherId, setSelectedPublisherId] = useState<string>('');
-  const [dateCheckedOut, setDateCheckedOut] = useState<string>('');
-  const [dateReturned, setDateReturned] = useState<string>('');
+  const [selectedPublisherId, setSelectedPublisherId] = useState<string>("");
+  const [dateCheckedOut, setDateCheckedOut] = useState<string>("");
+  const [dateReturned, setDateReturned] = useState<string>("");
   const [isCampaign, setIsCampaign] = useState(false);
 
-  const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
+  const { data: publishers = [], isLoading: publishersLoading } =
+    useGetAllPublishers();
   const updateMutation = useUpdateCheckoutRecord();
 
   // Filter active publishers and sort alphabetically by fullName
@@ -71,19 +72,21 @@ export function EditCheckoutRecordModal({
     if (open && record) {
       setSelectedPublisherId(record.publisherId.toString());
       setDateCheckedOut(timestampToDateString(record.dateCheckedOut));
-      setDateReturned(record.dateReturned ? timestampToDateString(record.dateReturned) : '');
+      setDateReturned(
+        record.dateReturned ? timestampToDateString(record.dateReturned) : "",
+      );
       setIsCampaign(record.isCampaign);
     }
   }, [open, record]);
 
   const handleSubmit = async () => {
     if (!selectedPublisherId) {
-      toast.error('Please select a publisher');
+      toast.error("Please select a publisher");
       return;
     }
 
     if (!dateCheckedOut) {
-      toast.error('Please select a checkout date');
+      toast.error("Please select a checkout date");
       return;
     }
 
@@ -94,18 +97,20 @@ export function EditCheckoutRecordModal({
         originalDateCheckedOut: record.dateCheckedOut,
         newPublisherId: BigInt(selectedPublisherId),
         newDateCheckedOut: dateStringToSeconds(dateCheckedOut),
-        newDateReturned: dateReturned ? dateStringToSeconds(dateReturned) : null,
+        newDateReturned: dateReturned
+          ? dateStringToSeconds(dateReturned)
+          : null,
         newIsCampaign: isCampaign,
       });
 
-      toast.success('Checkout record updated successfully!', {
+      toast.success("Checkout record updated successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to update checkout record:', error);
-      toast.error('Failed to update checkout record. Please try again.');
+      console.error("Failed to update checkout record:", error);
+      toast.error("Failed to update checkout record. Please try again.");
     }
   };
 
@@ -200,7 +205,7 @@ export function EditCheckoutRecordModal({
                 Saving...
               </>
             ) : (
-              'Save'
+              "Save"
             )}
           </Button>
         </DialogFooter>

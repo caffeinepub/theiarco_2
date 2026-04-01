@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useActor } from "./useActor";
 
 interface UpdateTaskCompletionParams {
   id: bigint;
@@ -12,12 +12,12 @@ export function useUpdateTaskCompletion() {
 
   return useMutation({
     mutationFn: async ({ id, isCompleted }: UpdateTaskCompletionParams) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.updateTaskCompletion(id, isCompleted);
     },
     onSuccess: () => {
       // Invalidate all task queries to refetch with updated completion status
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 }

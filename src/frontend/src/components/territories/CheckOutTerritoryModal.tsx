@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
-import { useGetAllPublishers } from '../../hooks/useQueries';
-import { useCheckOutTerritory } from '../../hooks/useCheckOutTerritory';
-import type { PublisherId } from '../../backend';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
+} from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { PublisherId } from "../../backend";
+import { useCheckOutTerritory } from "../../hooks/useCheckOutTerritory";
+import { useGetAllPublishers } from "../../hooks/useQueries";
 
 interface CheckOutTerritoryModalProps {
   open: boolean;
@@ -33,14 +33,14 @@ interface CheckOutTerritoryModalProps {
 function getTodayDateString(): string {
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
 // Helper to convert YYYY-MM-DD string to seconds timestamp
 function dateStringToSeconds(dateString: string): bigint {
-  const date = new Date(dateString + 'T00:00:00');
+  const date = new Date(`${dateString}T00:00:00`);
   return BigInt(Math.floor(date.getTime() / 1000));
 }
 
@@ -49,11 +49,12 @@ export function CheckOutTerritoryModal({
   onOpenChange,
   territoryId,
 }: CheckOutTerritoryModalProps) {
-  const [selectedPublisherId, setSelectedPublisherId] = useState<string>('');
-  const [dateCheckedOut, setDateCheckedOut] = useState<string>('');
+  const [selectedPublisherId, setSelectedPublisherId] = useState<string>("");
+  const [dateCheckedOut, setDateCheckedOut] = useState<string>("");
   const [isCampaign, setIsCampaign] = useState(false);
 
-  const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
+  const { data: publishers = [], isLoading: publishersLoading } =
+    useGetAllPublishers();
   const checkOutMutation = useCheckOutTerritory();
 
   // Filter active publishers and sort alphabetically by fullName
@@ -64,7 +65,7 @@ export function CheckOutTerritoryModal({
   // Reset form and set date to today when modal opens
   useEffect(() => {
     if (open) {
-      setSelectedPublisherId('');
+      setSelectedPublisherId("");
       setDateCheckedOut(getTodayDateString());
       setIsCampaign(false);
     }
@@ -72,12 +73,12 @@ export function CheckOutTerritoryModal({
 
   const handleSubmit = async () => {
     if (!selectedPublisherId) {
-      toast.error('Please select a publisher');
+      toast.error("Please select a publisher");
       return;
     }
 
     if (!dateCheckedOut) {
-      toast.error('Please select a checkout date');
+      toast.error("Please select a checkout date");
       return;
     }
 
@@ -89,14 +90,14 @@ export function CheckOutTerritoryModal({
         dateCheckedOut: dateStringToSeconds(dateCheckedOut),
       });
 
-      toast.success('Territory checked out successfully!', {
+      toast.success("Territory checked out successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to check out territory:', error);
-      toast.error('Failed to check out territory. Please try again.');
+      console.error("Failed to check out territory:", error);
+      toast.error("Failed to check out territory. Please try again.");
     }
   };
 
@@ -181,7 +182,7 @@ export function CheckOutTerritoryModal({
                 Checking Out...
               </>
             ) : (
-              'Check Out'
+              "Check Out"
             )}
           </Button>
         </DialogFooter>

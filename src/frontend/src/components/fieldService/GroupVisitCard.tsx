@@ -1,8 +1,8 @@
-import { Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import type { GroupVisit } from '../../backend';
-import { formatLongDate } from '../../utils/formatters';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Pencil, Trash2 } from "lucide-react";
+import type { GroupVisit } from "../../backend";
+import { formatLongDate } from "../../utils/formatters";
 
 interface GroupVisitCardProps {
   visit: GroupVisit;
@@ -13,28 +13,28 @@ interface GroupVisitCardProps {
   onClick?: () => void;
 }
 
-export function GroupVisitCard({ 
-  visit, 
-  publisherNameMap, 
-  groupNumber,
-  onEdit, 
+export function GroupVisitCard({
+  visit,
+  publisherNameMap,
+  onEdit,
   onDelete,
-  onClick 
+  onClick,
 }: GroupVisitCardProps) {
   // Use the new field names from the backend
-  const discussionTopics = visit.discussionTopics || '';
-  const overseerNotes = visit.notesForOverseer || '';
-  const assistantNotes = visit.notesForAssistant || '';
+  const discussionTopics = visit.discussionTopics || "";
+  const overseerNotes = visit.notesForOverseer || "";
+  const assistantNotes = visit.notesForAssistant || "";
   const nextPlannedVisitDate = visit.nextPlannedVisitDate;
 
   // Map publisher IDs to names using publisherNamesPresent if available, otherwise map IDs
-  const attendeeNames = visit.publisherNamesPresent && visit.publisherNamesPresent.length > 0
-    ? visit.publisherNamesPresent.join(', ')
-    : visit.publishersPresent
-        .map((id) => publisherNameMap.get(id) || 'Unknown')
-        .join(', ');
+  const attendeeNames =
+    visit.publisherNamesPresent && visit.publisherNamesPresent.length > 0
+      ? visit.publisherNamesPresent.join(", ")
+      : visit.publishersPresent
+          .map((id) => publisherNameMap.get(id) || "Unknown")
+          .join(", ");
 
-  const handleCardClick = (e: React.MouseEvent) => {
+  const handleCardClick = (_e: React.MouseEvent) => {
     // Only trigger if we have an onClick handler
     if (onClick) {
       onClick();
@@ -56,8 +56,12 @@ export function GroupVisitCard({
   };
 
   return (
-    <Card 
-      className={onClick ? 'cursor-pointer transition-all hover:shadow-md active:scale-[0.99]' : ''}
+    <Card
+      className={
+        onClick
+          ? "cursor-pointer transition-all hover:shadow-md active:scale-[0.99]"
+          : ""
+      }
       onClick={handleCardClick}
     >
       <CardContent className="p-4">
@@ -111,9 +115,7 @@ export function GroupVisitCard({
               <h4 className="text-sm font-medium text-foreground mb-1">
                 Publishers Present:
               </h4>
-              <p className="text-sm text-muted-foreground">
-                {attendeeNames}
-              </p>
+              <p className="text-sm text-muted-foreground">{attendeeNames}</p>
             </div>
           )}
 

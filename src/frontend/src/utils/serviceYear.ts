@@ -13,8 +13,7 @@ export function getCurrentServiceYear(): string {
   if (currentMonth >= 8) {
     // September through December
     return `${currentYear}-${currentYear + 1}`;
-  } else {
-    // January through August
-    return `${currentYear - 1}-${currentYear}`;
   }
+  // January through August
+  return `${currentYear - 1}-${currentYear}`;
 }

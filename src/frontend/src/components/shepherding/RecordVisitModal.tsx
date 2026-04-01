@@ -1,13 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCreateShepherdingVisit } from '../../hooks/useCreateShepherdingVisit';
-import { toast } from 'sonner';
-import type { Publisher } from '../../backend';
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { Publisher } from "../../backend";
+import { useCreateShepherdingVisit } from "../../hooks/useCreateShepherdingVisit";
 
 interface RecordVisitModalProps {
   open: boolean;
@@ -15,11 +27,15 @@ interface RecordVisitModalProps {
   publishers: Publisher[];
 }
 
-export default function RecordVisitModal({ open, onOpenChange, publishers }: RecordVisitModalProps) {
-  const [publisherId, setPublisherId] = useState('');
-  const [visitDate, setVisitDate] = useState('');
-  const [eldersPresent, setEldersPresent] = useState('');
-  const [notes, setNotes] = useState('');
+export default function RecordVisitModal({
+  open,
+  onOpenChange,
+  publishers,
+}: RecordVisitModalProps) {
+  const [publisherId, setPublisherId] = useState("");
+  const [visitDate, setVisitDate] = useState("");
+  const [eldersPresent, setEldersPresent] = useState("");
+  const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const createVisit = useCreateShepherdingVisit();
@@ -27,10 +43,10 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
   // Reset form when modal closes
   useEffect(() => {
     if (!open) {
-      setPublisherId('');
-      setVisitDate('');
-      setEldersPresent('');
-      setNotes('');
+      setPublisherId("");
+      setVisitDate("");
+      setEldersPresent("");
+      setNotes("");
       setErrors({});
     }
   }, [open]);
@@ -39,13 +55,13 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
     const newErrors: { [key: string]: string } = {};
 
     if (!publisherId) {
-      newErrors.publisherId = 'Publisher is required';
+      newErrors.publisherId = "Publisher is required";
     }
     if (!visitDate) {
-      newErrors.visitDate = 'Visit date is required';
+      newErrors.visitDate = "Visit date is required";
     }
     if (!eldersPresent.trim()) {
-      newErrors.eldersPresent = 'Elders present is required';
+      newErrors.eldersPresent = "Elders present is required";
     }
 
     setErrors(newErrors);
@@ -54,13 +70,15 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    const selectedPublisher = publishers.find((p) => p.id.toString() === publisherId);
+    const selectedPublisher = publishers.find(
+      (p) => p.id.toString() === publisherId,
+    );
     if (!selectedPublisher) {
-      toast.error('Selected publisher not found');
+      toast.error("Selected publisher not found");
       return;
     }
 
@@ -77,18 +95,18 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
         notes: notes.trim(),
       });
 
-      toast.success('Visit recorded successfully!', {
+      toast.success("Visit recorded successfully!", {
         duration: 3000,
         style: {
-          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-          color: 'white',
+          backgroundColor: "hsl(142.1 76.2% 36.3%)",
+          color: "white",
         },
       });
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Error creating visit:', error);
-      toast.error('Failed to record visit. Please try again.');
+      console.error("Error creating visit:", error);
+      toast.error("Failed to record visit. Please try again.");
     }
   };
 
@@ -110,12 +128,18 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
               Publisher <span className="text-destructive">*</span>
             </Label>
             <Select value={publisherId} onValueChange={setPublisherId}>
-              <SelectTrigger id="publisher" className={errors.publisherId ? 'border-destructive' : ''}>
+              <SelectTrigger
+                id="publisher"
+                className={errors.publisherId ? "border-destructive" : ""}
+              >
                 <SelectValue placeholder="Select a publisher" />
               </SelectTrigger>
               <SelectContent className="max-h-[250px]">
                 {publishers.map((publisher) => (
-                  <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
+                  <SelectItem
+                    key={publisher.id.toString()}
+                    value={publisher.id.toString()}
+                  >
                     {publisher.fullName}
                   </SelectItem>
                 ))}
@@ -136,7 +160,7 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
               type="date"
               value={visitDate}
               onChange={(e) => setVisitDate(e.target.value)}
-              className={errors.visitDate ? 'border-destructive' : ''}
+              className={errors.visitDate ? "border-destructive" : ""}
             />
             {errors.visitDate && (
               <p className="text-sm text-destructive">{errors.visitDate}</p>
@@ -154,7 +178,7 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
               placeholder="e.g., Sunny Trevino, Miguel Guerrero"
               value={eldersPresent}
               onChange={(e) => setEldersPresent(e.target.value)}
-              className={errors.eldersPresent ? 'border-destructive' : ''}
+              className={errors.eldersPresent ? "border-destructive" : ""}
             />
             {errors.eldersPresent && (
               <p className="text-sm text-destructive">{errors.eldersPresent}</p>
@@ -176,16 +200,20 @@ export default function RecordVisitModal({ open, onOpenChange, publishers }: Rec
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel} disabled={createVisit.isPending}>
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            disabled={createVisit.isPending}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={createVisit.isPending}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
+            style={{ backgroundColor: "#43587A", color: "white" }}
             className="hover:opacity-90"
           >
-            {createVisit.isPending ? 'Submitting...' : 'Submit'}
+            {createVisit.isPending ? "Submitting..." : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,56 +1,66 @@
-import { useState, useMemo } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { useGetAllPublishers } from '../hooks/useQueries';
-import { useGroupVisits } from '../hooks/useGroupVisits';
-import { useGetMeetingAttendance } from '../hooks/useMeetingAttendance';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import RecordGroupVisitModal from '../components/fieldService/RecordGroupVisitModal';
-import RecordAttendanceModal from '../components/fieldService/RecordAttendanceModal';
-import AttendanceStatsSummaryCard from '../components/fieldService/AttendanceStatsSummaryCard';
-import { GroupVisitCard } from '../components/fieldService/GroupVisitCard';
-import { DeleteGroupVisitDialog } from '../components/fieldService/DeleteGroupVisitDialog';
-import { DeleteAttendanceDialog } from '../components/fieldService/DeleteAttendanceDialog';
-import { getPrivilegeBadgeClassName } from '../utils/privilegeBadges';
-import { getGroupColor } from '../utils/fieldServiceGroupColors';
-import { formatLongDate } from '../utils/formatters';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { GroupVisit, MeetingAttendance, Publisher } from "../backend";
+import AttendanceStatsSummaryCard from "../components/fieldService/AttendanceStatsSummaryCard";
+import { DeleteAttendanceDialog } from "../components/fieldService/DeleteAttendanceDialog";
+import { DeleteGroupVisitDialog } from "../components/fieldService/DeleteGroupVisitDialog";
+import { GroupVisitCard } from "../components/fieldService/GroupVisitCard";
+import RecordAttendanceModal from "../components/fieldService/RecordAttendanceModal";
+import RecordGroupVisitModal from "../components/fieldService/RecordGroupVisitModal";
+import { useGroupVisits } from "../hooks/useGroupVisits";
+import { useGetMeetingAttendance } from "../hooks/useMeetingAttendance";
+import { useGetAllPublishers } from "../hooks/useQueries";
+import { getGroupColor } from "../utils/fieldServiceGroupColors";
+import { formatLongDate } from "../utils/formatters";
 import {
-  calculateTotalActivePublishers,
   calculateAverageAttendance,
-} from '../utils/meetingAttendanceStats';
-import type { Publisher, GroupVisit, MeetingAttendance } from '../backend';
+  calculateTotalActivePublishers,
+} from "../utils/meetingAttendanceStats";
+import { getPrivilegeBadgeClassName } from "../utils/privilegeBadges";
 
 export default function FieldServiceGroupProfile() {
   const { groupNumber } = useParams({ strict: false });
   const navigate = useNavigate();
   const { data: publishers = [], isLoading } = useGetAllPublishers();
   const [isRecordVisitModalOpen, setIsRecordVisitModalOpen] = useState(false);
-  const [isRecordAttendanceModalOpen, setIsRecordAttendanceModalOpen] = useState(false);
+  const [isRecordAttendanceModalOpen, setIsRecordAttendanceModalOpen] =
+    useState(false);
   const [visitToEdit, setVisitToEdit] = useState<GroupVisit | null>(null);
-  const [attendanceToEdit, setAttendanceToEdit] = useState<MeetingAttendance | null>(null);
-  const [visitToDelete, setVisitToDelete] = useState<{ id: string; groupNumber: number } | null>(null);
-  const [attendanceToDelete, setAttendanceToDelete] = useState<string | null>(null);
+  const [attendanceToEdit, setAttendanceToEdit] =
+    useState<MeetingAttendance | null>(null);
+  const [visitToDelete, setVisitToDelete] = useState<{
+    id: string;
+    groupNumber: number;
+  } | null>(null);
+  const [attendanceToDelete, setAttendanceToDelete] = useState<string | null>(
+    null,
+  );
 
   // Validate groupNumber
-  const groupNum = groupNumber ? parseInt(groupNumber, 10) : NaN;
-  const isValidGroup = !isNaN(groupNum) && groupNum >= 1 && groupNum <= 4;
+  const groupNum = groupNumber ? Number.parseInt(groupNumber, 10) : Number.NaN;
+  const isValidGroup =
+    !Number.isNaN(groupNum) && groupNum >= 1 && groupNum <= 4;
 
   // Get group color
-  const groupColor = isValidGroup ? getGroupColor(groupNum) : '#6B7280';
+  const groupColor = isValidGroup ? getGroupColor(groupNum) : "#6B7280";
 
   // Fetch group visits (must be called before any conditional returns)
-  const { data: groupVisits = [], isLoading: visitsLoading } = useGroupVisits(groupNum);
+  const { data: groupVisits = [], isLoading: visitsLoading } =
+    useGroupVisits(groupNum);
 
   // Fetch meeting attendance records for this group
-  const { data: attendanceRecords = [], isLoading: attendanceLoading } = useGetMeetingAttendance(groupNum);
+  const { data: attendanceRecords = [], isLoading: attendanceLoading } =
+    useGetMeetingAttendance(groupNum);
 
   // Create publisher name map for visit cards (must be called before any conditional returns)
   const publisherNameMap = useMemo(() => {
     const map = new Map<string, string>();
-    publishers.forEach((p) => {
+    for (const p of publishers) {
       map.set(p.id.toString(), p.fullName);
-    });
+    }
     return map;
   }, [publishers]);
 
@@ -75,8 +85,8 @@ export default function FieldServiceGroupProfile() {
   // Calculate attendance statistics
   const attendanceStats = useMemo(() => {
     const totalActive = calculateTotalActivePublishers(publishers, groupNum);
-    const weekdayAvg = calculateAverageAttendance(attendanceRecords, 'weekday');
-    const weekendAvg = calculateAverageAttendance(attendanceRecords, 'weekend');
+    const weekdayAvg = calculateAverageAttendance(attendanceRecords, "weekday");
+    const weekendAvg = calculateAverageAttendance(attendanceRecords, "weekend");
 
     return {
       totalPublishers: totalActive,
@@ -87,12 +97,12 @@ export default function FieldServiceGroupProfile() {
   }, [publishers, attendanceRecords, groupNum]);
 
   const handleBackClick = () => {
-    navigate({ to: '/field-service-groups' });
+    navigate({ to: "/field-service-groups" });
   };
 
   const handleVisitClick = (visitId: string) => {
-    navigate({ 
-      to: `/field-service-groups/${groupNum}/visits/${visitId}` 
+    navigate({
+      to: `/field-service-groups/${groupNum}/visits/${visitId}`,
     });
   };
 
@@ -161,7 +171,7 @@ export default function FieldServiceGroupProfile() {
 
   // Filter publishers for this group
   const groupPublishers = publishers.filter(
-    (p) => Number(p.fieldServiceGroup) === groupNum
+    (p) => Number(p.fieldServiceGroup) === groupNum,
   );
 
   // Find overseer and assistant
@@ -170,24 +180,40 @@ export default function FieldServiceGroupProfile() {
 
   // Sort publishers alphabetically
   const sortedPublishers = [...groupPublishers].sort((a, b) =>
-    a.fullName.localeCompare(b.fullName)
+    a.fullName.localeCompare(b.fullName),
   );
 
   // Helper function to get badges for a publisher
   const getPublisherBadges = (publisher: Publisher) => {
-    const badges: { label: string; variant?: 'default' | 'secondary' | 'outline'; className?: string }[] = [];
+    const badges: {
+      label: string;
+      variant?: "default" | "secondary" | "outline";
+      className?: string;
+    }[] = [];
 
     if (publisher.isGroupOverseer) {
-      badges.push({ label: 'Overseer', className: 'bg-black text-white hover:bg-black' });
+      badges.push({
+        label: "Overseer",
+        className: "bg-black text-white hover:bg-black",
+      });
     }
     if (publisher.isGroupAssistant) {
-      badges.push({ label: 'Assistant', className: 'bg-gray-500 text-white hover:bg-gray-500' });
+      badges.push({
+        label: "Assistant",
+        className: "bg-gray-500 text-white hover:bg-gray-500",
+      });
     }
     if (publisher.privileges.elder) {
-      badges.push({ label: 'Elder', className: getPrivilegeBadgeClassName('Elder') });
+      badges.push({
+        label: "Elder",
+        className: getPrivilegeBadgeClassName("Elder"),
+      });
     }
     if (publisher.privileges.servant) {
-      badges.push({ label: 'MS', className: getPrivilegeBadgeClassName('Ministerial Servant') });
+      badges.push({
+        label: "MS",
+        className: getPrivilegeBadgeClassName("Ministerial Servant"),
+      });
     }
 
     return badges;
@@ -195,7 +221,7 @@ export default function FieldServiceGroupProfile() {
 
   // Helper function to normalize meeting type display
   const normalizeMeetingType = (meetingType: string): string => {
-    return meetingType === 'Weekday Meeting' ? 'Mid-week Meeting' : meetingType;
+    return meetingType === "Weekday Meeting" ? "Mid-week Meeting" : meetingType;
   };
 
   return (
@@ -235,9 +261,9 @@ export default function FieldServiceGroupProfile() {
               <div>
                 <p className="font-medium">{overseer.fullName}</p>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {getPublisherBadges(overseer).map((badge, idx) => (
+                  {getPublisherBadges(overseer).map((badge) => (
                     <Badge
-                      key={idx}
+                      key={badge.label}
                       variant={badge.variant}
                       className={badge.className}
                     >
@@ -260,9 +286,9 @@ export default function FieldServiceGroupProfile() {
               <div>
                 <p className="font-medium">{assistant.fullName}</p>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {getPublisherBadges(assistant).map((badge, idx) => (
+                  {getPublisherBadges(assistant).map((badge) => (
                     <Badge
-                      key={idx}
+                      key={badge.label}
                       variant={badge.variant}
                       className={badge.className}
                     >
@@ -298,9 +324,9 @@ export default function FieldServiceGroupProfile() {
                   <div>
                     <p className="font-medium">{publisher.fullName}</p>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {getPublisherBadges(publisher).map((badge, idx) => (
+                      {getPublisherBadges(publisher).map((badge) => (
                         <Badge
-                          key={idx}
+                          key={badge.label}
                           variant={badge.variant}
                           className={badge.className}
                         >
@@ -342,7 +368,9 @@ export default function FieldServiceGroupProfile() {
           </div>
         ) : sortedVisits.length === 0 ? (
           <div className="rounded-lg border bg-card p-6 text-center">
-            <p className="text-muted-foreground">No group visits recorded yet</p>
+            <p className="text-muted-foreground">
+              No group visits recorded yet
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -398,7 +426,9 @@ export default function FieldServiceGroupProfile() {
           <div className="space-y-3">
             {sortedAttendance.map((attendance) => {
               const formattedDate = formatLongDate(attendance.meetingDate);
-              const displayMeetingType = normalizeMeetingType(attendance.meetingType);
+              const displayMeetingType = normalizeMeetingType(
+                attendance.meetingType,
+              );
 
               return (
                 <div
@@ -411,21 +441,21 @@ export default function FieldServiceGroupProfile() {
                         <h4 className="font-semibold text-lg">
                           {displayMeetingType}
                         </h4>
-                        <Badge
-                          variant="outline"
-                          className="text-xs"
-                        >
+                        <Badge variant="outline" className="text-xs">
                           {formattedDate}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">
                         {attendance.publisherNamesPresent.length} publisher
-                        {attendance.publisherNamesPresent.length !== 1 ? 's' : ''} present
+                        {attendance.publisherNamesPresent.length !== 1
+                          ? "s"
+                          : ""}{" "}
+                        present
                       </p>
                       {attendance.publisherNamesPresent.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {attendance.publisherNamesPresent.map((name, idx) => (
-                            <Badge key={idx} variant="secondary">
+                          {attendance.publisherNamesPresent.map((name) => (
+                            <Badge key={name} variant="secondary">
                               {name}
                             </Badge>
                           ))}

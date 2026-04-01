@@ -1,6 +1,6 @@
-import { TableHead, TableRow } from '@/components/ui/table';
-import { getContrastColor } from '@/theme/colorUtils';
-import type { ReactNode } from 'react';
+import { TableHead, TableRow } from "@/components/ui/table";
+import { getContrastColor } from "@/theme/colorUtils";
+import type { ReactNode } from "react";
 
 interface ThemedTableHeaderRowProps {
   themeColor: string;
@@ -10,7 +10,10 @@ interface ThemedTableHeaderRowProps {
 /**
  * Table header row with themed background and auto-contrast text
  */
-export function ThemedTableHeaderRow({ themeColor, children }: ThemedTableHeaderRowProps) {
+export function ThemedTableHeaderRow({
+  themeColor,
+  children,
+}: ThemedTableHeaderRowProps) {
   const textColor = getContrastColor(themeColor);
 
   return (
@@ -35,14 +38,15 @@ interface ThemedTableHeadProps {
 /**
  * Table header cell with themed text color
  */
-export function ThemedTableHead({ themeColor, children, className }: ThemedTableHeadProps) {
+export function ThemedTableHead({
+  themeColor,
+  children,
+  className,
+}: ThemedTableHeadProps) {
   const textColor = getContrastColor(themeColor);
 
   return (
-    <TableHead
-      style={{ color: textColor }}
-      className={className}
-    >
+    <TableHead style={{ color: textColor }} className={className}>
       {children}
     </TableHead>
   );

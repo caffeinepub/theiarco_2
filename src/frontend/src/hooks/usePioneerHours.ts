@@ -1,16 +1,22 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { PioneerMonthlyHours, CreatePioneerMonthlyHoursInput } from '../backend';
-import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type {
+  CreatePioneerMonthlyHoursInput,
+  PioneerMonthlyHours,
+} from "../backend";
+import { useActor } from "./useActor";
 
 // Query to get all monthly hours for a specific pioneer's service year
-export function useGetPioneerHoursForServiceYear(pioneerId: string, serviceYear: string) {
+export function useGetPioneerHoursForServiceYear(
+  pioneerId: string,
+  serviceYear: string,
+) {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<PioneerMonthlyHours[]>({
-    queryKey: ['pioneerHours', pioneerId, serviceYear],
+    queryKey: ["pioneerHours", pioneerId, serviceYear],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getPioneerHoursForServiceYear(pioneerId, serviceYear);
     },
     enabled: !!actor && !actorFetching && !!pioneerId && !!serviceYear,
@@ -22,9 +28,9 @@ export function useGetPioneerHours(id: string) {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<PioneerMonthlyHours | null>({
-    queryKey: ['pioneerHours', id],
+    queryKey: ["pioneerHours", id],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getPioneerHours(id);
     },
     enabled: !!actor && !actorFetching && !!id,
@@ -38,15 +44,17 @@ export function useAddPioneerHours() {
 
   return useMutation({
     mutationFn: async (input: CreatePioneerMonthlyHoursInput) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.addPioneerHours(input);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['pioneerHours', variables.pioneerId, variables.serviceYear] });
-      toast.success('Hours added successfully');
+      queryClient.invalidateQueries({
+        queryKey: ["pioneerHours", variables.pioneerId, variables.serviceYear],
+      });
+      toast.success("Hours added successfully");
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to add hours');
+      toast.error(error.message || "Failed to add hours");
     },
   });
 }
@@ -70,16 +78,20 @@ export function useUpdatePioneerHours() {
       hours: bigint;
       serviceYear: string;
     }) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.updatePioneerHours(id, pioneerId, month, hours, serviceYear);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['pioneerHours', variables.pioneerId, variables.serviceYear] });
-      queryClient.invalidateQueries({ queryKey: ['pioneerHours', variables.id] });
-      toast.success('Hours updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: ["pioneerHours", variables.pioneerId, variables.serviceYear],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pioneerHours", variables.id],
+      });
+      toast.success("Hours updated successfully");
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update hours');
+      toast.error(error.message || "Failed to update hours");
     },
   });
 }
@@ -90,16 +102,22 @@ export function useDeletePioneerHours() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, pioneerId, serviceYear }: { id: string; pioneerId: string; serviceYear: string }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async ({
+      id,
+      pioneerId: _pioneerId,
+      serviceYear: _serviceYear,
+    }: { id: string; pioneerId: string; serviceYear: string }) => {
+      if (!actor) throw new Error("Actor not available");
       return actor.deletePioneerHours(id);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['pioneerHours', variables.pioneerId, variables.serviceYear] });
-      toast.success('Hours deleted successfully');
+      queryClient.invalidateQueries({
+        queryKey: ["pioneerHours", variables.pioneerId, variables.serviceYear],
+      });
+      toast.success("Hours deleted successfully");
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Failed to delete hours');
+      toast.error(error.message || "Failed to delete hours");
     },
   });
 }

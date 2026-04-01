@@ -1,24 +1,24 @@
-import { Link, useRouterState } from '@tanstack/react-router';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { getContrastColor, lightenColor } from "@/theme/colorUtils";
+import { getPageThemeColor } from "@/theme/pageTheme";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard,
-  Users,
-  TrendingUp,
-  Map,
-  Heart,
-  Mic,
-  Eye,
-  UsersRound,
-  FileText,
   CheckSquare,
+  Eye,
+  FileText,
+  Heart,
+  LayoutDashboard,
+  Map as MapIcon,
+  Mic,
+  TrendingUp,
   UserCircle,
-  X
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { getPageThemeColor } from '@/theme/pageTheme';
-import { getContrastColor, lightenColor } from '@/theme/colorUtils';
-import { useState } from 'react';
+  Users,
+  UsersRound,
+  X,
+} from "lucide-react";
+import { useState } from "react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -26,17 +26,21 @@ interface SidebarProps {
 }
 
 const navigationItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/publishers', label: 'Publishers', icon: Users },
-  { path: '/pioneers', label: 'Pioneers', icon: TrendingUp },
-  { path: '/territories', label: 'Territories', icon: Map },
-  { path: '/shepherding', label: 'Shepherding', icon: Heart },
-  { path: '/conductors', label: 'Service Meeting Conductors', icon: Mic },
-  { path: '/public-witnessing', label: 'Public Witnessing', icon: Eye },
-  { path: '/field-service-groups', label: 'Field Service Groups', icon: UsersRound },
-  { path: '/notes', label: 'Notes', icon: FileText },
-  { path: '/tasks', label: 'Tasks', icon: CheckSquare },
-  { path: '/user-profile', label: 'User Profile', icon: UserCircle }
+  { path: "/", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/publishers", label: "Publishers", icon: Users },
+  { path: "/pioneers", label: "Pioneers", icon: TrendingUp },
+  { path: "/territories", label: "Territories", icon: MapIcon },
+  { path: "/shepherding", label: "Shepherding", icon: Heart },
+  { path: "/conductors", label: "Service Meeting Conductors", icon: Mic },
+  { path: "/public-witnessing", label: "Public Witnessing", icon: Eye },
+  {
+    path: "/field-service-groups",
+    label: "Field Service Groups",
+    icon: UsersRound,
+  },
+  { path: "/notes", label: "Notes", icon: FileText },
+  { path: "/tasks", label: "Tasks", icon: CheckSquare },
+  { path: "/user-profile", label: "User Profile", icon: UserCircle },
 ];
 
 export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
@@ -51,14 +55,17 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         <div
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
           onClick={onToggle}
+          onKeyUp={(e) => e.key === "Escape" && onToggle()}
+          role="button"
+          tabIndex={0}
         />
       )}
 
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed lg:static inset-y-0 left-0 z-50 flex w-72 flex-col border-r bg-card transition-transform duration-300 ease-in-out',
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          "fixed lg:static inset-y-0 left-0 z-50 flex w-72 flex-col border-r bg-card transition-transform duration-300 ease-in-out",
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
         )}
       >
         {/* Sidebar Header */}
@@ -83,15 +90,18 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
               const isHovered = hoveredPath === item.path;
               const themeColor = getPageThemeColor(item.path);
               const hoverColor = lightenColor(themeColor, 15);
-              const textColor = getContrastColor(isHovered ? hoverColor : themeColor);
+              const textColor = getContrastColor(
+                isHovered ? hoverColor : themeColor,
+              );
 
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-                    !isActive && 'text-muted-foreground hover:text-accent-foreground'
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                    !isActive &&
+                      "text-muted-foreground hover:text-accent-foreground",
                   )}
                   style={
                     isActive
@@ -100,11 +110,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                           color: textColor,
                         }
                       : isHovered
-                      ? {
-                          backgroundColor: hoverColor,
-                          color: textColor,
-                        }
-                      : undefined
+                        ? {
+                            backgroundColor: hoverColor,
+                            color: textColor,
+                          }
+                        : undefined
                   }
                   onMouseEnter={() => setHoveredPath(item.path)}
                   onMouseLeave={() => setHoveredPath(null)}
@@ -126,7 +136,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
         {/* Sidebar Footer */}
         <div className="border-t p-4">
           <p className="text-xs text-muted-foreground text-center">
-            © {new Date().getFullYear()}. Built with love using{' '}
+            © {new Date().getFullYear()}. Built with love using{" "}
             <a
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
               target="_blank"

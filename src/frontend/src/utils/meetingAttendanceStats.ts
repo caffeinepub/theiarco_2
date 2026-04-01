@@ -1,14 +1,14 @@
-import type { MeetingAttendance, Publisher } from '../backend';
+import type { MeetingAttendance, Publisher } from "../backend";
 
 /**
  * Calculate the total number of active publishers in a group
  */
 export function calculateTotalActivePublishers(
   publishers: Publisher[],
-  groupNumber: number
+  groupNumber: number,
 ): number {
   return publishers.filter(
-    (p) => Number(p.fieldServiceGroup) === groupNumber && p.isActive
+    (p) => Number(p.fieldServiceGroup) === groupNumber && p.isActive,
   ).length;
 }
 
@@ -18,16 +18,15 @@ export function calculateTotalActivePublishers(
  */
 export function calculateAverageAttendance(
   attendanceRecords: MeetingAttendance[],
-  meetingType: 'weekday' | 'weekend'
+  meetingType: "weekday" | "weekend",
 ): number {
   const filteredRecords = attendanceRecords.filter((record) => {
     const type = record.meetingType.toLowerCase();
-    if (meetingType === 'weekday') {
+    if (meetingType === "weekday") {
       // Include both "weekday" and "mid-week" for backward compatibility
-      return type.includes('weekday') || type.includes('mid-week');
-    } else {
-      return type.includes('weekend');
+      return type.includes("weekday") || type.includes("mid-week");
     }
+    return type.includes("weekend");
   });
 
   if (filteredRecords.length === 0) {
@@ -36,7 +35,7 @@ export function calculateAverageAttendance(
 
   const totalPresent = filteredRecords.reduce(
     (sum, record) => sum + record.publisherNamesPresent.length,
-    0
+    0,
   );
 
   return totalPresent / filteredRecords.length;
@@ -47,7 +46,7 @@ export function calculateAverageAttendance(
  */
 export function calculatePercentage(
   average: number,
-  totalActive: number
+  totalActive: number,
 ): number {
   if (totalActive === 0) {
     return 0;
@@ -69,7 +68,7 @@ export function formatCountDisplay(average: number, total: number): string {
  */
 export function computeMeetingAttendanceOverview(
   attendanceRecords: MeetingAttendance[],
-  publishers: Publisher[]
+  publishers: Publisher[],
 ): { totalRecords: number; averagePercentage: number } {
   const totalRecords = attendanceRecords.length;
 
@@ -80,7 +79,7 @@ export function computeMeetingAttendanceOverview(
   // Calculate total present across all records
   const totalPresent = attendanceRecords.reduce(
     (sum, record) => sum + record.publishersPresent.length,
-    0
+    0,
   );
 
   // Calculate total possible attendance across all records
@@ -88,7 +87,7 @@ export function computeMeetingAttendanceOverview(
   const totalPossible = attendanceRecords.reduce((sum, record) => {
     const groupNumber = Number(record.groupNumber);
     const activePublishersInGroup = publishers.filter(
-      (p) => Number(p.fieldServiceGroup) === groupNumber && p.isActive
+      (p) => Number(p.fieldServiceGroup) === groupNumber && p.isActive,
     ).length;
     return sum + activePublishersInGroup;
   }, 0);

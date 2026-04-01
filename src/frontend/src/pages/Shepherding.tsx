@@ -1,15 +1,8 @@
-import { useState, useMemo } from 'react';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { ThemedPrimaryButton } from "@/components/theming/ThemedPrimaryButton";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-} from '@/components/ui/table';
+  ThemedTableHead,
+  ThemedTableHeaderRow,
+} from "@/components/theming/ThemedTableHeaderRow";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,30 +11,43 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useGetAllShepherdingVisits } from '../hooks/useShepherdingVisits';
-import { useGetAllPublishers } from '../hooks/useQueries';
-import { useDeleteShepherdingVisit } from '../hooks/useShepherdingVisit';
-import { formatVisitDate } from '../utils/formatters';
-import RecordVisitModal from '../components/shepherding/RecordVisitModal';
-import { EditShepherdingVisitModal } from '../components/shepherding/EditShepherdingVisitModal';
-import { toast } from 'sonner';
-import type { ShepherdingVisit } from '../backend';
-import { getPageThemeColor } from '@/theme/pageTheme';
-import { getContrastColor } from '@/theme/colorUtils';
-import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
-import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+} from "@/components/ui/table";
+import { getPageThemeColor } from "@/theme/pageTheme";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import type { ShepherdingVisit } from "../backend";
+import { EditShepherdingVisitModal } from "../components/shepherding/EditShepherdingVisitModal";
+import RecordVisitModal from "../components/shepherding/RecordVisitModal";
+import { useGetAllPublishers } from "../hooks/useQueries";
+import { useDeleteShepherdingVisit } from "../hooks/useShepherdingVisit";
+import { useGetAllShepherdingVisits } from "../hooks/useShepherdingVisits";
+import { formatVisitDate } from "../utils/formatters";
 
 export default function Shepherding() {
   const navigate = useNavigate();
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedVisit, setSelectedVisit] = useState<ShepherdingVisit | null>(null);
-  const [visitToDelete, setVisitToDelete] = useState<ShepherdingVisit | null>(null);
-  const [searchText, setSearchText] = useState('');
+  const [selectedVisit, setSelectedVisit] = useState<ShepherdingVisit | null>(
+    null,
+  );
+  const [visitToDelete, setVisitToDelete] = useState<ShepherdingVisit | null>(
+    null,
+  );
+  const [searchText, setSearchText] = useState("");
 
   const { data: visits = [], isLoading } = useGetAllShepherdingVisits();
   const { data: publishers = [] } = useGetAllPublishers();
@@ -51,13 +57,15 @@ export default function Shepherding() {
   const filteredVisits = useMemo(() => {
     if (!searchText) return visits;
     return visits.filter((visit) =>
-      visit.publisherName.toLowerCase().includes(searchText.toLowerCase())
+      visit.publisherName.toLowerCase().includes(searchText.toLowerCase()),
     );
   }, [visits, searchText]);
 
   // Sort visits by date (most recent first)
   const sortedVisits = useMemo(() => {
-    return [...filteredVisits].sort((a, b) => Number(b.visitDate) - Number(a.visitDate));
+    return [...filteredVisits].sort(
+      (a, b) => Number(b.visitDate) - Number(a.visitDate),
+    );
   }, [filteredVisits]);
 
   const handlePublisherClick = (publisherId: string) => {
@@ -73,11 +81,6 @@ export default function Shepherding() {
     setIsEditModalOpen(true);
   };
 
-  const handleEditClose = () => {
-    setIsEditModalOpen(false);
-    setSelectedVisit(null);
-  };
-
   const handleDeleteClick = (visit: ShepherdingVisit) => {
     setVisitToDelete(visit);
   };
@@ -87,13 +90,13 @@ export default function Shepherding() {
 
     try {
       await deleteVisitMutation.mutateAsync(visitToDelete.id);
-      toast.success('Visit deleted successfully!', {
+      toast.success("Visit deleted successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
     } catch (error) {
-      console.error('Failed to delete visit:', error);
-      toast.error('Failed to delete visit. Please try again.');
+      console.error("Failed to delete visit:", error);
+      toast.error("Failed to delete visit. Please try again.");
     } finally {
       setVisitToDelete(null);
     }
@@ -103,13 +106,13 @@ export default function Shepherding() {
     setVisitToDelete(null);
   };
 
-  const headerTextColor = getContrastColor(themeColor);
-
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">Shepherding Visits</h1>
+        <h1 className="text-3xl font-bold text-foreground">
+          Shepherding Visits
+        </h1>
         <ThemedPrimaryButton
           themeColor={themeColor}
           onClick={() => setIsRecordModalOpen(true)}
@@ -144,7 +147,7 @@ export default function Shepherding() {
         <div className="text-center py-12 text-muted-foreground">
           {visits.length === 0
             ? "No visits recorded. Click 'Record Visit' to add one."
-            : 'No visits match your search.'}
+            : "No visits match your search."}
         </div>
       )}
 
@@ -154,10 +157,18 @@ export default function Shepherding() {
           <Table>
             <TableHeader>
               <ThemedTableHeaderRow themeColor={themeColor}>
-                <ThemedTableHead themeColor={themeColor}>Publisher</ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Visit Date</ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Elders Present</ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Publisher
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Visit Date
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Elders Present
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Actions
+                </ThemedTableHead>
               </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -165,6 +176,7 @@ export default function Shepherding() {
                 <tr key={visit.id}>
                   <TableCell>
                     <button
+                      type="button"
                       className="text-primary hover:underline font-medium"
                       onClick={() => handlePublisherClick(visit.publisherId)}
                     >
@@ -173,6 +185,7 @@ export default function Shepherding() {
                   </TableCell>
                   <TableCell>
                     <button
+                      type="button"
                       className="text-primary hover:underline"
                       onClick={() => handleVisitDateClick(visit.id)}
                     >
@@ -227,14 +240,21 @@ export default function Shepherding() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!visitToDelete} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={!!visitToDelete}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this visit?</AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

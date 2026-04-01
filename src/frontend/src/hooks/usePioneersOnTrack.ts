@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { Pioneer, PioneerMonthlyHours } from '../backend';
+import { useQuery } from "@tanstack/react-query";
+import type { Pioneer, PioneerMonthlyHours } from "../backend";
+import { useActor } from "./useActor";
 
 /**
  * Hook to calculate the number of pioneers who are "on track"
@@ -10,9 +10,9 @@ export function usePioneersOnTrack(serviceYear: string) {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<number>({
-    queryKey: ['pioneersOnTrack', serviceYear],
+    queryKey: ["pioneersOnTrack", serviceYear],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
 
       // Get all pioneers
       const pioneers: Pioneer[] = await actor.getAllPioneers();
@@ -22,10 +22,8 @@ export function usePioneersOnTrack(serviceYear: string) {
 
       for (const pioneer of pioneers) {
         // Get monthly hours for this pioneer's service year
-        const monthlyHours: PioneerMonthlyHours[] = await actor.getPioneerHoursForServiceYear(
-          pioneer.id,
-          serviceYear
-        );
+        const monthlyHours: PioneerMonthlyHours[] =
+          await actor.getPioneerHoursForServiceYear(pioneer.id, serviceYear);
 
         // Calculate average
         if (monthlyHours.length > 0) {

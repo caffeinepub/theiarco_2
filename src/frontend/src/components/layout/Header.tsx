@@ -1,7 +1,7 @@
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Menu, LogOut } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { LogOut, Menu } from "lucide-react";
+import { useInternetIdentity } from "../../hooks/useInternetIdentity";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -30,9 +30,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         </Button>
 
         {/* App Title */}
-        <h1 className="text-2xl font-bold text-theiarco-primary">
-          Theiarco
-        </h1>
+        <h1 className="text-2xl font-bold text-theiarco-primary">Theiarco</h1>
       </div>
 
       {/* Logout Button */}

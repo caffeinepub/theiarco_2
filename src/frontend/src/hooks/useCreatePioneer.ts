@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { CreatePioneerInput } from '../backend';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { CreatePioneerInput } from "../backend";
+import { useActor } from "./useActor";
 
 export function useCreatePioneer() {
   const { actor } = useActor();
@@ -8,14 +8,14 @@ export function useCreatePioneer() {
 
   return useMutation({
     mutationFn: async (input: CreatePioneerInput) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
 
       const pioneerId = await actor.createPioneer(input);
       return pioneerId;
     },
     onSuccess: () => {
       // Invalidate pioneers list query to trigger refetch
-      queryClient.invalidateQueries({ queryKey: ['pioneers'] });
+      queryClient.invalidateQueries({ queryKey: ["pioneers"] });
     },
   });
 }

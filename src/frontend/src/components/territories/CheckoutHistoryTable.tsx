@@ -1,7 +1,4 @@
-import type { CheckoutRecord } from '../../backend';
-import { formatCheckoutDate } from '../../utils/formatters';
-import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -9,7 +6,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
+import { Pencil, Trash2 } from "lucide-react";
+import type { CheckoutRecord } from "../../backend";
+import { formatCheckoutDate } from "../../utils/formatters";
 
 interface CheckoutHistoryTableProps {
   checkOutHistory: CheckoutRecord[];
@@ -17,7 +17,11 @@ interface CheckoutHistoryTableProps {
   onDelete?: (record: CheckoutRecord) => void;
 }
 
-export function CheckoutHistoryTable({ checkOutHistory, onEdit, onDelete }: CheckoutHistoryTableProps) {
+export function CheckoutHistoryTable({
+  checkOutHistory,
+  onEdit,
+  onDelete,
+}: CheckoutHistoryTableProps) {
   // Sort by dateCheckedOut descending (most recent first)
   const sortedHistory = [...checkOutHistory].sort((a, b) => {
     return Number(b.dateCheckedOut - a.dateCheckedOut);
@@ -44,20 +48,19 @@ export function CheckoutHistoryTable({ checkOutHistory, onEdit, onDelete }: Chec
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedHistory.map((record, index) => (
-            <TableRow key={index}>
+          {sortedHistory.map((record) => (
+            <TableRow key={`${record.publisherId}-${record.dateCheckedOut}`}>
               <TableCell className="font-medium">
                 {record.publisherName}
               </TableCell>
+              <TableCell>{formatCheckoutDate(record.dateCheckedOut)}</TableCell>
               <TableCell>
-                {formatCheckoutDate(record.dateCheckedOut)}
-              </TableCell>
-              <TableCell>
-                {record.dateReturned !== undefined && record.dateReturned !== null
+                {record.dateReturned !== undefined &&
+                record.dateReturned !== null
                   ? formatCheckoutDate(record.dateReturned)
-                  : 'Still Out'}
+                  : "Still Out"}
               </TableCell>
-              <TableCell>{record.isCampaign ? 'Yes' : 'No'}</TableCell>
+              <TableCell>{record.isCampaign ? "Yes" : "No"}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   {onEdit && (

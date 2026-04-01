@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useCreateGlobalNote } from '../../hooks/useCreateGlobalNote';
-import { useUpdateGlobalNote } from '../../hooks/useUpdateGlobalNote';
-import { useGetAllPublishers } from '../../hooks/useQueries';
-import { toast } from 'sonner';
-import type { PublisherId, GlobalNote } from '../../backend';
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { GlobalNote, PublisherId } from "../../backend";
+import { useCreateGlobalNote } from "../../hooks/useCreateGlobalNote";
+import { useGetAllPublishers } from "../../hooks/useQueries";
+import { useUpdateGlobalNote } from "../../hooks/useUpdateGlobalNote";
 
 interface AddGlobalNoteModalProps {
   isOpen: boolean;
@@ -29,13 +29,27 @@ interface AddGlobalNoteModalProps {
   noteToEdit?: GlobalNote | null;
 }
 
-type CategoryOption = 'None' | 'Publishers' | 'Territory' | 'Shepherding' | 'Elder' | 'General' | 'LDC' | 'Food Service' | 'Personal' | 'Family';
+type CategoryOption =
+  | "None"
+  | "Publishers"
+  | "Territory"
+  | "Shepherding"
+  | "Elder"
+  | "General"
+  | "LDC"
+  | "Food Service"
+  | "Personal"
+  | "Family";
 
-export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddGlobalNoteModalProps) {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [category, setCategory] = useState<CategoryOption | ''>('');
-  const [attachedPublisher, setAttachedPublisher] = useState<string>('');
+export default function AddGlobalNoteModal({
+  isOpen,
+  onClose,
+  noteToEdit,
+}: AddGlobalNoteModalProps) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [category, setCategory] = useState<CategoryOption | "">("");
+  const [attachedPublisher, setAttachedPublisher] = useState<string>("");
 
   const createNoteMutation = useCreateGlobalNote();
   const updateNoteMutation = useUpdateGlobalNote();
@@ -52,7 +66,7 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
       setTitle(noteToEdit.title);
       setContent(noteToEdit.content);
       setCategory(noteToEdit.category as CategoryOption);
-      setAttachedPublisher(noteToEdit.attachedPublisher?.toString() || '');
+      setAttachedPublisher(noteToEdit.attachedPublisher?.toString() || "");
     } else {
       resetForm();
     }
@@ -60,8 +74,8 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
 
   // Reset attached publisher when category changes
   useEffect(() => {
-    if (category !== 'Publishers') {
-      setAttachedPublisher('');
+    if (category !== "Publishers") {
+      setAttachedPublisher("");
     }
   }, [category]);
 
@@ -70,7 +84,7 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
 
     // Validate required fields
     if (!title.trim() || !content.trim() || !category) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -82,14 +96,16 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
           title: title.trim(),
           content: content.trim(),
           category,
-          attachedPublisher: attachedPublisher ? BigInt(attachedPublisher) : undefined,
+          attachedPublisher: attachedPublisher
+            ? BigInt(attachedPublisher)
+            : undefined,
         });
 
-        toast.success('Note updated successfully!', {
+        toast.success("Note updated successfully!", {
           duration: 3000,
           style: {
-            background: 'oklch(0.7 0.15 145)',
-            color: 'white',
+            background: "oklch(0.7 0.15 145)",
+            color: "white",
           },
         });
       } else {
@@ -98,14 +114,16 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
           title: title.trim(),
           content: content.trim(),
           category,
-          attachedPublisher: attachedPublisher ? BigInt(attachedPublisher) : undefined,
+          attachedPublisher: attachedPublisher
+            ? BigInt(attachedPublisher)
+            : undefined,
         });
 
-        toast.success('Note created successfully!', {
+        toast.success("Note created successfully!", {
           duration: 3000,
           style: {
-            background: 'oklch(0.7 0.15 145)',
-            color: 'white',
+            background: "oklch(0.7 0.15 145)",
+            color: "white",
           },
         });
       }
@@ -115,16 +133,21 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
       onClose();
     } catch (error) {
       // Error - keep modal open, show error toast
-      console.error(`Failed to ${isEditMode ? 'update' : 'create'} note:`, error);
-      toast.error(`Failed to ${isEditMode ? 'update' : 'create'} note. Please try again.`);
+      console.error(
+        `Failed to ${isEditMode ? "update" : "create"} note:`,
+        error,
+      );
+      toast.error(
+        `Failed to ${isEditMode ? "update" : "create"} note. Please try again.`,
+      );
     }
   };
 
   const resetForm = () => {
-    setTitle('');
-    setContent('');
-    setCategory('');
-    setAttachedPublisher('');
+    setTitle("");
+    setContent("");
+    setCategory("");
+    setAttachedPublisher("");
   };
 
   const handleClose = () => {
@@ -133,26 +156,31 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
   };
 
   // Determine if "Attach To" field should be shown
-  const showAttachTo = category === 'Publishers' || category === 'Territory' || category === 'Shepherding';
+  const showAttachTo =
+    category === "Publishers" ||
+    category === "Territory" ||
+    category === "Shepherding";
 
   // Determine if "Attach To" field should be disabled
-  const isAttachToDisabled = category === 'Territory' || category === 'Shepherding';
+  const isAttachToDisabled =
+    category === "Territory" || category === "Shepherding";
 
   // Get placeholder text for disabled states
   const getAttachToPlaceholder = () => {
-    if (category === 'Territory') return 'Territories (coming soon)';
-    if (category === 'Shepherding') return 'Shepherding Visits (coming soon)';
-    if (category === 'Publishers') return 'Select publisher';
-    return '';
+    if (category === "Territory") return "Territories (coming soon)";
+    if (category === "Shepherding") return "Shepherding Visits (coming soon)";
+    if (category === "Publishers") return "Select publisher";
+    return "";
   };
 
-  const isPending = createNoteMutation.isPending || updateNoteMutation.isPending;
+  const isPending =
+    createNoteMutation.isPending || updateNoteMutation.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Note' : 'Add Note'}</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Note" : "Add Note"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -190,7 +218,11 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
             <Label htmlFor="category">
               Category <span className="text-destructive">*</span>
             </Label>
-            <Select value={category} onValueChange={(value) => setCategory(value as CategoryOption)} required>
+            <Select
+              value={category}
+              onValueChange={(value) => setCategory(value as CategoryOption)}
+              required
+            >
               <SelectTrigger id="category">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
@@ -222,9 +254,12 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
                   <SelectValue placeholder={getAttachToPlaceholder()} />
                 </SelectTrigger>
                 <SelectContent>
-                  {category === 'Publishers' &&
+                  {category === "Publishers" &&
                     activePublishers.map((publisher) => (
-                      <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
+                      <SelectItem
+                        key={publisher.id.toString()}
+                        value={publisher.id.toString()}
+                      >
                         {publisher.fullName}
                       </SelectItem>
                     ))}
@@ -245,10 +280,16 @@ export default function AddGlobalNoteModal({ isOpen, onClose, noteToEdit }: AddG
             <Button
               type="submit"
               disabled={isPending}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
-              {isPending ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save' : 'Submit')}
+              {isPending
+                ? isEditMode
+                  ? "Saving..."
+                  : "Creating..."
+                : isEditMode
+                  ? "Save"
+                  : "Submit"}
             </Button>
           </DialogFooter>
         </form>

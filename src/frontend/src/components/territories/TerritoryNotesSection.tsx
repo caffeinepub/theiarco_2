@@ -1,23 +1,25 @@
-import { useState } from 'react';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { TerritoryNoteCard } from './TerritoryNoteCard';
-import { EditTerritoryNoteModal } from './EditTerritoryNoteModal';
-import { DeleteTerritoryNoteDialog } from './DeleteTerritoryNoteDialog';
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { TerritoryNote } from "../../backend";
 import {
-  useGetAllTerritoryNotes,
   useCreateTerritoryNote,
-} from '../../hooks/useTerritoryNotes';
-import type { TerritoryNote } from '../../backend';
-import { toast } from 'sonner';
+  useGetAllTerritoryNotes,
+} from "../../hooks/useTerritoryNotes";
+import { DeleteTerritoryNoteDialog } from "./DeleteTerritoryNoteDialog";
+import { EditTerritoryNoteModal } from "./EditTerritoryNoteModal";
+import { TerritoryNoteCard } from "./TerritoryNoteCard";
 
 interface TerritoryNotesSectionProps {
   territoryId: string;
 }
 
-export function TerritoryNotesSection({ territoryId }: TerritoryNotesSectionProps) {
-  const [noteContent, setNoteContent] = useState('');
+export function TerritoryNotesSection({
+  territoryId,
+}: TerritoryNotesSectionProps) {
+  const [noteContent, setNoteContent] = useState("");
   const [editingNote, setEditingNote] = useState<TerritoryNote | null>(null);
   const [deletingNote, setDeletingNote] = useState<TerritoryNote | null>(null);
 
@@ -29,19 +31,19 @@ export function TerritoryNotesSection({ territoryId }: TerritoryNotesSectionProp
 
     try {
       await createNote.mutateAsync({
-        title: '',
+        title: "",
         content: noteContent.trim(),
       });
 
-      toast.success('Notes saved successfully!', {
+      toast.success("Notes saved successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
 
-      setNoteContent('');
+      setNoteContent("");
     } catch (error) {
-      console.error('Failed to save note:', error);
-      toast.error('Failed to save note');
+      console.error("Failed to save note:", error);
+      toast.error("Failed to save note");
     }
   };
 
@@ -64,7 +66,7 @@ export function TerritoryNotesSection({ territoryId }: TerritoryNotesSectionProp
         <Button
           onClick={handleSaveNote}
           disabled={!noteContent.trim() || createNote.isPending}
-          style={{ backgroundColor: '#43587A', color: 'white' }}
+          style={{ backgroundColor: "#43587A", color: "white" }}
           className="hover:opacity-90"
         >
           {createNote.isPending ? (
@@ -73,7 +75,7 @@ export function TerritoryNotesSection({ territoryId }: TerritoryNotesSectionProp
               Saving...
             </>
           ) : (
-            'Save Notes'
+            "Save Notes"
           )}
         </Button>
       </div>

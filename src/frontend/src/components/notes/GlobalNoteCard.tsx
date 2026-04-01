@@ -1,8 +1,8 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
-import { formatNoteDate } from '../../utils/formatters';
-import type { GlobalNote } from '../../backend';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
+import type { GlobalNote } from "../../backend";
+import { formatNoteDate } from "../../utils/formatters";
 
 interface GlobalNoteCardProps {
   note: GlobalNote;
@@ -12,11 +12,11 @@ interface GlobalNoteCardProps {
 }
 
 const categoryColors: Record<string, string> = {
-  Publishers: 'bg-blue-500 text-white hover:bg-blue-600',
-  Territory: 'bg-green-500 text-white hover:bg-green-600',
-  Shepherding: 'bg-purple-500 text-white hover:bg-purple-600',
-  Elder: 'bg-orange-500 text-white hover:bg-orange-600',
-  General: 'bg-gray-500 text-white hover:bg-gray-600',
+  Publishers: "bg-blue-500 text-white hover:bg-blue-600",
+  Territory: "bg-green-500 text-white hover:bg-green-600",
+  Shepherding: "bg-purple-500 text-white hover:bg-purple-600",
+  Elder: "bg-orange-500 text-white hover:bg-orange-600",
+  General: "bg-gray-500 text-white hover:bg-gray-600",
 };
 
 export default function GlobalNoteCard({
@@ -27,7 +27,7 @@ export default function GlobalNoteCard({
 }: GlobalNoteCardProps) {
   const contentPreview =
     note.content.length > 200
-      ? note.content.substring(0, 200) + '...'
+      ? `${note.content.substring(0, 200)}...`
       : note.content;
 
   return (
@@ -37,8 +37,8 @@ export default function GlobalNoteCard({
 
       {/* Category Badge and Attachment */}
       <div className="flex flex-wrap items-center gap-2">
-        {note.category !== 'None' && (
-          <Badge className={categoryColors[note.category] || 'bg-gray-500'}>
+        {note.category !== "None" && (
+          <Badge className={categoryColors[note.category] || "bg-gray-500"}>
             {note.category}
           </Badge>
         )}

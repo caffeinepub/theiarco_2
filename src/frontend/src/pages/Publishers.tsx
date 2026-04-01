@@ -1,19 +1,8 @@
-import { useState, useMemo } from 'react';
-import { Plus, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
-import AddPublisherModal from '../components/publishers/AddPublisherModal';
-import EditPublisherModal from '../components/publishers/EditPublisherModal';
-import { useGetAllPublishers } from '../hooks/useQueries';
-import { useDeletePublisher } from '../hooks/useDeletePublisher';
-import type { Publisher } from '../backend';
+import { ThemedPrimaryButton } from "@/components/theming/ThemedPrimaryButton";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+  ThemedTableHead,
+  ThemedTableHeaderRow,
+} from "@/components/theming/ThemedTableHeaderRow";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,45 +12,77 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
-import { getPageThemeColor } from '@/theme/pageTheme';
-import { getContrastColor } from '@/theme/colorUtils';
-import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
-import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+} from "@/components/ui/table";
+import { getContrastColor } from "@/theme/colorUtils";
+import { getPageThemeColor } from "@/theme/pageTheme";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import type { Publisher } from "../backend";
+import AddPublisherModal from "../components/publishers/AddPublisherModal";
+import EditPublisherModal from "../components/publishers/EditPublisherModal";
+import { useDeletePublisher } from "../hooks/useDeletePublisher";
+import { useGetAllPublishers } from "../hooks/useQueries";
 
-type SortColumn = 'name' | 'group' | 'privileges' | null;
-type SortDirection = 'default' | 'asc' | 'desc';
+type SortColumn = "name" | "group" | "privileges" | null;
+type SortDirection = "default" | "asc" | "desc";
+
+// Helper function to render privilege labels (moved outside component to avoid stale closure)
+function renderPrivileges(privileges: {
+  publisher: boolean;
+  servant: boolean;
+  elder: boolean;
+}): string {
+  const labels: string[] = [];
+  if (privileges.elder) labels.push("Elder");
+  if (privileges.servant) labels.push("Ministerial Servant");
+  if (privileges.publisher) labels.push("Publisher");
+  if (labels.length === 0) labels.push("Unbaptized Publisher");
+  return labels.join(", ");
+}
 
 export default function Publishers() {
   const navigate = useNavigate();
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
-  const [publisherToDelete, setPublisherToDelete] = useState<Publisher | null>(null);
-  
+  const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(
+    null,
+  );
+  const [publisherToDelete, setPublisherToDelete] = useState<Publisher | null>(
+    null,
+  );
+
   // Filter states
-  const [searchText, setSearchText] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState<string>('all');
+  const [searchText, setSearchText] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState<string>("all");
   const [showInactive, setShowInactive] = useState(false);
-  
+
   // Sort states
   const [sortColumn, setSortColumn] = useState<SortColumn>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('default');
-  
+  const [sortDirection, setSortDirection] = useState<SortDirection>("default");
+
   const { data: publishers, isLoading } = useGetAllPublishers();
   const deletePublisher = useDeletePublisher();
 
@@ -77,7 +98,7 @@ export default function Publishers() {
 
       // Group filter: match specific group or show all
       const matchesGroup =
-        selectedGroup === 'all' ||
+        selectedGroup === "all" ||
         publisher.fieldServiceGroup.toString() === selectedGroup;
 
       // Active status filter: hide inactive unless showInactive is true
@@ -88,51 +109,37 @@ export default function Publishers() {
     });
   }, [publishers, searchText, selectedGroup, showInactive]);
 
-  // Helper function to render privilege labels
-  const renderPrivileges = (privileges: {
-    publisher: boolean;
-    servant: boolean;
-    elder: boolean;
-  }) => {
-    const labels: string[] = [];
-    if (privileges.elder) labels.push('Elder');
-    if (privileges.servant) labels.push('Ministerial Servant');
-    if (privileges.publisher) labels.push('Publisher');
-    if (labels.length === 0) labels.push('Unbaptized Publisher');
-    return labels.join(', ');
-  };
-
   // Handle column header click for sorting
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       // Cycle through: asc -> desc -> default
-      if (sortDirection === 'asc') {
-        setSortDirection('desc');
-      } else if (sortDirection === 'desc') {
-        setSortDirection('default');
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+      } else if (sortDirection === "desc") {
+        setSortDirection("default");
         setSortColumn(null);
       } else {
-        setSortDirection('asc');
+        setSortDirection("asc");
       }
     } else {
       // New column clicked, start with ascending
       setSortColumn(column);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
   // Get sort indicator for a column
   const getSortIndicator = (column: SortColumn) => {
     if (sortColumn !== column) return null;
-    if (sortDirection === 'asc') return ' ↑';
-    if (sortDirection === 'desc') return ' ↓';
+    if (sortDirection === "asc") return " ↑";
+    if (sortDirection === "desc") return " ↓";
     return null;
   };
 
   // Compute displayed publishers with sorting applied
   const displayedPublishers = useMemo(() => {
     if (!filteredPublishers || filteredPublishers.length === 0) return [];
-    if (sortColumn === null || sortDirection === 'default') {
+    if (sortColumn === null || sortDirection === "default") {
       return filteredPublishers;
     }
 
@@ -140,20 +147,25 @@ export default function Publishers() {
       let comparison = 0;
 
       switch (sortColumn) {
-        case 'name': {
-          comparison = a.fullName.toLowerCase().localeCompare(b.fullName.toLowerCase());
+        case "name": {
+          comparison = a.fullName
+            .toLowerCase()
+            .localeCompare(b.fullName.toLowerCase());
           break;
         }
 
-        case 'group': {
-          comparison = Number(a.fieldServiceGroup) - Number(b.fieldServiceGroup);
+        case "group": {
+          comparison =
+            Number(a.fieldServiceGroup) - Number(b.fieldServiceGroup);
           break;
         }
 
-        case 'privileges': {
+        case "privileges": {
           const aPrivileges = renderPrivileges(a.privileges);
           const bPrivileges = renderPrivileges(b.privileges);
-          comparison = aPrivileges.toLowerCase().localeCompare(bPrivileges.toLowerCase());
+          comparison = aPrivileges
+            .toLowerCase()
+            .localeCompare(bPrivileges.toLowerCase());
           break;
         }
 
@@ -161,7 +173,7 @@ export default function Publishers() {
           comparison = 0;
       }
 
-      return sortDirection === 'asc' ? comparison : -comparison;
+      return sortDirection === "asc" ? comparison : -comparison;
     });
 
     return sorted;
@@ -186,11 +198,11 @@ export default function Publishers() {
 
     try {
       await deletePublisher.mutateAsync(publisherToDelete.id);
-      toast.success('Publisher deleted successfully!', {
+      toast.success("Publisher deleted successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
-    } catch (error) {
+    } catch (_error) {
       // Error toast is handled in the mutation hook
     } finally {
       setPublisherToDelete(null);
@@ -280,7 +292,7 @@ export default function Publishers() {
         <div className="text-center py-12 text-muted-foreground">
           {publishers && publishers.length === 0
             ? "No publishers found. Click 'Add Publisher' to get started."
-            : 'No publishers match the current filters.'}
+            : "No publishers match the current filters."}
         </div>
       ) : (
         <div className="rounded-md border">
@@ -289,43 +301,51 @@ export default function Publishers() {
               <ThemedTableHeaderRow themeColor={themeColor}>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('name')}
+                    type="button"
+                    onClick={() => handleSort("name")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Name{getSortIndicator('name')}
+                    Name{getSortIndicator("name")}
                   </button>
                 </ThemedTableHead>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('group')}
+                    type="button"
+                    onClick={() => handleSort("group")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Group{getSortIndicator('group')}
+                    Group{getSortIndicator("group")}
                   </button>
                 </ThemedTableHead>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('privileges')}
+                    type="button"
+                    onClick={() => handleSort("privileges")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Privileges{getSortIndicator('privileges')}
+                    Privileges{getSortIndicator("privileges")}
                   </button>
                 </ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Actions
+                </ThemedTableHead>
               </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {displayedPublishers.map((publisher) => (
                 <tr
                   key={publisher.id.toString()}
-                  className={!publisher.isActive ? 'bg-gray-100 dark:bg-gray-800' : ''}
+                  className={
+                    !publisher.isActive ? "bg-gray-100 dark:bg-gray-800" : ""
+                  }
                 >
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <button
+                        type="button"
                         className="text-primary hover:underline font-medium"
                         onClick={() => handleNameClick(publisher.id)}
                       >
@@ -343,8 +363,12 @@ export default function Publishers() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>{publisher.fieldServiceGroup.toString()}</TableCell>
-                  <TableCell>{renderPrivileges(publisher.privileges)}</TableCell>
+                  <TableCell>
+                    {publisher.fieldServiceGroup.toString()}
+                  </TableCell>
+                  <TableCell>
+                    {renderPrivileges(publisher.privileges)}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Button
@@ -387,7 +411,10 @@ export default function Publishers() {
         />
       )}
 
-      <AlertDialog open={!!publisherToDelete} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={!!publisherToDelete}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Publisher</AlertDialogTitle>
@@ -396,8 +423,12 @@ export default function Publishers() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

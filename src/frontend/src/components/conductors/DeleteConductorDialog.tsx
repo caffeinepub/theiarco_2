@@ -7,9 +7,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useDeleteTrainedConductor } from '../../hooks/useDeleteTrainedConductor';
-import { Loader2 } from 'lucide-react';
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
+import { useDeleteTrainedConductor } from "../../hooks/useDeleteTrainedConductor";
 
 interface DeleteConductorDialogProps {
   open: boolean;
@@ -35,15 +35,18 @@ export default function DeleteConductorDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete this conductor?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the conductor record.
+            This action cannot be undone. This will permanently delete the
+            conductor record.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleteMutation.isPending}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
-            style={{ backgroundColor: '#43587A' }}
+            style={{ backgroundColor: "#43587A" }}
             className="text-white hover:opacity-90"
           >
             {deleteMutation.isPending ? (
@@ -52,7 +55,7 @@ export default function DeleteConductorDialog({
                 Deleting...
               </>
             ) : (
-              'Yes'
+              "Yes"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

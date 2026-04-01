@@ -7,10 +7,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useDeleteCheckoutRecord } from '../../hooks/useDeleteCheckoutRecord';
-import type { CheckoutRecord } from '../../backend';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import type { CheckoutRecord } from "../../backend";
+import { useDeleteCheckoutRecord } from "../../hooks/useDeleteCheckoutRecord";
 
 interface DeleteCheckoutRecordDialogProps {
   open: boolean;
@@ -37,15 +37,15 @@ export function DeleteCheckoutRecordDialog({
         dateCheckedOut: record.dateCheckedOut,
       });
 
-      toast.success('Checkout record deleted', {
+      toast.success("Checkout record deleted", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to delete checkout record:', error);
-      toast.error('Failed to delete checkout record');
+      console.error("Failed to delete checkout record:", error);
+      toast.error("Failed to delete checkout record");
     }
   };
 

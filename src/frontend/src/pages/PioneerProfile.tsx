@@ -1,18 +1,28 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Loader2, Pencil, Trash2, Check, X } from 'lucide-react';
-import { useGetPioneer } from '../hooks/usePioneers';
-import { useGetAllPublishers } from '../hooks/useQueries';
-import { useGetPioneerHoursForServiceYear, useUpdatePioneerHours } from '../hooks/usePioneerHours';
-import EditPioneerModal from '../components/pioneers/EditPioneerModal';
-import DeletePioneerDialog from '../components/pioneers/DeletePioneerDialog';
-import AddPioneerHoursModal from '../components/pioneers/AddPioneerHoursModal';
-import DeletePioneerHoursDialog from '../components/pioneers/DeletePioneerHoursDialog';
-import PioneerSummaryStatsCard from '../components/pioneers/PioneerSummaryStatsCard';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import type { PioneerMonthlyHours } from '../backend';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { ArrowLeft, Check, Loader2, Pencil, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import type { PioneerMonthlyHours } from "../backend";
+import AddPioneerHoursModal from "../components/pioneers/AddPioneerHoursModal";
+import DeletePioneerDialog from "../components/pioneers/DeletePioneerDialog";
+import DeletePioneerHoursDialog from "../components/pioneers/DeletePioneerHoursDialog";
+import EditPioneerModal from "../components/pioneers/EditPioneerModal";
+import PioneerSummaryStatsCard from "../components/pioneers/PioneerSummaryStatsCard";
+import {
+  useGetPioneerHoursForServiceYear,
+  useUpdatePioneerHours,
+} from "../hooks/usePioneerHours";
+import { useGetPioneer } from "../hooks/usePioneers";
+import { useGetAllPublishers } from "../hooks/useQueries";
 
 export default function PioneerProfile() {
   const { id } = useParams({ strict: false });
@@ -20,24 +30,24 @@ export default function PioneerProfile() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isAddHoursModalOpen, setIsAddHoursModalOpen] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [isDeleteHoursDialogOpen, setIsDeleteHoursDialogOpen] = useState(false);
-  const [selectedHoursRecord, setSelectedHoursRecord] = useState<PioneerMonthlyHours | null>(null);
-  
+  const [selectedHoursRecord, setSelectedHoursRecord] =
+    useState<PioneerMonthlyHours | null>(null);
+
   // Inline editing state
   const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
-  const [editingHoursValue, setEditingHoursValue] = useState('');
+  const [editingHoursValue, setEditingHoursValue] = useState("");
 
-  const { data: pioneer, isLoading } = useGetPioneer(id || '');
-  const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
-  const { data: monthlyHours = [], isLoading: hoursLoading } = useGetPioneerHoursForServiceYear(
-    id || '',
-    pioneer?.serviceYear || ''
-  );
+  const { data: pioneer, isLoading } = useGetPioneer(id || "");
+  const { data: publishers = [], isLoading: publishersLoading } =
+    useGetAllPublishers();
+  const { data: monthlyHours = [], isLoading: hoursLoading } =
+    useGetPioneerHoursForServiceYear(id || "", pioneer?.serviceYear || "");
   const updateHoursMutation = useUpdatePioneerHours();
 
   const handleBackClick = () => {
-    navigate({ to: '/pioneers' });
+    navigate({ to: "/pioneers" });
   };
 
   const handleEditClick = () => {
@@ -49,7 +59,7 @@ export default function PioneerProfile() {
   };
 
   const handleDeleteSuccess = () => {
-    navigate({ to: '/pioneers' });
+    navigate({ to: "/pioneers" });
   };
 
   const handleAddHoursClick = (month: string) => {
@@ -64,12 +74,12 @@ export default function PioneerProfile() {
 
   const handleCancelInlineEdit = () => {
     setEditingRecordId(null);
-    setEditingHoursValue('');
+    setEditingHoursValue("");
   };
 
   const handleSaveInlineEdit = async (hoursRecord: PioneerMonthlyHours) => {
-    const newHours = parseInt(editingHoursValue, 10);
-    if (isNaN(newHours) || newHours < 0) {
+    const newHours = Number.parseInt(editingHoursValue, 10);
+    if (Number.isNaN(newHours) || newHours < 0) {
       return;
     }
 
@@ -82,7 +92,7 @@ export default function PioneerProfile() {
     });
 
     setEditingRecordId(null);
-    setEditingHoursValue('');
+    setEditingHoursValue("");
   };
 
   const handleDeleteHoursClick = (hoursRecord: PioneerMonthlyHours) => {
@@ -92,40 +102,43 @@ export default function PioneerProfile() {
 
   // Service year months in order
   const serviceYearMonths = [
-    'September',
-    'October',
-    'November',
-    'December',
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
+    "September",
+    "October",
+    "November",
+    "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
   ];
 
   // Create a map of month -> hours record
   const hoursMap = new Map<string, PioneerMonthlyHours>();
-  monthlyHours.forEach((record) => {
+  for (const record of monthlyHours) {
     hoursMap.set(record.month, record);
-  });
+  }
 
   // Calculate statistics
-  const totalHours = monthlyHours.reduce((sum, record) => sum + Number(record.hours), 0);
+  const totalHours = monthlyHours.reduce(
+    (sum, record) => sum + Number(record.hours),
+    0,
+  );
   const monthsWithHours = monthlyHours.length;
   const average = monthsWithHours > 0 ? totalHours / monthsWithHours : 0;
 
   // Determine status
-  let status: 'loading' | 'no-entries' | 'on-track' | 'behind' = 'loading';
+  let status: "loading" | "no-entries" | "on-track" | "behind" = "loading";
   if (!hoursLoading) {
     if (monthsWithHours === 0) {
-      status = 'no-entries';
+      status = "no-entries";
     } else if (average >= 50) {
-      status = 'on-track';
+      status = "on-track";
     } else {
-      status = 'behind';
+      status = "behind";
     }
   }
 
@@ -221,13 +234,17 @@ export default function PioneerProfile() {
             <TableBody>
               {serviceYearMonths.map((month) => {
                 const hoursRecord = hoursMap.get(month);
-                const isEditing = hoursRecord && editingRecordId === hoursRecord.id;
+                const isEditing =
+                  hoursRecord && editingRecordId === hoursRecord.id;
                 const hours = hoursRecord ? Number(hoursRecord.hours) : null;
-                
+
                 // Determine color class for hours
-                let hoursColorClass = 'text-muted-foreground';
+                let hoursColorClass = "text-muted-foreground";
                 if (hours !== null) {
-                  hoursColorClass = hours >= 50 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500';
+                  hoursColorClass =
+                    hours >= 50
+                      ? "text-green-600 dark:text-green-500"
+                      : "text-red-600 dark:text-red-500";
                 }
 
                 return (
@@ -245,7 +262,9 @@ export default function PioneerProfile() {
                         />
                       ) : (
                         <span className={hoursColorClass}>
-                          {hoursRecord ? hoursRecord.hours.toString() : '—'}
+                          {hoursRecord
+                            ? hoursRecord.hours.toString()
+                            : "\u2014"}
                         </span>
                       )}
                     </TableCell>

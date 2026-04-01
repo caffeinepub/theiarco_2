@@ -1,11 +1,3 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { useGetPublisher } from '../hooks/useQueries';
-import { useDeletePublisher } from '../hooks/useDeletePublisher';
-import EditPublisherModal from '../components/publishers/EditPublisherModal';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,8 +7,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import EditPublisherModal from "../components/publishers/EditPublisherModal";
+import { useDeletePublisher } from "../hooks/useDeletePublisher";
+import { useGetPublisher } from "../hooks/useQueries";
 
 export default function PublisherProfile() {
   const { id } = useParams({ strict: false });
@@ -34,22 +34,18 @@ export default function PublisherProfile() {
     servant: boolean;
     elder: boolean;
   }) => {
-    if (privileges.elder) return 'Elder';
-    if (privileges.servant) return 'Ministerial Servant';
-    if (privileges.publisher) return 'Publisher';
-    return 'Unbaptized Publisher';
+    if (privileges.elder) return "Elder";
+    if (privileges.servant) return "Ministerial Servant";
+    if (privileges.publisher) return "Publisher";
+    return "Unbaptized Publisher";
   };
 
   const handleBackClick = () => {
-    navigate({ to: '/publishers' });
+    navigate({ to: "/publishers" });
   };
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
-  };
-
-  const handleEditClose = () => {
-    setIsEditModalOpen(false);
   };
 
   const handleDeleteClick = () => {
@@ -61,13 +57,13 @@ export default function PublisherProfile() {
 
     try {
       await deletePublisher.mutateAsync(publisher.id);
-      toast.success('Publisher deleted successfully!', {
+      toast.success("Publisher deleted successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
       // Navigate back to publishers list after successful deletion
-      navigate({ to: '/publishers' });
-    } catch (error) {
+      navigate({ to: "/publishers" });
+    } catch (_error) {
       // Error toast is handled in the mutation hook
       setShowDeleteDialog(false);
     }
@@ -128,7 +124,10 @@ export default function PublisherProfile() {
                 <Badge variant="secondary">Group Assistant</Badge>
               )}
               {!publisher.isActive && (
-                <Badge variant="outline" className="bg-gray-100 dark:bg-gray-800">
+                <Badge
+                  variant="outline"
+                  className="bg-gray-100 dark:bg-gray-800"
+                >
                   Inactive
                 </Badge>
               )}
@@ -185,7 +184,7 @@ export default function PublisherProfile() {
               Group Overseer
             </h3>
             <p className="text-lg font-semibold text-foreground">
-              {publisher.isGroupOverseer ? 'Yes' : 'No'}
+              {publisher.isGroupOverseer ? "Yes" : "No"}
             </p>
           </div>
 
@@ -195,7 +194,7 @@ export default function PublisherProfile() {
               Group Assistant
             </h3>
             <p className="text-lg font-semibold text-foreground">
-              {publisher.isGroupAssistant ? 'Yes' : 'No'}
+              {publisher.isGroupAssistant ? "Yes" : "No"}
             </p>
           </div>
         </div>
@@ -205,23 +204,31 @@ export default function PublisherProfile() {
       {publisher && (
         <EditPublisherModal
           isOpen={isEditModalOpen}
-          onClose={handleEditClose}
+          onClose={() => setIsEditModalOpen(false)}
           publisher={publisher}
         />
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Publisher</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {publisher.fullName}? This action cannot be undone.
+              Are you sure you want to delete {publisher.fullName}? This action
+              cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

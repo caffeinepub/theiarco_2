@@ -1,41 +1,49 @@
-import { useState } from 'react';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { ThemedPrimaryButton } from "@/components/theming/ThemedPrimaryButton";
+import {
+  ThemedTableHead,
+  ThemedTableHeaderRow,
+} from "@/components/theming/ThemedTableHeaderRow";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
   TableCell,
   TableHeader,
-} from '@/components/ui/table';
-import { useGetAllTrainedConductors } from '../hooks/useTrainedConductors';
-import { formatTrainingDate } from '../utils/formatters';
-import ConductorModal from '../components/conductors/ConductorModal';
-import DeleteConductorDialog from '../components/conductors/DeleteConductorDialog';
-import type { TrainedServiceMeetingConductor } from '../backend';
-import { getPageThemeColor } from '@/theme/pageTheme';
-import { getContrastColor } from '@/theme/colorUtils';
-import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
-import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
+} from "@/components/ui/table";
+import { getPageThemeColor } from "@/theme/pageTheme";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import type { TrainedServiceMeetingConductor } from "../backend";
+import ConductorModal from "../components/conductors/ConductorModal";
+import DeleteConductorDialog from "../components/conductors/DeleteConductorDialog";
+import { useGetAllTrainedConductors } from "../hooks/useTrainedConductors";
+import { formatTrainingDate } from "../utils/formatters";
 
 export default function ServiceMeetingConductors() {
   const navigate = useNavigate();
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const { data: conductors, isLoading } = useGetAllTrainedConductors();
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedConductor, setSelectedConductor] = useState<TrainedServiceMeetingConductor | null>(null);
-  const [conductorToDelete, setConductorToDelete] = useState<string | null>(null);
+  const [selectedConductor, setSelectedConductor] =
+    useState<TrainedServiceMeetingConductor | null>(null);
+  const [conductorToDelete, setConductorToDelete] = useState<string | null>(
+    null,
+  );
 
   const handleAddConductor = () => {
     setSelectedConductor(null);
     setModalOpen(true);
   };
 
-  const handleEditConductor = (e: React.MouseEvent, conductor: TrainedServiceMeetingConductor) => {
+  const handleEditConductor = (
+    e: React.MouseEvent,
+    conductor: TrainedServiceMeetingConductor,
+  ) => {
     e.stopPropagation();
     setSelectedConductor(conductor);
     setModalOpen(true);
@@ -53,16 +61,18 @@ export default function ServiceMeetingConductors() {
 
   // Sort conductors alphabetically by name
   const sortedConductors = conductors
-    ? [...conductors].sort((a, b) => a.publisherName.localeCompare(b.publisherName))
+    ? [...conductors].sort((a, b) =>
+        a.publisherName.localeCompare(b.publisherName),
+      )
     : [];
-
-  const headerTextColor = getContrastColor(themeColor);
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">Service Meeting Conductors</h1>
+        <h1 className="text-3xl font-bold text-foreground">
+          Service Meeting Conductors
+        </h1>
         <ThemedPrimaryButton
           themeColor={themeColor}
           onClick={handleAddConductor}
@@ -96,36 +106,58 @@ export default function ServiceMeetingConductors() {
           <Table>
             <TableHeader>
               <ThemedTableHeaderRow themeColor={themeColor}>
-                <ThemedTableHead themeColor={themeColor}>Conductor Name</ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Training Date</ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Status</ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Available Days</ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Conductor Name
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Training Date
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Status
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Available Days
+                </ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Actions
+                </ThemedTableHead>
               </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {sortedConductors.map((conductor) => {
                 const availableDays: string[] = [];
-                if (conductor.availableThursday) availableDays.push('Thu');
-                if (conductor.availableFriday) availableDays.push('Fri');
-                if (conductor.availableSaturday) availableDays.push('Sat');
-                if (conductor.availableSunday) availableDays.push('Sun');
+                if (conductor.availableThursday) availableDays.push("Thu");
+                if (conductor.availableFriday) availableDays.push("Fri");
+                if (conductor.availableSaturday) availableDays.push("Sat");
+                if (conductor.availableSunday) availableDays.push("Sun");
 
                 return (
-                  <tr 
+                  <tr
                     key={conductor.id}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleConductorClick(conductor.id)}
+                    onKeyUp={(e) =>
+                      e.key === "Enter" && handleConductorClick(conductor.id)
+                    }
+                    tabIndex={0}
                   >
-                    <TableCell className="font-medium">{conductor.publisherName}</TableCell>
-                    <TableCell>{formatTrainingDate(conductor.trainingDate)}</TableCell>
+                    <TableCell className="font-medium">
+                      {conductor.publisherName}
+                    </TableCell>
+                    <TableCell>
+                      {formatTrainingDate(conductor.trainingDate)}
+                    </TableCell>
                     <TableCell>
                       <Badge
-                        variant={conductor.status === 'Available' ? 'default' : 'destructive'}
+                        variant={
+                          conductor.status === "Available"
+                            ? "default"
+                            : "destructive"
+                        }
                         className={
-                          conductor.status === 'Available'
-                            ? 'bg-green-600 hover:bg-green-700'
-                            : 'bg-red-600 hover:bg-red-700'
+                          conductor.status === "Available"
+                            ? "bg-green-600 hover:bg-green-700"
+                            : "bg-red-600 hover:bg-red-700"
                         }
                       >
                         {conductor.status}
@@ -135,7 +167,11 @@ export default function ServiceMeetingConductors() {
                       {availableDays.length > 0 ? (
                         <div className="flex gap-1 flex-wrap">
                           {availableDays.map((day) => (
-                            <Badge key={day} variant="outline" className="text-xs">
+                            <Badge
+                              key={day}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {day}
                             </Badge>
                           ))}
@@ -156,7 +192,9 @@ export default function ServiceMeetingConductors() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => handleDeleteConductor(e, conductor.id)}
+                          onClick={(e) =>
+                            handleDeleteConductor(e, conductor.id)
+                          }
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

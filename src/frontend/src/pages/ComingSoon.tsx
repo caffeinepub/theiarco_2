@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react';
+import { Construction } from "lucide-react";
 
 interface ComingSoonProps {
   title: string;
@@ -14,11 +14,10 @@ export default function ComingSoon({ title }: ComingSoonProps) {
           </div>
         </div>
         <h2 className="text-3xl font-bold text-foreground">{title}</h2>
-        <p className="text-lg text-muted-foreground">
-          Coming Soon
-        </p>
+        <p className="text-lg text-muted-foreground">Coming Soon</p>
         <p className="text-sm text-muted-foreground">
-          This feature is currently under development and will be available in a future update.
+          This feature is currently under development and will be available in a
+          future update.
         </p>
       </div>
     </div>

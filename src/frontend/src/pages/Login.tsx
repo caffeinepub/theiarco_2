@@ -1,5 +1,5 @@
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 
 export default function Login() {
   const { login, isLoggingIn } = useInternetIdentity();
@@ -33,11 +33,11 @@ export default function Login() {
           >
             {isLoggingIn ? (
               <>
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 Connecting...
               </>
             ) : (
-              'Login with Internet Identity'
+              "Login with Internet Identity"
             )}
           </Button>
         </div>

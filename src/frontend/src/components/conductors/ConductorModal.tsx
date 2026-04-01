@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useGetAllPublishers } from '../../hooks/useQueries';
-import { useCreateTrainedConductor } from '../../hooks/useCreateTrainedConductor';
-import { useUpdateTrainedConductor } from '../../hooks/useUpdateTrainedConductor';
-import type { TrainedServiceMeetingConductor } from '../../backend';
-import { Loader2 } from 'lucide-react';
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { TrainedServiceMeetingConductor } from "../../backend";
+import { useCreateTrainedConductor } from "../../hooks/useCreateTrainedConductor";
+import { useGetAllPublishers } from "../../hooks/useQueries";
+import { useUpdateTrainedConductor } from "../../hooks/useUpdateTrainedConductor";
 
 interface ConductorModalProps {
   open: boolean;
@@ -35,18 +35,21 @@ export default function ConductorModal({
   conductor,
 }: ConductorModalProps) {
   const isEditMode = !!conductor;
-  const { data: publishers, isLoading: publishersLoading } = useGetAllPublishers();
+  const { data: publishers, isLoading: publishersLoading } =
+    useGetAllPublishers();
   const createMutation = useCreateTrainedConductor();
   const updateMutation = useUpdateTrainedConductor();
 
-  const [publisherId, setPublisherId] = useState('');
-  const [trainingDate, setTrainingDate] = useState('');
-  const [status, setStatus] = useState<'Available' | 'Unavailable'>('Available');
+  const [publisherId, setPublisherId] = useState("");
+  const [trainingDate, setTrainingDate] = useState("");
+  const [status, setStatus] = useState<"Available" | "Unavailable">(
+    "Available",
+  );
   const [availableThursday, setAvailableThursday] = useState(false);
   const [availableFriday, setAvailableFriday] = useState(false);
   const [availableSaturday, setAvailableSaturday] = useState(false);
   const [availableSunday, setAvailableSunday] = useState(false);
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState("");
 
   // Pre-fill form in edit mode and reset in create mode
   useEffect(() => {
@@ -54,25 +57,25 @@ export default function ConductorModal({
       setPublisherId(conductor.publisherId);
       // Convert seconds timestamp to YYYY-MM-DD format
       const date = new Date(Number(conductor.trainingDate) * 1000);
-      setTrainingDate(date.toISOString().split('T')[0]);
-      setStatus(conductor.status as 'Available' | 'Unavailable');
+      setTrainingDate(date.toISOString().split("T")[0]);
+      setStatus(conductor.status as "Available" | "Unavailable");
       setAvailableThursday(conductor.availableThursday || false);
       setAvailableFriday(conductor.availableFriday || false);
       setAvailableSaturday(conductor.availableSaturday || false);
       setAvailableSunday(conductor.availableSunday || false);
-      setNotes(conductor.notes || '');
+      setNotes(conductor.notes || "");
     } else {
       // Reset form in create mode
-      setPublisherId('');
-      setTrainingDate('');
-      setStatus('Available');
+      setPublisherId("");
+      setTrainingDate("");
+      setStatus("Available");
       setAvailableThursday(false);
       setAvailableFriday(false);
       setAvailableSaturday(false);
       setAvailableSunday(false);
-      setNotes('');
+      setNotes("");
     }
-  }, [conductor, open]);
+  }, [conductor]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +84,9 @@ export default function ConductorModal({
       return;
     }
 
-    const selectedPublisher = publishers?.find((p) => p.id.toString() === publisherId);
+    const selectedPublisher = publishers?.find(
+      (p) => p.id.toString() === publisherId,
+    );
     if (!selectedPublisher) return;
 
     // Convert date string to seconds timestamp
@@ -113,7 +118,7 @@ export default function ConductorModal({
 
   const activePublishers = publishers?.filter((p) => p.isActive) || [];
   const sortedPublishers = [...activePublishers].sort((a, b) =>
-    a.fullName.localeCompare(b.fullName)
+    a.fullName.localeCompare(b.fullName),
   );
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
@@ -122,7 +127,9 @@ export default function ConductorModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Conductor' : 'Add Conductor'}</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Edit Conductor" : "Add Conductor"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -134,13 +141,20 @@ export default function ConductorModal({
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
             ) : (
-              <Select value={publisherId} onValueChange={setPublisherId} required>
+              <Select
+                value={publisherId}
+                onValueChange={setPublisherId}
+                required
+              >
                 <SelectTrigger id="publisher">
                   <SelectValue placeholder="Select a publisher" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[250px]">
                   {sortedPublishers.map((publisher) => (
-                    <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
+                    <SelectItem
+                      key={publisher.id.toString()}
+                      value={publisher.id.toString()}
+                    >
                       {publisher.fullName}
                     </SelectItem>
                   ))}
@@ -165,7 +179,13 @@ export default function ConductorModal({
           {/* Status Dropdown */}
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
-            <Select value={status} onValueChange={(val) => setStatus(val as 'Available' | 'Unavailable')} required>
+            <Select
+              value={status}
+              onValueChange={(val) =>
+                setStatus(val as "Available" | "Unavailable")
+              }
+              required
+            >
               <SelectTrigger id="status">
                 <SelectValue />
               </SelectTrigger>
@@ -184,7 +204,9 @@ export default function ConductorModal({
                 <Checkbox
                   id="thursday"
                   checked={availableThursday}
-                  onCheckedChange={(checked) => setAvailableThursday(checked === true)}
+                  onCheckedChange={(checked) =>
+                    setAvailableThursday(checked === true)
+                  }
                 />
                 <label
                   htmlFor="thursday"
@@ -197,7 +219,9 @@ export default function ConductorModal({
                 <Checkbox
                   id="friday"
                   checked={availableFriday}
-                  onCheckedChange={(checked) => setAvailableFriday(checked === true)}
+                  onCheckedChange={(checked) =>
+                    setAvailableFriday(checked === true)
+                  }
                 />
                 <label
                   htmlFor="friday"
@@ -210,7 +234,9 @@ export default function ConductorModal({
                 <Checkbox
                   id="saturday"
                   checked={availableSaturday}
-                  onCheckedChange={(checked) => setAvailableSaturday(checked === true)}
+                  onCheckedChange={(checked) =>
+                    setAvailableSaturday(checked === true)
+                  }
                 />
                 <label
                   htmlFor="saturday"
@@ -223,7 +249,9 @@ export default function ConductorModal({
                 <Checkbox
                   id="sunday"
                   checked={availableSunday}
-                  onCheckedChange={(checked) => setAvailableSunday(checked === true)}
+                  onCheckedChange={(checked) =>
+                    setAvailableSunday(checked === true)
+                  }
                 />
                 <label
                   htmlFor="sunday"
@@ -260,10 +288,10 @@ export default function ConductorModal({
             <Button
               type="submit"
               disabled={isSubmitting}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
-              {isSubmitting ? 'Saving...' : 'Save'}
+              {isSubmitting ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>

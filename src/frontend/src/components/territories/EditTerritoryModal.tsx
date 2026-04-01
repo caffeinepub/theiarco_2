@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useUpdateTerritory } from '../../hooks/useTerritory';
-import { toast } from 'sonner';
-import type { Territory } from '../../backend';
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { Territory } from "../../backend";
+import { useUpdateTerritory } from "../../hooks/useTerritory";
 
 interface EditTerritoryModalProps {
   open: boolean;
@@ -26,10 +26,17 @@ interface EditTerritoryModalProps {
   territory: Territory;
 }
 
-export function EditTerritoryModal({ open, onOpenChange, territory }: EditTerritoryModalProps) {
-  const [number, setNumber] = useState('');
-  const [territoryType, setTerritoryType] = useState('');
-  const [errors, setErrors] = useState<{ number?: string; territoryType?: string }>({});
+export function EditTerritoryModal({
+  open,
+  onOpenChange,
+  territory,
+}: EditTerritoryModalProps) {
+  const [number, setNumber] = useState("");
+  const [territoryType, setTerritoryType] = useState("");
+  const [errors, setErrors] = useState<{
+    number?: string;
+    territoryType?: string;
+  }>({});
 
   const updateTerritory = useUpdateTerritory();
 
@@ -48,10 +55,10 @@ export function EditTerritoryModal({ open, onOpenChange, territory }: EditTerrit
     // Validate
     const newErrors: { number?: string; territoryType?: string } = {};
     if (!number.trim()) {
-      newErrors.number = 'Territory Number is required';
+      newErrors.number = "Territory Number is required";
     }
     if (!territoryType) {
-      newErrors.territoryType = 'Territory Type is required';
+      newErrors.territoryType = "Territory Type is required";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -66,15 +73,15 @@ export function EditTerritoryModal({ open, onOpenChange, territory }: EditTerrit
         territoryType,
       });
 
-      toast.success('Territory updated successfully!', {
+      toast.success("Territory updated successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to update territory:', error);
-      toast.error('Failed to update territory');
+      console.error("Failed to update territory:", error);
+      toast.error("Failed to update territory");
     }
   };
 
@@ -139,7 +146,9 @@ export function EditTerritoryModal({ open, onOpenChange, territory }: EditTerrit
                 </SelectContent>
               </Select>
               {errors.territoryType && (
-                <p className="text-sm text-destructive">{errors.territoryType}</p>
+                <p className="text-sm text-destructive">
+                  {errors.territoryType}
+                </p>
               )}
             </div>
 
@@ -170,10 +179,10 @@ export function EditTerritoryModal({ open, onOpenChange, territory }: EditTerrit
             <Button
               type="submit"
               disabled={updateTerritory.isPending}
-              style={{ backgroundColor: '#43587A', color: 'white' }}
+              style={{ backgroundColor: "#43587A", color: "white" }}
               className="hover:opacity-90"
             >
-              {updateTerritory.isPending ? 'Saving...' : 'Save'}
+              {updateTerritory.isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>

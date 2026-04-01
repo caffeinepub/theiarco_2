@@ -1,11 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { useUpdatePioneerHours } from '../../hooks/usePioneerHours';
-import { Loader2 } from 'lucide-react';
-import type { PioneerMonthlyHours } from '../../backend';
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { PioneerMonthlyHours } from "../../backend";
+import { useUpdatePioneerHours } from "../../hooks/usePioneerHours";
 
 interface EditPioneerHoursModalProps {
   isOpen: boolean;
@@ -18,7 +24,7 @@ export default function EditPioneerHoursModal({
   onClose,
   hoursRecord,
 }: EditPioneerHoursModalProps) {
-  const [hours, setHours] = useState('');
+  const [hours, setHours] = useState("");
   const updateHoursMutation = useUpdatePioneerHours();
 
   useEffect(() => {
@@ -30,8 +36,8 @@ export default function EditPioneerHoursModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const hoursNum = parseInt(hours, 10);
-    if (isNaN(hoursNum) || hoursNum < 0) {
+    const hoursNum = Number.parseInt(hours, 10);
+    if (Number.isNaN(hoursNum) || hoursNum < 0) {
       return;
     }
 
@@ -81,7 +87,7 @@ export default function EditPioneerHoursModal({
             <Button
               type="submit"
               disabled={updateHoursMutation.isPending}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
               {updateHoursMutation.isPending ? (
@@ -90,7 +96,7 @@ export default function EditPioneerHoursModal({
                   Saving...
                 </>
               ) : (
-                'Save'
+                "Save"
               )}
             </Button>
           </DialogFooter>

@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { toast } from 'sonner';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useActor } from "./useActor";
 
 interface CreateTrainedPublisherInput {
   publisherId: string;
@@ -15,28 +15,32 @@ export function useCreateTrainedPublisher() {
 
   return useMutation({
     mutationFn: async (input: CreateTrainedPublisherInput) => {
-      if (!actor) throw new Error('Actor not available');
-      
+      if (!actor) throw new Error("Actor not available");
+
       // Create the trained publisher first
       const id = await actor.addTrainedPublisher({
         publisherId: input.publisherId,
         publisherName: input.publisherName,
         trainingDate: input.trainingDate,
       });
-      
+
       // Then update the S-148 status if needed
       if (input.hasS148Received) {
         await actor.setS148Received(id, true);
       }
-      
+
       return id;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trainedPublishers'] });
-      toast.success('Trained publisher added successfully!', { duration: 3000 });
+      queryClient.invalidateQueries({ queryKey: ["trainedPublishers"] });
+      toast.success("Trained publisher added successfully!", {
+        duration: 3000,
+      });
     },
     onError: (error: Error) => {
-      toast.error(`Failed to add trained publisher: ${error.message}`, { duration: 3000 });
+      toast.error(`Failed to add trained publisher: ${error.message}`, {
+        duration: 3000,
+      });
     },
   });
 }

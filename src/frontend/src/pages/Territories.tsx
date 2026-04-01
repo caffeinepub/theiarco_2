@@ -1,14 +1,8 @@
-import { useState, useMemo } from 'react';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
-import { Download, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { ThemedPrimaryButton } from "@/components/theming/ThemedPrimaryButton";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-} from '@/components/ui/table';
+  ThemedTableHead,
+  ThemedTableHeaderRow,
+} from "@/components/theming/ThemedTableHeaderRow";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,36 +12,76 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useGetAllTerritories } from '../hooks/useTerritories';
-import { useDeleteTerritory } from '../hooks/useTerritory';
-import { AddTerritoryModal } from '../components/territories/AddTerritoryModal';
-import { EditTerritoryModal } from '../components/territories/EditTerritoryModal';
-import { toast } from 'sonner';
-import type { Territory } from '../backend';
-import { buildTerritoryAssignmentRecordCsv } from '../utils/territoryAssignmentRecordCsvExport';
-import { getPageThemeColor } from '@/theme/pageTheme';
-import { getContrastColor } from '@/theme/colorUtils';
-import { ThemedPrimaryButton } from '@/components/theming/ThemedPrimaryButton';
-import { ThemedTableHeaderRow, ThemedTableHead } from '@/components/theming/ThemedTableHeaderRow';
-import { calculateCheckoutDuration, getCheckoutDurationMonths } from '@/utils/territoryTime';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+} from "@/components/ui/table";
+import { getContrastColor } from "@/theme/colorUtils";
+import { getPageThemeColor } from "@/theme/pageTheme";
+import {
+  calculateCheckoutDuration,
+  getCheckoutDurationMonths,
+} from "@/utils/territoryTime";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { Download, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+import type { Territory } from "../backend";
+import { AddTerritoryModal } from "../components/territories/AddTerritoryModal";
+import { EditTerritoryModal } from "../components/territories/EditTerritoryModal";
+import { useGetAllTerritories } from "../hooks/useTerritories";
+import { useDeleteTerritory } from "../hooks/useTerritory";
+import { buildTerritoryAssignmentRecordCsv } from "../utils/territoryAssignmentRecordCsvExport";
 
-type SortColumn = 'number' | 'publisher' | 'status' | 'type' | 'duration' | null;
-type SortDirection = 'default' | 'asc' | 'desc';
+type SortColumn =
+  | "number"
+  | "publisher"
+  | "status"
+  | "type"
+  | "duration"
+  | null;
+type SortDirection = "default" | "asc" | "desc";
+
+// Pure helper functions moved outside the component to avoid stale closure warnings
+function getCurrentPublisher(territory: Territory): string {
+  if (territory.status !== "Checked Out") return "\u2014";
+  const currentCheckout = territory.checkOutHistory.find(
+    (record) => !record.dateReturned,
+  );
+  return currentCheckout?.publisherName || "\u2014";
+}
+
+function getTerritoryDurationMonths(territory: Territory): number | null {
+  if (territory.status !== "Checked Out") return null;
+  const currentCheckout = territory.checkOutHistory.find(
+    (record) => !record.dateReturned,
+  );
+  if (!currentCheckout) return null;
+  return getCheckoutDurationMonths(currentCheckout.dateCheckedOut);
+}
 
 export default function Territories() {
   const navigate = useNavigate();
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedTerritory, setSelectedTerritory] = useState<Territory | null>(null);
-  const [territoryToDelete, setTerritoryToDelete] = useState<Territory | null>(null);
-  
+  const [selectedTerritory, setSelectedTerritory] = useState<Territory | null>(
+    null,
+  );
+  const [territoryToDelete, setTerritoryToDelete] = useState<Territory | null>(
+    null,
+  );
+
   // Sort states
   const [sortColumn, setSortColumn] = useState<SortColumn>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>('default');
+  const [sortDirection, setSortDirection] = useState<SortDirection>("default");
 
   const { data: territories, isLoading } = useGetAllTerritories();
   const deleteTerritory = useDeleteTerritory();
@@ -56,51 +90,37 @@ export default function Territories() {
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       // Cycle through: asc -> desc -> default
-      if (sortDirection === 'asc') {
-        setSortDirection('desc');
-      } else if (sortDirection === 'desc') {
-        setSortDirection('default');
+      if (sortDirection === "asc") {
+        setSortDirection("desc");
+      } else if (sortDirection === "desc") {
+        setSortDirection("default");
         setSortColumn(null);
       } else {
-        setSortDirection('asc');
+        setSortDirection("asc");
       }
     } else {
       // New column clicked, start with ascending
       setSortColumn(column);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
   // Get sort indicator for a column
   const getSortIndicator = (column: SortColumn) => {
     if (sortColumn !== column) return null;
-    if (sortDirection === 'asc') return ' ↑';
-    if (sortDirection === 'desc') return ' ↓';
+    if (sortDirection === "asc") return " \u2191";
+    if (sortDirection === "desc") return " \u2193";
     return null;
-  };
-
-  // Helper to get current publisher name
-  const getCurrentPublisher = (territory: Territory): string => {
-    if (territory.status !== 'Checked Out') return '—';
-    const currentCheckout = territory.checkOutHistory.find((record) => !record.dateReturned);
-    return currentCheckout?.publisherName || '—';
-  };
-
-  // Helper to get checkout duration in months for sorting
-  const getTerritoryDurationMonths = (territory: Territory): number | null => {
-    if (territory.status !== 'Checked Out') return null;
-    const currentCheckout = territory.checkOutHistory.find((record) => !record.dateReturned);
-    if (!currentCheckout) return null;
-    
-    return getCheckoutDurationMonths(currentCheckout.dateCheckedOut);
   };
 
   // Helper to format checkout duration for display
   const formatCheckoutDuration = (territory: Territory): string => {
-    if (territory.status !== 'Checked Out') return '—';
-    const currentCheckout = territory.checkOutHistory.find((record) => !record.dateReturned);
-    if (!currentCheckout) return '—';
-    
+    if (territory.status !== "Checked Out") return "\u2014";
+    const currentCheckout = territory.checkOutHistory.find(
+      (record) => !record.dateReturned,
+    );
+    if (!currentCheckout) return "\u2014";
+
     const duration = calculateCheckoutDuration(currentCheckout.dateCheckedOut);
     return duration.displayText;
   };
@@ -108,7 +128,7 @@ export default function Territories() {
   // Compute displayed territories with sorting applied
   const displayedTerritories = useMemo(() => {
     if (!territories || territories.length === 0) return [];
-    if (sortColumn === null || sortDirection === 'default') {
+    if (sortColumn === null || sortDirection === "default") {
       return territories;
     }
 
@@ -116,29 +136,31 @@ export default function Territories() {
       let comparison = 0;
 
       switch (sortColumn) {
-        case 'number': {
-          comparison = a.number.localeCompare(b.number, undefined, { numeric: true });
+        case "number": {
+          comparison = a.number.localeCompare(b.number, undefined, {
+            numeric: true,
+          });
           break;
         }
 
-        case 'publisher': {
+        case "publisher": {
           const aPublisher = getCurrentPublisher(a);
           const bPublisher = getCurrentPublisher(b);
           comparison = aPublisher.localeCompare(bPublisher);
           break;
         }
 
-        case 'status': {
+        case "status": {
           comparison = a.status.localeCompare(b.status);
           break;
         }
 
-        case 'type': {
+        case "type": {
           comparison = a.territoryType.localeCompare(b.territoryType);
           break;
         }
 
-        case 'duration': {
+        case "duration": {
           const aDuration = getTerritoryDurationMonths(a) ?? -1;
           const bDuration = getTerritoryDurationMonths(b) ?? -1;
           comparison = aDuration - bDuration;
@@ -149,7 +171,7 @@ export default function Territories() {
           comparison = 0;
       }
 
-      return sortDirection === 'asc' ? comparison : -comparison;
+      return sortDirection === "asc" ? comparison : -comparison;
     });
 
     return sorted;
@@ -165,11 +187,6 @@ export default function Territories() {
     setIsEditModalOpen(true);
   };
 
-  const handleEditClose = () => {
-    setIsEditModalOpen(false);
-    setSelectedTerritory(null);
-  };
-
   const handleDeleteClick = (e: React.MouseEvent, territory: Territory) => {
     e.stopPropagation();
     setTerritoryToDelete(territory);
@@ -180,13 +197,13 @@ export default function Territories() {
 
     try {
       await deleteTerritory.mutateAsync(territoryToDelete.id);
-      toast.success('Territory deleted successfully!', {
+      toast.success("Territory deleted successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
     } catch (error) {
-      console.error('Failed to delete territory:', error);
-      toast.error('Failed to delete territory. Please try again.');
+      console.error("Failed to delete territory:", error);
+      toast.error("Failed to delete territory. Please try again.");
     } finally {
       setTerritoryToDelete(null);
     }
@@ -198,43 +215,43 @@ export default function Territories() {
 
   const handleExportCsv = () => {
     if (!territories || territories.length === 0) {
-      toast.error('No territories to export');
+      toast.error("No territories to export");
       return;
     }
 
     try {
       const csvContent = buildTerritoryAssignmentRecordCsv(territories);
       // Download CSV
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'territory-assignment-record.csv');
-      link.style.visibility = 'hidden';
+      link.setAttribute("href", url);
+      link.setAttribute("download", "territory-assignment-record.csv");
+      link.style.visibility = "hidden";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-      toast.success('Territory history exported successfully!', {
+
+      toast.success("Territory history exported successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
     } catch (error) {
-      console.error('Failed to export territory history:', error);
-      toast.error('Failed to export territory history. Please try again.');
+      console.error("Failed to export territory history:", error);
+      toast.error("Failed to export territory history. Please try again.");
     }
   };
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
-      case 'Available':
-        return 'bg-green-600 hover:bg-green-700';
-      case 'Checked Out':
-        return 'bg-blue-600 hover:bg-blue-700';
-      case 'Under Review':
-        return 'bg-yellow-600 hover:bg-yellow-700';
+      case "Available":
+        return "bg-green-600 hover:bg-green-700";
+      case "Checked Out":
+        return "bg-blue-600 hover:bg-blue-700";
+      case "Under Review":
+        return "bg-yellow-600 hover:bg-yellow-700";
       default:
-        return '';
+        return "";
     }
   };
 
@@ -245,11 +262,7 @@ export default function Territories() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">Territories</h1>
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={handleExportCsv}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={handleExportCsv} className="gap-2">
             <Download className="h-4 w-4" />
             Export Territory History
           </Button>
@@ -278,66 +291,80 @@ export default function Territories() {
               <ThemedTableHeaderRow themeColor={themeColor}>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('number')}
+                    type="button"
+                    onClick={() => handleSort("number")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Territory Number{getSortIndicator('number')}
+                    Territory Number{getSortIndicator("number")}
                   </button>
                 </ThemedTableHead>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('publisher')}
+                    type="button"
+                    onClick={() => handleSort("publisher")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Publisher{getSortIndicator('publisher')}
+                    Publisher{getSortIndicator("publisher")}
                   </button>
                 </ThemedTableHead>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('status')}
+                    type="button"
+                    onClick={() => handleSort("status")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Status{getSortIndicator('status')}
+                    Status{getSortIndicator("status")}
                   </button>
                 </ThemedTableHead>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('type')}
+                    type="button"
+                    onClick={() => handleSort("type")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Type{getSortIndicator('type')}
+                    Type{getSortIndicator("type")}
                   </button>
                 </ThemedTableHead>
                 <ThemedTableHead themeColor={themeColor}>
                   <button
-                    onClick={() => handleSort('duration')}
+                    type="button"
+                    onClick={() => handleSort("duration")}
                     className="w-full text-left font-medium cursor-pointer hover:opacity-80 px-2 py-1 -mx-2 -my-1 rounded transition-opacity"
                     style={{ color: headerTextColor }}
                   >
-                    Checked Out Duration{getSortIndicator('duration')}
+                    Checked Out Duration{getSortIndicator("duration")}
                   </button>
                 </ThemedTableHead>
-                <ThemedTableHead themeColor={themeColor}>Actions</ThemedTableHead>
+                <ThemedTableHead themeColor={themeColor}>
+                  Actions
+                </ThemedTableHead>
               </ThemedTableHeaderRow>
             </TableHeader>
             <TableBody>
               {displayedTerritories.map((territory) => {
                 const durationMonths = getTerritoryDurationMonths(territory);
-                const isOverdue = durationMonths !== null && durationMonths >= 4;
+                const isOverdue =
+                  durationMonths !== null && durationMonths >= 4;
 
                 return (
                   <tr
                     key={territory.id}
                     className={`cursor-pointer hover:bg-muted/50 ${
-                      isOverdue ? 'bg-red-100 dark:bg-red-900/20' : ''
+                      isOverdue ? "bg-red-100 dark:bg-red-900/20" : ""
                     }`}
                     onClick={() => handleTerritoryClick(territory.id)}
+                    onKeyUp={(e) =>
+                      e.key === "Enter" && handleTerritoryClick(territory.id)
+                    }
+                    tabIndex={0}
                   >
-                    <TableCell className="font-medium">{territory.number}</TableCell>
+                    <TableCell className="font-medium">
+                      {territory.number}
+                    </TableCell>
                     <TableCell>{getCurrentPublisher(territory)}</TableCell>
                     <TableCell>
                       <Badge className={getStatusBadgeColor(territory.status)}>
@@ -389,17 +416,25 @@ export default function Territories() {
         />
       )}
 
-      <AlertDialog open={!!territoryToDelete} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={!!territoryToDelete}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Territory</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this territory? This action cannot be undone.
+              Are you sure you want to delete this territory? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

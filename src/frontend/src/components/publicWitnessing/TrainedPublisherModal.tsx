@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useGetAllPublishers } from '../../hooks/useQueries';
-import { useCreateTrainedPublisher } from '../../hooks/useCreateTrainedPublisher';
-import { useUpdateTrainedPublisher } from '../../hooks/useUpdateTrainedPublisher';
-import type { TrainedPublisher } from '../../backend';
-import { Loader2 } from 'lucide-react';
+} from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { TrainedPublisher } from "../../backend";
+import { useCreateTrainedPublisher } from "../../hooks/useCreateTrainedPublisher";
+import { useGetAllPublishers } from "../../hooks/useQueries";
+import { useUpdateTrainedPublisher } from "../../hooks/useUpdateTrainedPublisher";
 
 interface TrainedPublisherModalProps {
   open: boolean;
@@ -34,12 +34,13 @@ export default function TrainedPublisherModal({
   publisher,
 }: TrainedPublisherModalProps) {
   const isEditMode = !!publisher;
-  const { data: publishers, isLoading: publishersLoading } = useGetAllPublishers();
+  const { data: publishers, isLoading: publishersLoading } =
+    useGetAllPublishers();
   const createMutation = useCreateTrainedPublisher();
   const updateMutation = useUpdateTrainedPublisher();
 
-  const [publisherId, setPublisherId] = useState('');
-  const [trainingDate, setTrainingDate] = useState('');
+  const [publisherId, setPublisherId] = useState("");
+  const [trainingDate, setTrainingDate] = useState("");
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [hasS148Received, setHasS148Received] = useState(false);
 
@@ -49,17 +50,17 @@ export default function TrainedPublisherModal({
       setPublisherId(publisher.publisherId);
       // Convert seconds timestamp to YYYY-MM-DD format
       const date = new Date(Number(publisher.trainingDate) * 1000);
-      setTrainingDate(date.toISOString().split('T')[0]);
+      setTrainingDate(date.toISOString().split("T")[0]);
       setIsAuthorized(publisher.isAuthorized);
       setHasS148Received(publisher.hasS148Received);
     } else {
       // Reset form in create mode
-      setPublisherId('');
-      setTrainingDate('');
+      setPublisherId("");
+      setTrainingDate("");
       setIsAuthorized(false);
       setHasS148Received(false);
     }
-  }, [publisher, open]);
+  }, [publisher]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +69,9 @@ export default function TrainedPublisherModal({
       return;
     }
 
-    const selectedPublisher = publishers?.find((p) => p.id.toString() === publisherId);
+    const selectedPublisher = publishers?.find(
+      (p) => p.id.toString() === publisherId,
+    );
     if (!selectedPublisher) return;
 
     // Convert date string to seconds timestamp
@@ -100,7 +103,7 @@ export default function TrainedPublisherModal({
 
   const activePublishers = publishers?.filter((p) => p.isActive) || [];
   const sortedPublishers = [...activePublishers].sort((a, b) =>
-    a.fullName.localeCompare(b.fullName)
+    a.fullName.localeCompare(b.fullName),
   );
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
@@ -110,7 +113,7 @@ export default function TrainedPublisherModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {isEditMode ? 'Edit Trained Publisher' : 'Add Trained Publisher'}
+            {isEditMode ? "Edit Trained Publisher" : "Add Trained Publisher"}
           </DialogTitle>
         </DialogHeader>
 
@@ -123,13 +126,20 @@ export default function TrainedPublisherModal({
                 <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
             ) : (
-              <Select value={publisherId} onValueChange={setPublisherId} required>
+              <Select
+                value={publisherId}
+                onValueChange={setPublisherId}
+                required
+              >
                 <SelectTrigger id="publisher">
                   <SelectValue placeholder="Select a publisher" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[250px]">
                   {sortedPublishers.map((pub) => (
-                    <SelectItem key={pub.id.toString()} value={pub.id.toString()}>
+                    <SelectItem
+                      key={pub.id.toString()}
+                      value={pub.id.toString()}
+                    >
                       {pub.fullName}
                     </SelectItem>
                   ))}
@@ -173,7 +183,9 @@ export default function TrainedPublisherModal({
             <Checkbox
               id="hasS148"
               checked={hasS148Received}
-              onCheckedChange={(checked) => setHasS148Received(checked === true)}
+              onCheckedChange={(checked) =>
+                setHasS148Received(checked === true)
+              }
             />
             <label
               htmlFor="hasS148"
@@ -195,10 +207,10 @@ export default function TrainedPublisherModal({
             <Button
               type="submit"
               disabled={isSubmitting}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
-              {isSubmitting ? 'Saving...' : 'Save'}
+              {isSubmitting ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>

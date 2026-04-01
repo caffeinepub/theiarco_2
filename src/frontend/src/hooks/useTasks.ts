@@ -1,16 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { TaskStatus } from '../backend';
-import type { Task } from '../backend';
+import { useQuery } from "@tanstack/react-query";
+import type { TaskStatus } from "../backend";
+import type { Task } from "../backend";
+import { useActor } from "./useActor";
 
 // Query to get tasks filtered by status
 export function useGetTasks(status: TaskStatus) {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<Task[]>({
-    queryKey: ['tasks', status],
+    queryKey: ["tasks", status],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getTasks(status);
     },
     enabled: !!actor && !actorFetching,
@@ -22,9 +22,9 @@ export function useGetTask(id: bigint) {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<Task | null>({
-    queryKey: ['task', id.toString()],
+    queryKey: ["task", id.toString()],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getTask(id);
     },
     enabled: !!actor && !actorFetching,

@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useUpdateTask } from '../../hooks/useUpdateTask';
-import { toast } from 'sonner';
-import type { Task } from '../../backend';
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { Task } from "../../backend";
+import { useUpdateTask } from "../../hooks/useUpdateTask";
 
 interface EditTaskModalProps {
   isOpen: boolean;
@@ -27,13 +27,25 @@ interface EditTaskModalProps {
   task: Task;
 }
 
-type CategoryOption = 'Territory' | 'Pioneers' | 'Meeting' | 'General' | 'Publisher' | 'Public Witnessing' | 'LDC' | 'Food Service';
+type CategoryOption =
+  | "Territory"
+  | "Pioneers"
+  | "Meeting"
+  | "General"
+  | "Publisher"
+  | "Public Witnessing"
+  | "LDC"
+  | "Food Service";
 
-export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalProps) {
-  const [title, setTitle] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [category, setCategory] = useState<CategoryOption | ''>('');
-  const [notes, setNotes] = useState('');
+export default function EditTaskModal({
+  isOpen,
+  onClose,
+  task,
+}: EditTaskModalProps) {
+  const [title, setTitle] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [category, setCategory] = useState<CategoryOption | "">("");
+  const [notes, setNotes] = useState("");
 
   const updateTaskMutation = useUpdateTask();
 
@@ -41,16 +53,16 @@ export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalPr
   useEffect(() => {
     if (isOpen && task) {
       setTitle(task.title);
-      
+
       // Convert bigint seconds timestamp to date string (YYYY-MM-DD)
       const dateObj = new Date(Number(task.dueDate) * 1000);
       const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
       setDueDate(`${year}-${month}-${day}`);
-      
+
       setCategory(task.category as CategoryOption);
-      setNotes(task.notes || '');
+      setNotes(task.notes || "");
     }
   }, [isOpen, task]);
 
@@ -59,15 +71,15 @@ export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalPr
 
     // Validate required fields
     if (!title.trim()) {
-      toast.error('Please enter a title');
+      toast.error("Please enter a title");
       return;
     }
     if (!dueDate) {
-      toast.error('Please select a due date');
+      toast.error("Please select a due date");
       return;
     }
     if (!category) {
-      toast.error('Please select a category');
+      toast.error("Please select a category");
       return;
     }
 
@@ -87,15 +99,15 @@ export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalPr
         },
       });
 
-      toast.success('Task updated successfully!', {
+      toast.success("Task updated successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
 
       onClose();
     } catch (error) {
-      console.error('Failed to update task:', error);
-      toast.error('Failed to update task. Please try again.');
+      console.error("Failed to update task:", error);
+      toast.error("Failed to update task. Please try again.");
     }
   };
 
@@ -146,7 +158,11 @@ export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalPr
             <Label htmlFor="category">
               Category <span className="text-destructive">*</span>
             </Label>
-            <Select value={category} onValueChange={(value) => setCategory(value as CategoryOption)} required>
+            <Select
+              value={category}
+              onValueChange={(value) => setCategory(value as CategoryOption)}
+              required
+            >
               <SelectTrigger id="category">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
@@ -156,7 +172,9 @@ export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalPr
                 <SelectItem value="Meeting">Meeting</SelectItem>
                 <SelectItem value="General">General</SelectItem>
                 <SelectItem value="Publisher">Publisher</SelectItem>
-                <SelectItem value="Public Witnessing">Public Witnessing</SelectItem>
+                <SelectItem value="Public Witnessing">
+                  Public Witnessing
+                </SelectItem>
                 <SelectItem value="LDC">LDC</SelectItem>
                 <SelectItem value="Food Service">Food Service</SelectItem>
               </SelectContent>
@@ -187,10 +205,10 @@ export default function EditTaskModal({ isOpen, onClose, task }: EditTaskModalPr
             <Button
               type="submit"
               disabled={isPending}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
-              {isPending ? 'Saving...' : 'Save'}
+              {isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>

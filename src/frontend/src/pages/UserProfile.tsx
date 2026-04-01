@@ -1,31 +1,36 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Pencil, Save, X } from 'lucide-react';
-import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useCallerUserProfile';
-import { toast } from 'sonner';
-import { useRouterState } from '@tanstack/react-router';
-import { getPageThemeColor } from '@/theme/pageTheme';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getPageThemeColor } from "@/theme/pageTheme";
+import { useRouterState } from "@tanstack/react-router";
+import { Pencil, Save, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import {
+  useGetCallerUserProfile,
+  useSaveCallerUserProfile,
+} from "../hooks/useCallerUserProfile";
 
 export default function UserProfile() {
   const routerState = useRouterState();
   const themeColor = getPageThemeColor(routerState.location.pathname);
-  
+
   const { data: userProfile, isLoading } = useGetCallerUserProfile();
   const saveProfileMutation = useSaveCallerUserProfile();
 
   // Local state for form fields
-  const [fullName, setFullName] = useState('');
-  const [congregationName, setCongregationName] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [congregationName, setCongregationName] = useState("");
 
   // Last saved values for cancel functionality
-  const [lastSavedFullName, setLastSavedFullName] = useState('');
-  const [lastSavedCongregationName, setLastSavedCongregationName] = useState('');
+  const [lastSavedFullName, setLastSavedFullName] = useState("");
+  const [lastSavedCongregationName, setLastSavedCongregationName] =
+    useState("");
 
   // Edit mode state for each field
   const [isEditingFullName, setIsEditingFullName] = useState(false);
-  const [isEditingCongregationName, setIsEditingCongregationName] = useState(false);
+  const [isEditingCongregationName, setIsEditingCongregationName] =
+    useState(false);
 
   // Initialize form values when profile loads
   useEffect(() => {
@@ -45,10 +50,10 @@ export default function UserProfile() {
       });
       setLastSavedFullName(fullName);
       setIsEditingFullName(false);
-      toast.success('Full name updated successfully!', { duration: 3000 });
+      toast.success("Full name updated successfully!", { duration: 3000 });
     } catch (error) {
-      toast.error('Failed to update full name');
-      console.error('Error saving full name:', error);
+      toast.error("Failed to update full name");
+      console.error("Error saving full name:", error);
     }
   };
 
@@ -60,10 +65,12 @@ export default function UserProfile() {
       });
       setLastSavedCongregationName(congregationName);
       setIsEditingCongregationName(false);
-      toast.success('Congregation name updated successfully!', { duration: 3000 });
+      toast.success("Congregation name updated successfully!", {
+        duration: 3000,
+      });
     } catch (error) {
-      toast.error('Failed to update congregation name');
-      console.error('Error saving congregation name:', error);
+      toast.error("Failed to update congregation name");
+      console.error("Error saving congregation name:", error);
     }
   };
 
@@ -81,7 +88,7 @@ export default function UserProfile() {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
           <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -119,7 +126,7 @@ export default function UserProfile() {
                   size="icon"
                   onClick={handleSaveFullName}
                   disabled={saveProfileMutation.isPending}
-                  style={{ backgroundColor: themeColor, color: 'white' }}
+                  style={{ backgroundColor: themeColor, color: "white" }}
                   className="hover:opacity-90"
                 >
                   <Save className="h-4 w-4" />
@@ -163,7 +170,7 @@ export default function UserProfile() {
                   size="icon"
                   onClick={handleSaveCongregationName}
                   disabled={saveProfileMutation.isPending}
-                  style={{ backgroundColor: themeColor, color: 'white' }}
+                  style={{ backgroundColor: themeColor, color: "white" }}
                   className="hover:opacity-90"
                 >
                   <Save className="h-4 w-4" />

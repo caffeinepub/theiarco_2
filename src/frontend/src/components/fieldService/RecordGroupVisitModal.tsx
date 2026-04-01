@@ -1,14 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useCreateGroupVisit } from '../../hooks/useCreateGroupVisit';
-import { useUpdateGroupVisit } from '../../hooks/useUpdateGroupVisit';
-import { toast } from 'sonner';
-import type { Publisher, GroupVisit } from '../../backend';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { GroupVisit, Publisher } from "../../backend";
+import { useCreateGroupVisit } from "../../hooks/useCreateGroupVisit";
+import { useUpdateGroupVisit } from "../../hooks/useUpdateGroupVisit";
 
 interface RecordGroupVisitModalProps {
   open: boolean;
@@ -18,19 +24,21 @@ interface RecordGroupVisitModalProps {
   visitToEdit?: GroupVisit | null;
 }
 
-export default function RecordGroupVisitModal({ 
-  open, 
-  onOpenChange, 
+export default function RecordGroupVisitModal({
+  open,
+  onOpenChange,
   groupNumber,
   publishers,
-  visitToEdit = null
+  visitToEdit = null,
 }: RecordGroupVisitModalProps) {
-  const [visitDate, setVisitDate] = useState('');
-  const [discussionTopics, setDiscussionTopics] = useState('');
-  const [selectedPublishers, setSelectedPublishers] = useState<Set<string>>(new Set());
-  const [notesForOverseer, setNotesForOverseer] = useState('');
-  const [notesForAssistant, setNotesForAssistant] = useState('');
-  const [nextPlannedVisitDate, setNextPlannedVisitDate] = useState('');
+  const [visitDate, setVisitDate] = useState("");
+  const [discussionTopics, setDiscussionTopics] = useState("");
+  const [selectedPublishers, setSelectedPublishers] = useState<Set<string>>(
+    new Set(),
+  );
+  const [notesForOverseer, setNotesForOverseer] = useState("");
+  const [notesForAssistant, setNotesForAssistant] = useState("");
+  const [nextPlannedVisitDate, setNextPlannedVisitDate] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const createGroupVisit = useCreateGroupVisit();
@@ -43,7 +51,7 @@ export default function RecordGroupVisitModal({
     if (open && visitToEdit) {
       // Convert timestamp to date string
       const visitDateObj = new Date(Number(visitToEdit.visitDate) * 1000);
-      const visitDateStr = visitDateObj.toISOString().split('T')[0];
+      const visitDateStr = visitDateObj.toISOString().split("T")[0];
       setVisitDate(visitDateStr);
 
       setDiscussionTopics(visitToEdit.discussionTopics);
@@ -52,11 +60,13 @@ export default function RecordGroupVisitModal({
       setNotesForAssistant(visitToEdit.notesForAssistant);
 
       if (visitToEdit.nextPlannedVisitDate) {
-        const nextDateObj = new Date(Number(visitToEdit.nextPlannedVisitDate) * 1000);
-        const nextDateStr = nextDateObj.toISOString().split('T')[0];
+        const nextDateObj = new Date(
+          Number(visitToEdit.nextPlannedVisitDate) * 1000,
+        );
+        const nextDateStr = nextDateObj.toISOString().split("T")[0];
         setNextPlannedVisitDate(nextDateStr);
       } else {
-        setNextPlannedVisitDate('');
+        setNextPlannedVisitDate("");
       }
     }
   }, [open, visitToEdit]);
@@ -64,12 +74,12 @@ export default function RecordGroupVisitModal({
   // Reset form when modal closes
   useEffect(() => {
     if (!open) {
-      setVisitDate('');
-      setDiscussionTopics('');
+      setVisitDate("");
+      setDiscussionTopics("");
       setSelectedPublishers(new Set());
-      setNotesForOverseer('');
-      setNotesForAssistant('');
-      setNextPlannedVisitDate('');
+      setNotesForOverseer("");
+      setNotesForAssistant("");
+      setNextPlannedVisitDate("");
       setErrors({});
     }
   }, [open]);
@@ -78,10 +88,10 @@ export default function RecordGroupVisitModal({
     const newErrors: { [key: string]: string } = {};
 
     if (!visitDate) {
-      newErrors.visitDate = 'Visit date is required';
+      newErrors.visitDate = "Visit date is required";
     }
     if (!discussionTopics.trim()) {
-      newErrors.discussionTopics = 'Discussion topics is required';
+      newErrors.discussionTopics = "Discussion topics is required";
     }
 
     setErrors(newErrors);
@@ -100,7 +110,7 @@ export default function RecordGroupVisitModal({
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -112,14 +122,16 @@ export default function RecordGroupVisitModal({
     let nextPlannedVisitSeconds: bigint | null = null;
     if (nextPlannedVisitDate) {
       const nextDateObj = new Date(nextPlannedVisitDate);
-      nextPlannedVisitSeconds = BigInt(Math.floor(nextDateObj.getTime() / 1000));
+      nextPlannedVisitSeconds = BigInt(
+        Math.floor(nextDateObj.getTime() / 1000),
+      );
     }
 
     // Get publisher IDs and names
     const publisherIds = Array.from(selectedPublishers);
     const publisherNames = publisherIds.map((id) => {
       const publisher = publishers.find((p) => p.id.toString() === id);
-      return publisher ? publisher.fullName : 'Unknown';
+      return publisher ? publisher.fullName : "Unknown";
     });
 
     try {
@@ -137,11 +149,11 @@ export default function RecordGroupVisitModal({
           nextPlannedVisitDate: nextPlannedVisitSeconds,
         });
 
-        toast.success('Group visit updated successfully', {
+        toast.success("Group visit updated successfully", {
           duration: 3000,
           style: {
-            backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-            color: 'white',
+            backgroundColor: "hsl(142.1 76.2% 36.3%)",
+            color: "white",
           },
         });
       } else {
@@ -157,19 +169,19 @@ export default function RecordGroupVisitModal({
           nextPlannedVisitDate: nextPlannedVisitSeconds,
         });
 
-        toast.success('Group visit saved successfully', {
+        toast.success("Group visit saved successfully", {
           duration: 3000,
           style: {
-            backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-            color: 'white',
+            backgroundColor: "hsl(142.1 76.2% 36.3%)",
+            color: "white",
           },
         });
       }
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Error saving group visit:', error);
-      toast.error('Failed to save group visit. Please try again.');
+      console.error("Error saving group visit:", error);
+      toast.error("Failed to save group visit. Please try again.");
     }
   };
 
@@ -183,7 +195,9 @@ export default function RecordGroupVisitModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Group Visit' : 'Record Group Visit'}</DialogTitle>
+          <DialogTitle>
+            {isEditMode ? "Edit Group Visit" : "Record Group Visit"}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
@@ -197,7 +211,7 @@ export default function RecordGroupVisitModal({
               type="date"
               value={visitDate}
               onChange={(e) => setVisitDate(e.target.value)}
-              className={errors.visitDate ? 'border-destructive' : ''}
+              className={errors.visitDate ? "border-destructive" : ""}
             />
             {errors.visitDate && (
               <p className="text-sm text-destructive">{errors.visitDate}</p>
@@ -215,10 +229,12 @@ export default function RecordGroupVisitModal({
               value={discussionTopics}
               onChange={(e) => setDiscussionTopics(e.target.value)}
               rows={4}
-              className={`resize-none ${errors.discussionTopics ? 'border-destructive' : ''}`}
+              className={`resize-none ${errors.discussionTopics ? "border-destructive" : ""}`}
             />
             {errors.discussionTopics && (
-              <p className="text-sm text-destructive">{errors.discussionTopics}</p>
+              <p className="text-sm text-destructive">
+                {errors.discussionTopics}
+              </p>
             )}
           </div>
 
@@ -228,11 +244,16 @@ export default function RecordGroupVisitModal({
             <div className="border rounded-md p-3 space-y-2 max-h-[200px] overflow-y-auto">
               {publishers.length > 0 ? (
                 publishers.map((publisher) => (
-                  <div key={publisher.id.toString()} className="flex items-center space-x-2">
+                  <div
+                    key={publisher.id.toString()}
+                    className="flex items-center space-x-2"
+                  >
                     <Checkbox
                       id={`publisher-${publisher.id}`}
                       checked={selectedPublishers.has(publisher.id.toString())}
-                      onCheckedChange={() => handlePublisherToggle(publisher.id.toString())}
+                      onCheckedChange={() =>
+                        handlePublisherToggle(publisher.id.toString())
+                      }
                     />
                     <label
                       htmlFor={`publisher-${publisher.id}`}
@@ -243,7 +264,9 @@ export default function RecordGroupVisitModal({
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">No publishers in this group</p>
+                <p className="text-sm text-muted-foreground">
+                  No publishers in this group
+                </p>
               )}
             </div>
           </div>
@@ -276,7 +299,9 @@ export default function RecordGroupVisitModal({
 
           {/* Next Planned Visit Date */}
           <div className="space-y-2">
-            <Label htmlFor="nextPlannedVisitDate">Next Planned Visit Date</Label>
+            <Label htmlFor="nextPlannedVisitDate">
+              Next Planned Visit Date
+            </Label>
             <Input
               id="nextPlannedVisitDate"
               type="date"
@@ -293,10 +318,14 @@ export default function RecordGroupVisitModal({
           <Button
             onClick={handleSubmit}
             disabled={isPending}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
+            style={{ backgroundColor: "#43587A", color: "white" }}
             className="hover:opacity-90"
           >
-            {isPending ? 'Submitting...' : isEditMode ? 'Save Changes' : 'Submit'}
+            {isPending
+              ? "Submitting..."
+              : isEditMode
+                ? "Save Changes"
+                : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>

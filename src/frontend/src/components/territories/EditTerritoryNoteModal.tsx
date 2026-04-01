@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { useUpdateTerritoryNote } from '../../hooks/useTerritoryNotes';
-import type { TerritoryNote } from '../../backend';
-import { toast } from 'sonner';
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { TerritoryNote } from "../../backend";
+import { useUpdateTerritoryNote } from "../../hooks/useTerritoryNotes";
 
 interface EditTerritoryNoteModalProps {
   open: boolean;
@@ -42,20 +42,20 @@ export function EditTerritoryNoteModal({
       await updateNote.mutateAsync({
         noteId: note.id,
         input: {
-          title: '',
+          title: "",
           content: content.trim(),
         },
       });
 
-      toast.success('Note updated successfully!', {
+      toast.success("Note updated successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to update note:', error);
-      toast.error('Failed to update note');
+      console.error("Failed to update note:", error);
+      toast.error("Failed to update note");
     }
   };
 
@@ -84,7 +84,7 @@ export function EditTerritoryNoteModal({
           <Button
             onClick={handleSave}
             disabled={!content.trim() || updateNote.isPending}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
+            style={{ backgroundColor: "#43587A", color: "white" }}
             className="hover:opacity-90"
           >
             {updateNote.isPending ? (
@@ -93,7 +93,7 @@ export function EditTerritoryNoteModal({
                 Saving...
               </>
             ) : (
-              'Save'
+              "Save"
             )}
           </Button>
         </DialogFooter>

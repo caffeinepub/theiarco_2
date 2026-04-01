@@ -1,10 +1,3 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,34 +7,45 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useGetTrainedConductor, useUpdateTrainedConductorNotes, useDeleteTrainedConductor } from '../hooks/useTrainedConductor';
-import { formatTrainingDate } from '../utils/formatters';
-import ConductorModal from '../components/conductors/ConductorModal';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import ConductorModal from "../components/conductors/ConductorModal";
+import {
+  useDeleteTrainedConductor,
+  useGetTrainedConductor,
+  useUpdateTrainedConductorNotes,
+} from "../hooks/useTrainedConductor";
+import { formatTrainingDate } from "../utils/formatters";
 
 export default function ConductorProfile() {
   const { id } = useParams({ strict: false });
   const navigate = useNavigate();
-  const conductorId = id || '';
+  const conductorId = id || "";
 
   const { data: conductor, isLoading } = useGetTrainedConductor(conductorId);
   const updateNotes = useUpdateTrainedConductorNotes();
   const deleteConductor = useDeleteTrainedConductor();
 
-  const [draftNotes, setDraftNotes] = useState('');
+  const [draftNotes, setDraftNotes] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Initialize draft notes when conductor loads
   useEffect(() => {
     if (conductor) {
-      setDraftNotes(conductor.notes || '');
+      setDraftNotes(conductor.notes || "");
     }
-  }, [conductor?.id, conductor?.notes]);
+  }, [conductor]);
 
   const handleBackClick = () => {
-    navigate({ to: '/conductors' });
+    navigate({ to: "/conductors" });
   };
 
   const handleSaveNotes = async () => {
@@ -53,22 +57,22 @@ export default function ConductorProfile() {
         notes: draftNotes,
       });
 
-      toast.success('Notes saved successfully!', {
+      toast.success("Notes saved successfully!", {
         duration: 3000,
         style: {
-          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-          color: 'white',
+          backgroundColor: "hsl(142.1 76.2% 36.3%)",
+          color: "white",
         },
       });
     } catch (error) {
-      console.error('Failed to save notes:', error);
-      toast.error('Failed to save notes. Please try again.');
+      console.error("Failed to save notes:", error);
+      toast.error("Failed to save notes. Please try again.");
     }
   };
 
   const handleCancelNotes = () => {
     if (conductor) {
-      setDraftNotes(conductor.notes || '');
+      setDraftNotes(conductor.notes || "");
     }
   };
 
@@ -85,17 +89,17 @@ export default function ConductorProfile() {
 
     try {
       await deleteConductor.mutateAsync(conductor.id);
-      toast.success('Conductor deleted successfully!', {
+      toast.success("Conductor deleted successfully!", {
         duration: 3000,
         style: {
-          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-          color: 'white',
+          backgroundColor: "hsl(142.1 76.2% 36.3%)",
+          color: "white",
         },
       });
-      navigate({ to: '/conductors' });
+      navigate({ to: "/conductors" });
     } catch (error) {
-      console.error('Failed to delete conductor:', error);
-      toast.error('Failed to delete conductor');
+      console.error("Failed to delete conductor:", error);
+      toast.error("Failed to delete conductor");
       setShowDeleteDialog(false);
     }
   };
@@ -126,10 +130,10 @@ export default function ConductorProfile() {
   }
 
   const availableDays: string[] = [];
-  if (conductor.availableThursday) availableDays.push('Thursday');
-  if (conductor.availableFriday) availableDays.push('Friday');
-  if (conductor.availableSaturday) availableDays.push('Saturday');
-  if (conductor.availableSunday) availableDays.push('Sunday');
+  if (conductor.availableThursday) availableDays.push("Thursday");
+  if (conductor.availableFriday) availableDays.push("Friday");
+  if (conductor.availableSaturday) availableDays.push("Saturday");
+  if (conductor.availableSunday) availableDays.push("Sunday");
 
   return (
     <div className="p-6 space-y-6">
@@ -145,7 +149,9 @@ export default function ConductorProfile() {
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold text-foreground">{conductor.publisherName}</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            {conductor.publisherName}
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -173,18 +179,26 @@ export default function ConductorProfile() {
       <div className="rounded-lg border bg-card p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Training Date</Label>
-            <p className="text-lg font-medium mt-1">{formatTrainingDate(conductor.trainingDate)}</p>
+            <Label className="text-sm font-medium text-muted-foreground">
+              Training Date
+            </Label>
+            <p className="text-lg font-medium mt-1">
+              {formatTrainingDate(conductor.trainingDate)}
+            </p>
           </div>
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Status</Label>
+            <Label className="text-sm font-medium text-muted-foreground">
+              Status
+            </Label>
             <div className="mt-1">
               <Badge
-                variant={conductor.status === 'Available' ? 'default' : 'destructive'}
+                variant={
+                  conductor.status === "Available" ? "default" : "destructive"
+                }
                 className={
-                  conductor.status === 'Available'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-red-600 hover:bg-red-700'
+                  conductor.status === "Available"
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-red-600 hover:bg-red-700"
                 }
               >
                 {conductor.status}
@@ -192,7 +206,9 @@ export default function ConductorProfile() {
             </div>
           </div>
           <div className="md:col-span-2">
-            <Label className="text-sm font-medium text-muted-foreground">Available Days</Label>
+            <Label className="text-sm font-medium text-muted-foreground">
+              Available Days
+            </Label>
             <div className="mt-1">
               {availableDays.length > 0 ? (
                 <div className="flex gap-2 flex-wrap">
@@ -224,10 +240,10 @@ export default function ConductorProfile() {
           <Button
             onClick={handleSaveNotes}
             disabled={updateNotes.isPending}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
+            style={{ backgroundColor: "#43587A", color: "white" }}
             className="hover:opacity-90"
           >
-            {updateNotes.isPending ? 'Saving...' : 'Save'}
+            {updateNotes.isPending ? "Saving..." : "Save"}
           </Button>
           <Button
             variant="outline"
@@ -249,7 +265,10 @@ export default function ConductorProfile() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this conductor?</AlertDialogTitle>
@@ -258,8 +277,12 @@ export default function ConductorProfile() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

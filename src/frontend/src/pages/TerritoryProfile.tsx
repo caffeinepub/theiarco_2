@@ -1,16 +1,3 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { useGetTerritory, useDeleteTerritory, useMarkTerritoryReturned, useMakeTerritoryAvailable } from '../hooks/useTerritory';
-import { EditTerritoryModal } from '../components/territories/EditTerritoryModal';
-import { TerritoryNotesSection } from '../components/territories/TerritoryNotesSection';
-import { CheckOutTerritoryModal } from '../components/territories/CheckOutTerritoryModal';
-import { EditCheckoutRecordModal } from '../components/territories/EditCheckoutRecordModal';
-import { DeleteCheckoutRecordDialog } from '../components/territories/DeleteCheckoutRecordDialog';
-import { CheckoutHistoryTable } from '../components/territories/CheckoutHistoryTable';
-import type { CheckoutRecord } from '../backend';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,8 +7,26 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { CheckoutRecord } from "../backend";
+import { CheckOutTerritoryModal } from "../components/territories/CheckOutTerritoryModal";
+import { CheckoutHistoryTable } from "../components/territories/CheckoutHistoryTable";
+import { DeleteCheckoutRecordDialog } from "../components/territories/DeleteCheckoutRecordDialog";
+import { EditCheckoutRecordModal } from "../components/territories/EditCheckoutRecordModal";
+import { EditTerritoryModal } from "../components/territories/EditTerritoryModal";
+import { TerritoryNotesSection } from "../components/territories/TerritoryNotesSection";
+import {
+  useDeleteTerritory,
+  useGetTerritory,
+  useMakeTerritoryAvailable,
+  useMarkTerritoryReturned,
+} from "../hooks/useTerritory";
 
 export default function TerritoryProfile() {
   const { id } = useParams({ strict: false });
@@ -30,10 +35,12 @@ export default function TerritoryProfile() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isCheckOutModalOpen, setIsCheckOutModalOpen] = useState(false);
   const [isEditCheckoutModalOpen, setIsEditCheckoutModalOpen] = useState(false);
-  const [isDeleteCheckoutDialogOpen, setIsDeleteCheckoutDialogOpen] = useState(false);
-  const [selectedCheckoutRecord, setSelectedCheckoutRecord] = useState<CheckoutRecord | null>(null);
+  const [isDeleteCheckoutDialogOpen, setIsDeleteCheckoutDialogOpen] =
+    useState(false);
+  const [selectedCheckoutRecord, setSelectedCheckoutRecord] =
+    useState<CheckoutRecord | null>(null);
 
-  const territoryId = id || '';
+  const territoryId = id || "";
   const { data: territory, isLoading } = useGetTerritory(territoryId);
   const deleteTerritory = useDeleteTerritory();
   const markReturned = useMarkTerritoryReturned();
@@ -41,27 +48,23 @@ export default function TerritoryProfile() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Available':
-        return 'bg-green-600 text-white hover:bg-green-700';
-      case 'Checked Out':
-        return 'bg-blue-600 text-white hover:bg-blue-700';
-      case 'Under Review':
-        return 'bg-orange-600 text-white hover:bg-orange-700';
+      case "Available":
+        return "bg-green-600 text-white hover:bg-green-700";
+      case "Checked Out":
+        return "bg-blue-600 text-white hover:bg-blue-700";
+      case "Under Review":
+        return "bg-orange-600 text-white hover:bg-orange-700";
       default:
-        return 'bg-gray-600 text-white hover:bg-gray-700';
+        return "bg-gray-600 text-white hover:bg-gray-700";
     }
   };
 
   const handleBackClick = () => {
-    navigate({ to: '/territories' });
+    navigate({ to: "/territories" });
   };
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
-  };
-
-  const handleEditClose = () => {
-    setIsEditModalOpen(false);
   };
 
   const handleDeleteClick = () => {
@@ -73,15 +76,15 @@ export default function TerritoryProfile() {
 
     try {
       await deleteTerritory.mutateAsync(territory.id);
-      toast.success('Territory deleted successfully!', {
+      toast.success("Territory deleted successfully!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
       // Navigate back to territories list after successful deletion
-      navigate({ to: '/territories' });
+      navigate({ to: "/territories" });
     } catch (error) {
-      console.error('Failed to delete territory:', error);
-      toast.error('Failed to delete territory');
+      console.error("Failed to delete territory:", error);
+      toast.error("Failed to delete territory");
       setShowDeleteDialog(false);
     }
   };
@@ -116,13 +119,13 @@ export default function TerritoryProfile() {
 
     try {
       await markReturned.mutateAsync(territory.id);
-      toast.success('Territory marked as returned!', {
+      toast.success("Territory marked as returned!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
     } catch (error) {
-      console.error('Failed to mark territory as returned:', error);
-      toast.error('Failed to mark territory as returned');
+      console.error("Failed to mark territory as returned:", error);
+      toast.error("Failed to mark territory as returned");
     }
   };
 
@@ -131,13 +134,13 @@ export default function TerritoryProfile() {
 
     try {
       await makeAvailable.mutateAsync(territory.id);
-      toast.success('Territory is now available!', {
+      toast.success("Territory is now available!", {
         duration: 3000,
-        className: 'bg-green-600 text-white',
+        className: "bg-green-600 text-white",
       });
     } catch (error) {
-      console.error('Failed to make territory available:', error);
-      toast.error('Failed to make territory available');
+      console.error("Failed to make territory available:", error);
+      toast.error("Failed to make territory available");
     }
   };
 
@@ -238,21 +241,23 @@ export default function TerritoryProfile() {
       {/* Checkout History Section */}
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-foreground">Checkout History</h2>
-          {territory.status === 'Available' && (
+          <h2 className="text-2xl font-bold text-foreground">
+            Checkout History
+          </h2>
+          {territory.status === "Available" && (
             <Button
               onClick={handleCheckOutClick}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
               Check Out Territory
             </Button>
           )}
-          {territory.status === 'Checked Out' && (
+          {territory.status === "Checked Out" && (
             <Button
               onClick={handleMarkReturnedClick}
               disabled={markReturned.isPending}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
               {markReturned.isPending ? (
@@ -261,15 +266,15 @@ export default function TerritoryProfile() {
                   Marking...
                 </>
               ) : (
-                'Mark as Returned'
+                "Mark as Returned"
               )}
             </Button>
           )}
-          {territory.status === 'Under Review' && (
+          {territory.status === "Under Review" && (
             <Button
               onClick={handleMakeAvailableClick}
               disabled={makeAvailable.isPending}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
               {makeAvailable.isPending ? (
@@ -278,13 +283,13 @@ export default function TerritoryProfile() {
                   Updating...
                 </>
               ) : (
-                'Make Available'
+                "Make Available"
               )}
             </Button>
           )}
         </div>
 
-        <CheckoutHistoryTable 
+        <CheckoutHistoryTable
           checkOutHistory={territory.checkOutHistory}
           onEdit={handleEditCheckoutRecord}
           onDelete={handleDeleteCheckoutRecord}
@@ -326,7 +331,10 @@ export default function TerritoryProfile() {
       />
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this territory?</AlertDialogTitle>
@@ -335,8 +343,12 @@ export default function TerritoryProfile() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

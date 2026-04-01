@@ -7,10 +7,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useDeletePioneer } from '../../hooks/useDeletePioneer';
-import { toast } from 'sonner';
-import type { Pioneer } from '../../backend';
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import type { Pioneer } from "../../backend";
+import { useDeletePioneer } from "../../hooks/useDeletePioneer";
 
 interface DeletePioneerDialogProps {
   isOpen: boolean;
@@ -34,11 +34,11 @@ export default function DeletePioneerDialog({
       await deletePioneerMutation.mutateAsync(pioneer.id);
 
       // Success - show toast and close dialog
-      toast.success('Pioneer deleted successfully!', {
+      toast.success("Pioneer deleted successfully!", {
         duration: 3000,
         style: {
-          background: 'oklch(0.7 0.15 145)',
-          color: 'white',
+          background: "oklch(0.7 0.15 145)",
+          color: "white",
         },
       });
 
@@ -50,8 +50,8 @@ export default function DeletePioneerDialog({
       }
     } catch (error) {
       // Error - show error toast
-      console.error('Failed to delete pioneer:', error);
-      toast.error('Failed to delete pioneer. Please try again.');
+      console.error("Failed to delete pioneer:", error);
+      toast.error("Failed to delete pioneer. Please try again.");
     }
   };
 
@@ -71,10 +71,10 @@ export default function DeletePioneerDialog({
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deletePioneerMutation.isPending}
-            style={{ backgroundColor: '#43587A' }}
+            style={{ backgroundColor: "#43587A" }}
             className="text-white hover:opacity-90"
           >
-            {deletePioneerMutation.isPending ? 'Deleting...' : 'Yes'}
+            {deletePioneerMutation.isPending ? "Deleting..." : "Yes"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

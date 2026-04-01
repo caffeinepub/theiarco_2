@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { AddGroupVisitInput } from '@/backend';
+import type { AddGroupVisitInput } from "@/backend";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useActor } from "./useActor";
 
 interface CreateGroupVisitInput {
   groupNumber: number;
@@ -20,7 +20,7 @@ export function useCreateGroupVisit() {
   return useMutation({
     mutationFn: async (input: CreateGroupVisitInput) => {
       if (!actor) {
-        throw new Error('Actor not available');
+        throw new Error("Actor not available");
       }
 
       const backendInput: AddGroupVisitInput = {
@@ -38,9 +38,11 @@ export function useCreateGroupVisit() {
     },
     onSuccess: (_, variables) => {
       // Invalidate the specific group's cache
-      queryClient.invalidateQueries({ queryKey: ['groupVisits', variables.groupNumber] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupVisits", variables.groupNumber],
+      });
       // Also invalidate the base key for safety
-      queryClient.invalidateQueries({ queryKey: ['groupVisits'] });
+      queryClient.invalidateQueries({ queryKey: ["groupVisits"] });
     },
   });
 }

@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useActor } from "./useActor";
 
 export function useDeletePioneer() {
   const { actor } = useActor();
@@ -7,14 +7,14 @@ export function useDeletePioneer() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       await actor.deletePioneer(id);
     },
     onSuccess: (_, id) => {
       // Invalidate pioneers list query to trigger refetch
-      queryClient.invalidateQueries({ queryKey: ['pioneers'] });
+      queryClient.invalidateQueries({ queryKey: ["pioneers"] });
       // Remove single pioneer query from cache
-      queryClient.removeQueries({ queryKey: ['pioneer', id] });
+      queryClient.removeQueries({ queryKey: ["pioneer", id] });
     },
   });
 }

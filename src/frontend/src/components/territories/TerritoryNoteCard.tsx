@@ -1,8 +1,8 @@
-import { Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import type { TerritoryNote } from '../../backend';
-import { formatNoteDate } from '../../utils/formatters';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Pencil, Trash2 } from "lucide-react";
+import type { TerritoryNote } from "../../backend";
+import { formatNoteDate } from "../../utils/formatters";
 
 interface TerritoryNoteCardProps {
   note: TerritoryNote;
@@ -10,7 +10,11 @@ interface TerritoryNoteCardProps {
   onDelete: () => void;
 }
 
-export function TerritoryNoteCard({ note, onEdit, onDelete }: TerritoryNoteCardProps) {
+export function TerritoryNoteCard({
+  note,
+  onEdit,
+  onDelete,
+}: TerritoryNoteCardProps) {
   return (
     <Card>
       <CardContent className="p-4">

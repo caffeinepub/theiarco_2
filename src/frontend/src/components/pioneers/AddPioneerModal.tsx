@@ -1,23 +1,23 @@
-import { useState } from 'react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { useCreatePioneer } from '../../hooks/useCreatePioneer';
-import { toast } from 'sonner';
-import type { Publisher } from '../../backend';
+} from "@/components/ui/select";
+import { useState } from "react";
+import { toast } from "sonner";
+import type { Publisher } from "../../backend";
+import { useCreatePioneer } from "../../hooks/useCreatePioneer";
 
 interface AddPioneerModalProps {
   isOpen: boolean;
@@ -32,8 +32,8 @@ export default function AddPioneerModal({
   publishers,
   publishersLoading,
 }: AddPioneerModalProps) {
-  const [selectedPublisherId, setSelectedPublisherId] = useState<string>('');
-  const [serviceYear, setServiceYear] = useState<string>('');
+  const [selectedPublisherId, setSelectedPublisherId] = useState<string>("");
+  const [serviceYear, setServiceYear] = useState<string>("");
 
   const createPioneerMutation = useCreatePioneer();
 
@@ -47,17 +47,17 @@ export default function AddPioneerModal({
 
     // Validate required fields
     if (!selectedPublisherId || !serviceYear) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
     // Find the selected publisher to get their name
     const selectedPublisher = activePublishers.find(
-      (p) => p.id.toString() === selectedPublisherId
+      (p) => p.id.toString() === selectedPublisherId,
     );
 
     if (!selectedPublisher) {
-      toast.error('Selected publisher not found');
+      toast.error("Selected publisher not found");
       return;
     }
 
@@ -69,11 +69,11 @@ export default function AddPioneerModal({
       });
 
       // Success - show toast and close modal
-      toast.success('Pioneer added successfully!', {
+      toast.success("Pioneer added successfully!", {
         duration: 3000,
         style: {
-          background: 'oklch(0.7 0.15 145)',
-          color: 'white',
+          background: "oklch(0.7 0.15 145)",
+          color: "white",
         },
       });
 
@@ -82,14 +82,14 @@ export default function AddPioneerModal({
       onClose();
     } catch (error) {
       // Error - keep modal open, show error toast
-      console.error('Failed to add pioneer:', error);
-      toast.error('Failed to add pioneer. Please try again.');
+      console.error("Failed to add pioneer:", error);
+      toast.error("Failed to add pioneer. Please try again.");
     }
   };
 
   const resetForm = () => {
-    setSelectedPublisherId('');
-    setServiceYear('');
+    setSelectedPublisherId("");
+    setServiceYear("");
   };
 
   const handleClose = () => {
@@ -121,7 +121,10 @@ export default function AddPioneerModal({
               </SelectTrigger>
               <SelectContent className="max-h-[250px]">
                 {activePublishers.map((publisher) => (
-                  <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
+                  <SelectItem
+                    key={publisher.id.toString()}
+                    value={publisher.id.toString()}
+                  >
                     {publisher.fullName}
                   </SelectItem>
                 ))}
@@ -158,10 +161,10 @@ export default function AddPioneerModal({
             <Button
               type="submit"
               disabled={createPioneerMutation.isPending}
-              style={{ backgroundColor: '#43587A' }}
+              style={{ backgroundColor: "#43587A" }}
               className="text-white hover:opacity-90"
             >
-              {createPioneerMutation.isPending ? 'Adding...' : 'Submit'}
+              {createPioneerMutation.isPending ? "Adding..." : "Submit"}
             </Button>
           </DialogFooter>
         </form>

@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { PublisherId } from '../backend';
-import { normalizeToEpochSeconds } from '@/utils/territoryTime';
+import { normalizeToEpochSeconds } from "@/utils/territoryTime";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { PublisherId } from "../backend";
+import { useActor } from "./useActor";
 
 interface CheckOutTerritoryInput {
   territoryId: string;
@@ -16,23 +16,25 @@ export function useCheckOutTerritory() {
 
   return useMutation({
     mutationFn: async (input: CheckOutTerritoryInput) => {
-      if (!actor) throw new Error('Actor not available');
-      
+      if (!actor) throw new Error("Actor not available");
+
       // Defensively normalize to seconds before sending to backend
       const normalizedDate = normalizeToEpochSeconds(input.dateCheckedOut);
-      
+
       return actor.checkOutTerritory(
         input.territoryId,
         input.publisherId,
         input.isCampaign,
-        normalizedDate
+        normalizedDate,
       );
     },
     onSuccess: (_, variables) => {
       // Invalidate the specific territory query to refresh the profile
-      queryClient.invalidateQueries({ queryKey: ['territory', variables.territoryId] });
+      queryClient.invalidateQueries({
+        queryKey: ["territory", variables.territoryId],
+      });
       // Invalidate the territories list
-      queryClient.invalidateQueries({ queryKey: ['territories'] });
+      queryClient.invalidateQueries({ queryKey: ["territories"] });
     },
   });
 }

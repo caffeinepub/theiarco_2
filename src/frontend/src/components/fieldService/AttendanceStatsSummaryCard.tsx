@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface AttendanceStatsSummaryCardProps {
   totalPublishers: number;
@@ -23,21 +23,23 @@ export default function AttendanceStatsSummaryCard({
     );
   }
 
-  const weekdayPercentage = totalPublishers > 0 
-    ? Math.round((weekdayAverage / totalPublishers) * 100) 
-    : 0;
-  const weekendPercentage = totalPublishers > 0 
-    ? Math.round((weekendAverage / totalPublishers) * 100) 
-    : 0;
+  const weekdayPercentage =
+    totalPublishers > 0
+      ? Math.round((weekdayAverage / totalPublishers) * 100)
+      : 0;
+  const weekendPercentage =
+    totalPublishers > 0
+      ? Math.round((weekendAverage / totalPublishers) * 100)
+      : 0;
 
   const renderStatRow = (
     label: string,
     average: number,
     percentage: number,
-    total: number
+    total: number,
   ) => {
     const roundedAverage = Math.round(average);
-    
+
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
@@ -65,25 +67,27 @@ export default function AttendanceStatsSummaryCard({
         {/* Total Publishers */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-foreground">Total publishers</span>
+            <span className="font-medium text-foreground">
+              Total publishers
+            </span>
             <span className="text-muted-foreground">{totalPublishers}</span>
           </div>
         </div>
 
         {/* Mid-week Average */}
         {renderStatRow(
-          'Average mid-week attendance',
+          "Average mid-week attendance",
           weekdayAverage,
           weekdayPercentage,
-          totalPublishers
+          totalPublishers,
         )}
 
         {/* Weekend Average */}
         {renderStatRow(
-          'Average weekend attendance',
+          "Average weekend attendance",
           weekendAverage,
           weekendPercentage,
-          totalPublishers
+          totalPublishers,
         )}
       </div>
     </div>

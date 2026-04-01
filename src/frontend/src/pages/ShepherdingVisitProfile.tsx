@@ -1,9 +1,3 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Loader2, Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,24 +7,34 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useGetShepherdingVisit, useUpdateShepherdingVisitNotes, useDeleteShepherdingVisit } from '../hooks/useShepherdingVisit';
-import { useGetAllPublishers } from '../hooks/useQueries';
-import { formatVisitDate } from '../utils/formatters';
-import { EditShepherdingVisitModal } from '../components/shepherding/EditShepherdingVisitModal';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useNavigate, useParams } from "@tanstack/react-router";
+import { ArrowLeft, Loader2, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { EditShepherdingVisitModal } from "../components/shepherding/EditShepherdingVisitModal";
+import { useGetAllPublishers } from "../hooks/useQueries";
+import {
+  useDeleteShepherdingVisit,
+  useGetShepherdingVisit,
+  useUpdateShepherdingVisitNotes,
+} from "../hooks/useShepherdingVisit";
+import { formatVisitDate } from "../utils/formatters";
 
 export default function ShepherdingVisitProfile() {
   const { id } = useParams({ strict: false });
   const navigate = useNavigate();
-  const visitId = id || '';
+  const visitId = id || "";
 
   const { data: visit, isLoading } = useGetShepherdingVisit(visitId);
   const { data: allPublishers } = useGetAllPublishers();
   const updateNotes = useUpdateShepherdingVisitNotes();
   const deleteVisit = useDeleteShepherdingVisit();
 
-  const [draftNotes, setDraftNotes] = useState('');
+  const [draftNotes, setDraftNotes] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -39,12 +43,15 @@ export default function ShepherdingVisitProfile() {
     if (visit) {
       setDraftNotes(visit.notes);
     }
-  }, [visit?.id, visit?.notes]);
+  }, [visit]);
 
-  const activePublishers = allPublishers?.filter((p) => p.isActive).sort((a, b) => a.fullName.localeCompare(b.fullName)) || [];
+  const activePublishers =
+    allPublishers
+      ?.filter((p) => p.isActive)
+      .sort((a, b) => a.fullName.localeCompare(b.fullName)) || [];
 
   const handleBackClick = () => {
-    navigate({ to: '/shepherding' });
+    navigate({ to: "/shepherding" });
   };
 
   const handleSaveNotes = async () => {
@@ -56,16 +63,16 @@ export default function ShepherdingVisitProfile() {
         notes: draftNotes,
       });
 
-      toast.success('Notes saved successfully!', {
+      toast.success("Notes saved successfully!", {
         duration: 3000,
         style: {
-          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-          color: 'white',
+          backgroundColor: "hsl(142.1 76.2% 36.3%)",
+          color: "white",
         },
       });
     } catch (error) {
-      console.error('Failed to save notes:', error);
-      toast.error('Failed to save notes. Please try again.');
+      console.error("Failed to save notes:", error);
+      toast.error("Failed to save notes. Please try again.");
     }
   };
 
@@ -88,17 +95,17 @@ export default function ShepherdingVisitProfile() {
 
     try {
       await deleteVisit.mutateAsync(visit.id);
-      toast.success('Visit deleted successfully!', {
+      toast.success("Visit deleted successfully!", {
         duration: 3000,
         style: {
-          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-          color: 'white',
+          backgroundColor: "hsl(142.1 76.2% 36.3%)",
+          color: "white",
         },
       });
-      navigate({ to: '/shepherding' });
+      navigate({ to: "/shepherding" });
     } catch (error) {
-      console.error('Failed to delete visit:', error);
-      toast.error('Failed to delete visit');
+      console.error("Failed to delete visit:", error);
+      toast.error("Failed to delete visit");
       setShowDeleteDialog(false);
     }
   };
@@ -170,15 +177,23 @@ export default function ShepherdingVisitProfile() {
       <div className="rounded-lg border bg-card p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Publisher Name</Label>
+            <Label className="text-sm font-medium text-muted-foreground">
+              Publisher Name
+            </Label>
             <p className="text-lg font-medium mt-1">{visit.publisherName}</p>
           </div>
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Visit Date</Label>
-            <p className="text-lg font-medium mt-1">{formatVisitDate(visit.visitDate)}</p>
+            <Label className="text-sm font-medium text-muted-foreground">
+              Visit Date
+            </Label>
+            <p className="text-lg font-medium mt-1">
+              {formatVisitDate(visit.visitDate)}
+            </p>
           </div>
           <div className="md:col-span-2">
-            <Label className="text-sm font-medium text-muted-foreground">Elders Present</Label>
+            <Label className="text-sm font-medium text-muted-foreground">
+              Elders Present
+            </Label>
             <p className="text-lg font-medium mt-1">{visit.eldersPresent}</p>
           </div>
         </div>
@@ -198,10 +213,10 @@ export default function ShepherdingVisitProfile() {
           <Button
             onClick={handleSaveNotes}
             disabled={updateNotes.isPending}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
+            style={{ backgroundColor: "#43587A", color: "white" }}
             className="hover:opacity-90"
           >
-            {updateNotes.isPending ? 'Saving...' : 'Save'}
+            {updateNotes.isPending ? "Saving..." : "Save"}
           </Button>
           <Button
             variant="outline"
@@ -224,7 +239,10 @@ export default function ShepherdingVisitProfile() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => !open && handleDeleteCancel()}>
+      <AlertDialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => !open && handleDeleteCancel()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this visit?</AlertDialogTitle>
@@ -233,8 +251,12 @@ export default function ShepherdingVisitProfile() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleDeleteCancel}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Yes</AlertDialogAction>
+            <AlertDialogCancel onClick={handleDeleteCancel}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Yes
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

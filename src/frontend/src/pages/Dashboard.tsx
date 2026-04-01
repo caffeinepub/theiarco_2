@@ -1,73 +1,100 @@
-import { useGetAllPublishers } from '../hooks/useQueries';
-import { useGetAllTerritories } from '../hooks/useTerritories';
-import { useGetTasks } from '../hooks/useTasks';
-import { useGetAllShepherdingVisits } from '../hooks/useShepherdingVisits';
-import { useGetAllGlobalNotes } from '../hooks/useGlobalNotes';
-import { usePioneersOnTrack } from '../hooks/usePioneersOnTrack';
-import { useGetMeetingAttendance } from '../hooks/useMeetingAttendance';
-import { TaskStatus, Territory, CheckoutRecord } from '../backend';
-import { Users, Map, ListTodo, AlertCircle, AlertTriangle, TrendingUp, ClipboardList, FileText } from 'lucide-react';
-import { formatVisitDate } from '../utils/formatters';
-import { getCurrentServiceYear } from '../utils/serviceYear';
-import { computeMeetingAttendanceOverview } from '../utils/meetingAttendanceStats';
-import { Link } from '@tanstack/react-router';
-import { getPageThemeColor } from '../theme/pageTheme';
+import { Link } from "@tanstack/react-router";
+import {
+  AlertCircle,
+  AlertTriangle,
+  ClipboardList,
+  FileText,
+  ListTodo,
+  Map as MapIcon,
+  TrendingUp,
+  Users,
+} from "lucide-react";
+import { type CheckoutRecord, TaskStatus, type Territory } from "../backend";
+import { useGetAllGlobalNotes } from "../hooks/useGlobalNotes";
+import { useGetMeetingAttendance } from "../hooks/useMeetingAttendance";
+import { usePioneersOnTrack } from "../hooks/usePioneersOnTrack";
+import { useGetAllPublishers } from "../hooks/useQueries";
+import { useGetAllShepherdingVisits } from "../hooks/useShepherdingVisits";
+import { useGetTasks } from "../hooks/useTasks";
+import { useGetAllTerritories } from "../hooks/useTerritories";
+import { getPageThemeColor } from "../theme/pageTheme";
+import { formatVisitDate } from "../utils/formatters";
+import { computeMeetingAttendanceOverview } from "../utils/meetingAttendanceStats";
+import { getCurrentServiceYear } from "../utils/serviceYear";
 
 export default function Dashboard() {
-  const { data: publishers = [], isLoading: publishersLoading } = useGetAllPublishers();
-  const { data: territories = [], isLoading: territoriesLoading } = useGetAllTerritories();
-  const { data: tasks = [], isLoading: tasksLoading } = useGetTasks(TaskStatus.all);
-  const { data: shepherdingVisits = [], isLoading: visitsLoading } = useGetAllShepherdingVisits();
-  const { data: globalNotes = [], isLoading: notesLoading } = useGetAllGlobalNotes();
-  const { data: allAttendanceRecords = [], isLoading: attendanceLoading } = useGetMeetingAttendance();
-  
+  const { data: publishers = [], isLoading: publishersLoading } =
+    useGetAllPublishers();
+  const { data: territories = [], isLoading: territoriesLoading } =
+    useGetAllTerritories();
+  const { data: tasks = [], isLoading: tasksLoading } = useGetTasks(
+    TaskStatus.all,
+  );
+  const { data: shepherdingVisits = [], isLoading: visitsLoading } =
+    useGetAllShepherdingVisits();
+  const { data: globalNotes = [], isLoading: notesLoading } =
+    useGetAllGlobalNotes();
+  const { data: allAttendanceRecords = [], isLoading: attendanceLoading } =
+    useGetMeetingAttendance();
+
   // Get current service year and pioneers on track count
   const currentServiceYear = getCurrentServiceYear();
-  const { data: pioneersOnTrackCount = 0, isLoading: pioneersOnTrackLoading } = usePioneersOnTrack(currentServiceYear);
+  const { data: pioneersOnTrackCount = 0, isLoading: pioneersOnTrackLoading } =
+    usePioneersOnTrack(currentServiceYear);
 
   // Calculate current timestamp in seconds
   const nowSeconds = Math.floor(Date.now() / 1000);
 
   // Calculate stats
-  const activePublishersCount = publishers.filter(p => p.isActive).length;
-  const checkedOutTerritoriesCount = territories.filter(t => t.status === 'Checked Out').length;
-  
+  const activePublishersCount = publishers.filter((p) => p.isActive).length;
+  const checkedOutTerritoriesCount = territories.filter(
+    (t) => t.status === "Checked Out",
+  ).length;
+
   // Uncompleted tasks: all tasks where isCompleted = false
-  const uncompletedTasksCount = tasks.filter(task => !task.isCompleted).length;
+  const uncompletedTasksCount = tasks.filter(
+    (task) => !task.isCompleted,
+  ).length;
 
   // Overdue tasks: not completed and dueDate has passed (still needed for Alerts section)
-  const overdueTasksCount = tasks.filter(task => {
+  const overdueTasksCount = tasks.filter((task) => {
     if (task.isCompleted) return false;
-    const dueDate = typeof task.dueDate === 'bigint' ? Number(task.dueDate) : task.dueDate;
+    const dueDate =
+      typeof task.dueDate === "bigint" ? Number(task.dueDate) : task.dueDate;
     return dueDate < nowSeconds;
   }).length;
 
   // Calculate meeting attendance overview stats
   const { totalRecords, averagePercentage } = computeMeetingAttendanceOverview(
     allAttendanceRecords,
-    publishers
+    publishers,
   );
 
   // Calculate total notes count
   const totalNotesCount = globalNotes.length;
 
   // Helper to get the active checkout record (most recent with dateReturned = null)
-  const getActiveCheckoutRecord = (territory: Territory): CheckoutRecord | null => {
+  const getActiveCheckoutRecord = (
+    territory: Territory,
+  ): CheckoutRecord | null => {
     const activeRecords = territory.checkOutHistory.filter(
-      (record) => record.dateReturned === undefined || record.dateReturned === null
+      (record) =>
+        record.dateReturned === undefined || record.dateReturned === null,
     );
 
     if (activeRecords.length === 0) return null;
 
     // Return the record with the largest dateCheckedOut
     return activeRecords.reduce((latest, current) => {
-      return Number(current.dateCheckedOut) > Number(latest.dateCheckedOut) ? current : latest;
+      return Number(current.dateCheckedOut) > Number(latest.dateCheckedOut)
+        ? current
+        : latest;
     });
   };
 
   // Helper to calculate checked out duration in months
   const getCheckedOutDuration = (territory: Territory): number | null => {
-    if (territory.status !== 'Checked Out') {
+    if (territory.status !== "Checked Out") {
       return null;
     }
 
@@ -78,13 +105,15 @@ export default function Dashboard() {
 
     const currentTimestampSeconds = Math.floor(Date.now() / 1000);
     const dateCheckedOutSeconds = Number(activeRecord.dateCheckedOut);
-    const months = Math.floor((currentTimestampSeconds - dateCheckedOutSeconds) / (30 * 24 * 60 * 60));
+    const months = Math.floor(
+      (currentTimestampSeconds - dateCheckedOutSeconds) / (30 * 24 * 60 * 60),
+    );
 
     return months;
   };
 
   // Calculate overdue territories (checked out for 4+ months)
-  const overdueTerritoriesCount = territories.filter(territory => {
+  const overdueTerritoriesCount = territories.filter((territory) => {
     const duration = getCheckedOutDuration(territory);
     return duration !== null && duration >= 4;
   }).length;
@@ -92,19 +121,28 @@ export default function Dashboard() {
   // Get 5 most recent shepherding visits sorted by date (newest first)
   const recentVisits = [...shepherdingVisits]
     .sort((a, b) => {
-      const dateA = typeof a.visitDate === 'bigint' ? Number(a.visitDate) : a.visitDate;
-      const dateB = typeof b.visitDate === 'bigint' ? Number(b.visitDate) : b.visitDate;
+      const dateA =
+        typeof a.visitDate === "bigint" ? Number(a.visitDate) : a.visitDate;
+      const dateB =
+        typeof b.visitDate === "bigint" ? Number(b.visitDate) : b.visitDate;
       return dateB - dateA;
     })
     .slice(0, 5);
 
-  const isLoading = publishersLoading || territoriesLoading || tasksLoading || visitsLoading || pioneersOnTrackLoading || attendanceLoading || notesLoading;
+  const isLoading =
+    publishersLoading ||
+    territoriesLoading ||
+    tasksLoading ||
+    visitsLoading ||
+    pioneersOnTrackLoading ||
+    attendanceLoading ||
+    notesLoading;
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
           <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
@@ -116,7 +154,9 @@ export default function Dashboard() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Overview of your congregation's activities</p>
+        <p className="text-muted-foreground mt-1">
+          Overview of your congregation's activities
+        </p>
       </div>
 
       {/* Stats Cards - First Row (4 cards) */}
@@ -125,7 +165,7 @@ export default function Dashboard() {
         <Link
           to="/publishers"
           className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
-          style={{ backgroundColor: getPageThemeColor('/publishers') }}
+          style={{ backgroundColor: getPageThemeColor("/publishers") }}
         >
           <div className="flex items-center justify-between mb-4">
             <Users className="h-8 w-8 opacity-80" />
@@ -140,14 +180,16 @@ export default function Dashboard() {
         <Link
           to="/territories"
           className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
-          style={{ backgroundColor: getPageThemeColor('/territories') }}
+          style={{ backgroundColor: getPageThemeColor("/territories") }}
         >
           <div className="flex items-center justify-between mb-4">
-            <Map className="h-8 w-8 opacity-80" />
+            <MapIcon className="h-8 w-8 opacity-80" />
           </div>
           <div className="space-y-1">
             <p className="text-5xl font-bold">{checkedOutTerritoriesCount}</p>
-            <p className="text-lg font-medium opacity-90">Checked Out Territories</p>
+            <p className="text-lg font-medium opacity-90">
+              Checked Out Territories
+            </p>
           </div>
         </Link>
 
@@ -155,7 +197,7 @@ export default function Dashboard() {
         <Link
           to="/tasks"
           className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
-          style={{ backgroundColor: getPageThemeColor('/tasks') }}
+          style={{ backgroundColor: getPageThemeColor("/tasks") }}
         >
           <div className="flex items-center justify-between mb-4">
             <ListTodo className="h-8 w-8 opacity-80" />
@@ -170,7 +212,7 @@ export default function Dashboard() {
         <Link
           to="/pioneers"
           className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
-          style={{ backgroundColor: getPageThemeColor('/pioneers') }}
+          style={{ backgroundColor: getPageThemeColor("/pioneers") }}
         >
           <div className="flex items-center justify-between mb-4">
             <TrendingUp className="h-8 w-8 opacity-80" />
@@ -188,7 +230,7 @@ export default function Dashboard() {
         <Link
           to="/field-service-groups"
           className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
-          style={{ backgroundColor: '#14b8a6' }}
+          style={{ backgroundColor: "#14b8a6" }}
         >
           <div className="flex items-center justify-between mb-4">
             <ClipboardList className="h-8 w-8 opacity-80" />
@@ -196,11 +238,15 @@ export default function Dashboard() {
           <div className="space-y-3">
             <div>
               <p className="text-5xl font-bold">{totalRecords}</p>
-              <p className="text-lg font-medium opacity-90">Meeting Attendance</p>
+              <p className="text-lg font-medium opacity-90">
+                Meeting Attendance
+              </p>
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="opacity-90">{averagePercentage}% average attendance</span>
+                <span className="opacity-90">
+                  {averagePercentage}% average attendance
+                </span>
               </div>
               <div className="h-2 w-full rounded-full bg-white/30 overflow-hidden">
                 <div
@@ -216,7 +262,7 @@ export default function Dashboard() {
         <Link
           to="/notes"
           className="block rounded-lg p-6 text-white shadow-md transition-all hover:shadow-xl hover:brightness-110 cursor-pointer"
-          style={{ backgroundColor: '#374151' }}
+          style={{ backgroundColor: "#374151" }}
         >
           <div className="flex items-center justify-between mb-4">
             <FileText className="h-8 w-8 opacity-80" />
@@ -224,7 +270,7 @@ export default function Dashboard() {
           <div className="space-y-1">
             <p className="text-5xl font-bold">{totalNotesCount}</p>
             <p className="text-lg font-medium opacity-90">
-              {totalNotesCount === 1 ? 'Note' : 'Notes'}
+              {totalNotesCount === 1 ? "Note" : "Notes"}
             </p>
           </div>
         </Link>
@@ -232,7 +278,9 @@ export default function Dashboard() {
 
       {/* Recent Activity Section */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-foreground mb-4">Recent Activity</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-4">
+          Recent Activity
+        </h2>
         {recentVisits.length === 0 ? (
           <p className="text-muted-foreground">No recent activity</p>
         ) : (
@@ -243,7 +291,9 @@ export default function Dashboard() {
                 className="flex items-center justify-between rounded-lg border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-foreground">{visit.publisherName}</p>
+                  <p className="font-medium text-foreground">
+                    {visit.publisherName}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     {formatVisitDate(visit.visitDate)}
                   </p>
@@ -274,7 +324,11 @@ export default function Dashboard() {
                 <div className="flex items-center gap-3 flex-1">
                   <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
                   <p className="font-medium text-red-900">
-                    {overdueTerritoriesCount} {overdueTerritoriesCount === 1 ? 'territory' : 'territories'} overdue for return
+                    {overdueTerritoriesCount}{" "}
+                    {overdueTerritoriesCount === 1
+                      ? "territory"
+                      : "territories"}{" "}
+                    overdue for return
                   </p>
                 </div>
                 <Link
@@ -292,7 +346,8 @@ export default function Dashboard() {
                 <div className="flex items-center gap-3 flex-1">
                   <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0" />
                   <p className="font-medium text-orange-900">
-                    {overdueTasksCount} overdue {overdueTasksCount === 1 ? 'task' : 'tasks'}
+                    {overdueTasksCount} overdue{" "}
+                    {overdueTasksCount === 1 ? "task" : "tasks"}
                   </p>
                 </div>
                 <Link

@@ -7,10 +7,10 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useDeletePioneerHours } from '../../hooks/usePioneerHours';
-import { Loader2 } from 'lucide-react';
-import type { PioneerMonthlyHours } from '../../backend';
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
+import type { PioneerMonthlyHours } from "../../backend";
+import { useDeletePioneerHours } from "../../hooks/usePioneerHours";
 
 interface DeletePioneerHoursDialogProps {
   isOpen: boolean;
@@ -44,9 +44,13 @@ export default function DeletePioneerHoursDialog({
     <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete hours for {hoursRecord.month}?</AlertDialogTitle>
+          <AlertDialogTitle>
+            Delete hours for {hoursRecord.month}?
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the {hoursRecord.hours.toString()} hours recorded for {hoursRecord.month}. This action cannot be undone.
+            This will permanently delete the {hoursRecord.hours.toString()}{" "}
+            hours recorded for {hoursRecord.month}. This action cannot be
+            undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -56,7 +60,7 @@ export default function DeletePioneerHoursDialog({
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleteHoursMutation.isPending}
-            style={{ backgroundColor: '#43587A' }}
+            style={{ backgroundColor: "#43587A" }}
             className="text-white hover:opacity-90"
           >
             {deleteHoursMutation.isPending ? (
@@ -65,7 +69,7 @@ export default function DeletePioneerHoursDialog({
                 Deleting...
               </>
             ) : (
-              'Yes'
+              "Yes"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

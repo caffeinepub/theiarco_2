@@ -1,33 +1,39 @@
-import { useState } from 'react';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useCreateTerritory } from '../../hooks/useCreateTerritory';
-import { toast } from 'sonner';
+} from "@/components/ui/select";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useCreateTerritory } from "../../hooks/useCreateTerritory";
 
 interface AddTerritoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function AddTerritoryModal({ open, onOpenChange }: AddTerritoryModalProps) {
-  const [number, setNumber] = useState('');
-  const [territoryType, setTerritoryType] = useState('');
-  const [errors, setErrors] = useState<{ number?: string; territoryType?: string }>({});
+export function AddTerritoryModal({
+  open,
+  onOpenChange,
+}: AddTerritoryModalProps) {
+  const [number, setNumber] = useState("");
+  const [territoryType, setTerritoryType] = useState("");
+  const [errors, setErrors] = useState<{
+    number?: string;
+    territoryType?: string;
+  }>({});
 
   const createTerritory = useCreateTerritory();
 
@@ -37,10 +43,10 @@ export function AddTerritoryModal({ open, onOpenChange }: AddTerritoryModalProps
     // Validate
     const newErrors: { number?: string; territoryType?: string } = {};
     if (!number.trim()) {
-      newErrors.number = 'Territory Number/Name is required';
+      newErrors.number = "Territory Number/Name is required";
     }
     if (!territoryType) {
-      newErrors.territoryType = 'Territory Type is required';
+      newErrors.territoryType = "Territory Type is required";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -54,24 +60,24 @@ export function AddTerritoryModal({ open, onOpenChange }: AddTerritoryModalProps
         territoryType,
       });
 
-      toast.success('Territory added successfully!', {
+      toast.success("Territory added successfully!", {
         duration: 3000,
       });
 
       // Reset form and close modal
-      setNumber('');
-      setTerritoryType('');
+      setNumber("");
+      setTerritoryType("");
       setErrors({});
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to create territory:', error);
-      toast.error('Failed to add territory');
+      console.error("Failed to create territory:", error);
+      toast.error("Failed to add territory");
     }
   };
 
   const handleCancel = () => {
-    setNumber('');
-    setTerritoryType('');
+    setNumber("");
+    setTerritoryType("");
     setErrors({});
     onOpenChange(false);
   };
@@ -87,7 +93,8 @@ export function AddTerritoryModal({ open, onOpenChange }: AddTerritoryModalProps
             {/* Territory Number/Name */}
             <div className="space-y-2">
               <Label htmlFor="number">
-                Territory Number/Name <span className="text-destructive">*</span>
+                Territory Number/Name{" "}
+                <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="number"
@@ -130,7 +137,9 @@ export function AddTerritoryModal({ open, onOpenChange }: AddTerritoryModalProps
                 </SelectContent>
               </Select>
               {errors.territoryType && (
-                <p className="text-sm text-destructive">{errors.territoryType}</p>
+                <p className="text-sm text-destructive">
+                  {errors.territoryType}
+                </p>
               )}
             </div>
           </div>
@@ -147,10 +156,10 @@ export function AddTerritoryModal({ open, onOpenChange }: AddTerritoryModalProps
             <Button
               type="submit"
               disabled={createTerritory.isPending}
-              style={{ backgroundColor: '#43587A', color: 'white' }}
+              style={{ backgroundColor: "#43587A", color: "white" }}
               className="hover:opacity-90"
             >
-              {createTerritory.isPending ? 'Submitting...' : 'Submit'}
+              {createTerritory.isPending ? "Submitting..." : "Submit"}
             </Button>
           </DialogFooter>
         </form>

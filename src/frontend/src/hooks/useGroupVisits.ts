@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { GroupVisit } from '../backend';
+import { useQuery } from "@tanstack/react-query";
+import type { GroupVisit } from "../backend";
+import { useActor } from "./useActor";
 
 export function useGroupVisits(groupId: number) {
   const { actor, isFetching: actorFetching } = useActor();
@@ -9,9 +9,9 @@ export function useGroupVisits(groupId: number) {
   const isValidGroupId = Number.isFinite(groupId) && groupId > 0;
 
   return useQuery<GroupVisit[]>({
-    queryKey: ['groupVisits', groupId],
+    queryKey: ["groupVisits", groupId],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getGroupVisitsForGroup(BigInt(groupId));
     },
     enabled: !!actor && !actorFetching && isValidGroupId,

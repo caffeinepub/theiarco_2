@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { useIsFetching, useIsMutating } from '@tanstack/react-query';
-import { useActor } from '../../hooks/useActor';
-import { toast } from 'sonner';
-import { reconnectState } from '../../utils/reconnectState';
-import { Loader2 } from 'lucide-react';
+import { useIsFetching, useIsMutating } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { useActor } from "../../hooks/useActor";
+import { reconnectState } from "../../utils/reconnectState";
 
-const RECONNECT_TOAST_ID = 'reconnect-toast';
+const RECONNECT_TOAST_ID = "reconnect-toast";
 
 export default function ReconnectToastManager() {
   const { actor, isFetching: actorFetching } = useActor();
@@ -25,24 +25,25 @@ export default function ReconnectToastManager() {
   useEffect(() => {
     const hasInFlightOperations = isFetchingQueries > 0 || isMutating > 0;
     const actorUnavailable = !actor || actorFetching;
-    const shouldShowToast = (hasInFlightOperations && actorUnavailable) || errorState;
+    const shouldShowToast =
+      (hasInFlightOperations && actorUnavailable) || errorState;
 
     if (shouldShowToast && !toastShownRef.current) {
       // Show persistent reconnect toast
-      toast.loading('Reconnecting…', {
+      toast.loading("Reconnecting…", {
         id: RECONNECT_TOAST_ID,
-        duration: Infinity,
+        duration: Number.POSITIVE_INFINITY,
         icon: <Loader2 className="h-4 w-4 animate-spin" />,
       });
       toastShownRef.current = true;
     } else if (!shouldShowToast && toastShownRef.current) {
       // Dismiss reconnect toast and show success message
       toast.dismiss(RECONNECT_TOAST_ID);
-      toast.success('Connection restored', {
+      toast.success("Connection restored", {
         duration: 2000,
       });
       toastShownRef.current = false;
-      
+
       // Clear error state
       if (errorState) {
         reconnectState.setError(false);

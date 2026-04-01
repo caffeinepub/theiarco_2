@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { PublisherId } from '../backend';
-import { normalizeToEpochSeconds } from '@/utils/territoryTime';
+import { normalizeToEpochSeconds } from "@/utils/territoryTime";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { PublisherId } from "../backend";
+import { useActor } from "./useActor";
 
 interface UpdateCheckoutRecordInput {
   territoryId: string;
@@ -19,14 +19,16 @@ export function useUpdateCheckoutRecord() {
 
   return useMutation({
     mutationFn: async (input: UpdateCheckoutRecordInput) => {
-      if (!actor) throw new Error('Actor not available');
-      
+      if (!actor) throw new Error("Actor not available");
+
       // Defensively normalize all timestamps to seconds before sending to backend
-      const normalizedDateCheckedOut = normalizeToEpochSeconds(input.newDateCheckedOut);
-      const normalizedDateReturned = input.newDateReturned 
+      const normalizedDateCheckedOut = normalizeToEpochSeconds(
+        input.newDateCheckedOut,
+      );
+      const normalizedDateReturned = input.newDateReturned
         ? normalizeToEpochSeconds(input.newDateReturned)
         : null;
-      
+
       return actor.updateCheckoutRecord(
         input.territoryId,
         input.originalPublisherId,
@@ -34,14 +36,16 @@ export function useUpdateCheckoutRecord() {
         input.newPublisherId,
         normalizedDateCheckedOut,
         normalizedDateReturned,
-        input.newIsCampaign
+        input.newIsCampaign,
       );
     },
     onSuccess: (_, variables) => {
       // Invalidate the specific territory query to refresh the profile
-      queryClient.invalidateQueries({ queryKey: ['territory', variables.territoryId] });
+      queryClient.invalidateQueries({
+        queryKey: ["territory", variables.territoryId],
+      });
       // Invalidate the territories list
-      queryClient.invalidateQueries({ queryKey: ['territories'] });
+      queryClient.invalidateQueries({ queryKey: ["territories"] });
     },
   });
 }

@@ -7,8 +7,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useDeleteMeetingAttendance } from '../../hooks/useDeleteMeetingAttendance';
+} from "@/components/ui/alert-dialog";
+import { useDeleteMeetingAttendance } from "../../hooks/useDeleteMeetingAttendance";
 
 interface DeleteAttendanceDialogProps {
   open: boolean;
@@ -32,7 +32,7 @@ export function DeleteAttendanceDialog({
       onDeleted?.();
     } catch (error) {
       // Error handling is done in the mutation hook
-      console.error('Error deleting attendance:', error);
+      console.error("Error deleting attendance:", error);
     }
   };
 
@@ -42,7 +42,8 @@ export function DeleteAttendanceDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete this attendance record?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the attendance record.
+            This action cannot be undone. This will permanently delete the
+            attendance record.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -54,7 +55,7 @@ export function DeleteAttendanceDialog({
             disabled={deleteMutation.isPending}
             className="bg-green-600 hover:bg-green-700"
           >
-            {deleteMutation.isPending ? 'Deleting...' : 'Yes'}
+            {deleteMutation.isPending ? "Deleting..." : "Yes"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

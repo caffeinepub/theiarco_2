@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useActor } from "./useActor";
 
 interface CreateTerritoryInput {
   number: string;
@@ -12,7 +12,7 @@ export function useCreateTerritory() {
 
   return useMutation({
     mutationFn: async (input: CreateTerritoryInput) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
 
       // Generate a unique ID (timestamp + random)
       const id = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -22,12 +22,12 @@ export function useCreateTerritory() {
         input.number,
         input.territoryType,
         null, // status defaults to "Available"
-        null  // notes defaults to empty string
+        null, // notes defaults to empty string
       );
     },
     onSuccess: () => {
       // Invalidate and refetch territories
-      queryClient.invalidateQueries({ queryKey: ['territories'] });
+      queryClient.invalidateQueries({ queryKey: ["territories"] });
     },
   });
 }

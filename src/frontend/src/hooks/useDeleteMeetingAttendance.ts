@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { toast } from 'sonner';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useActor } from "./useActor";
 
 export function useDeleteMeetingAttendance() {
   const { actor } = useActor();
@@ -8,17 +8,17 @@ export function useDeleteMeetingAttendance() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.deleteMeetingAttendance(id);
     },
     onSuccess: () => {
       // Invalidate all meeting attendance queries
-      queryClient.invalidateQueries({ queryKey: ['meetingAttendance'] });
-      toast.success('Attendance record deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ["meetingAttendance"] });
+      toast.success("Attendance record deleted successfully");
     },
     onError: (error: Error) => {
-      console.error('Error deleting attendance record:', error);
-      toast.error('Failed to delete attendance record');
+      console.error("Error deleting attendance record:", error);
+      toast.error("Failed to delete attendance record");
     },
   });
 }

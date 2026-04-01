@@ -8,12 +8,12 @@ export function formatNoteDate(timestamp: bigint): string {
   // Convert nanoseconds to milliseconds
   const milliseconds = Number(timestamp / BigInt(1_000_000));
   const date = new Date(milliseconds);
-  
+
   // Format as "MMM d, yyyy"
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -27,12 +27,12 @@ export function formatTaskDate(timestamp: bigint): string {
   // Convert seconds to milliseconds
   const milliseconds = Number(timestamp) * 1000;
   const date = new Date(milliseconds);
-  
+
   // Format as "MMM d, yyyy"
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -45,7 +45,7 @@ export function formatTaskDate(timestamp: bigint): string {
 export function formatCheckoutDate(timestamp: bigint): string {
   const timestampNum = Number(timestamp);
   let milliseconds: number;
-  
+
   // If timestamp is very large, it's likely in nanoseconds
   // Nanoseconds since epoch would be > 1 trillion for dates after 2001
   if (timestampNum > 1_000_000_000_000) {
@@ -55,14 +55,14 @@ export function formatCheckoutDate(timestamp: bigint): string {
     // Otherwise it's in seconds, convert to milliseconds
     milliseconds = timestampNum * 1000;
   }
-  
+
   const date = new Date(milliseconds);
-  
+
   // Format as "MMM d, yyyy"
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -76,12 +76,12 @@ export function formatVisitDate(timestamp: bigint): string {
   // Convert seconds to milliseconds
   const milliseconds = Number(timestamp) * 1000;
   const date = new Date(milliseconds);
-  
+
   // Format as "MMM d, yyyy"
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -95,12 +95,12 @@ export function formatWeekOfDate(timestamp: bigint): string {
   // Convert seconds to milliseconds
   const milliseconds = Number(timestamp) * 1000;
   const date = new Date(milliseconds);
-  
+
   // Format as "MMM d, yyyy"
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -114,12 +114,12 @@ export function formatTrainingDate(timestamp: bigint): string {
   // Convert seconds to milliseconds
   const milliseconds = Number(timestamp) * 1000;
   const date = new Date(milliseconds);
-  
+
   // Format as "MMM d, yyyy"
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -133,11 +133,11 @@ export function formatLongDate(timestamp: bigint): string {
   // Convert seconds to milliseconds
   const milliseconds = Number(timestamp) * 1000;
   const date = new Date(milliseconds);
-  
+
   // Format as "MMMM d, yyyy"
-  return date.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 }

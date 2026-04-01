@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { PublisherId } from '../backend';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { PublisherId } from "../backend";
+import { useActor } from "./useActor";
 
 interface CreateGlobalNoteParams {
   title: string;
@@ -15,36 +15,37 @@ export function useCreateGlobalNote() {
 
   return useMutation({
     mutationFn: async (params: CreateGlobalNoteParams) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
 
       // Validate required fields
       if (!params.title.trim()) {
-        throw new Error('Title is required');
+        throw new Error("Title is required");
       }
       if (!params.content.trim()) {
-        throw new Error('Content is required');
+        throw new Error("Content is required");
       }
       if (!params.category) {
-        throw new Error('Category is required');
+        throw new Error("Category is required");
       }
 
       // Only include attachedPublisher if category is "Publishers"
-      const attachedPublisher = params.category === 'Publishers' && params.attachedPublisher
-        ? params.attachedPublisher
-        : null;
+      const attachedPublisher =
+        params.category === "Publishers" && params.attachedPublisher
+          ? params.attachedPublisher
+          : null;
 
       const noteId = await actor.createGlobalNote(
         params.title.trim(),
         params.content.trim(),
         params.category,
-        attachedPublisher
+        attachedPublisher,
       );
 
       return noteId;
     },
     onSuccess: () => {
       // Invalidate only global notes queries
-      queryClient.invalidateQueries({ queryKey: ['globalNotes'] });
+      queryClient.invalidateQueries({ queryKey: ["globalNotes"] });
     },
   });
 }

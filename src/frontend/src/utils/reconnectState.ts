@@ -24,7 +24,9 @@ class ReconnectState {
   }
 
   private notify() {
-    this.listeners.forEach((listener) => listener());
+    for (const listener of this.listeners) {
+      listener();
+    }
   }
 }
 

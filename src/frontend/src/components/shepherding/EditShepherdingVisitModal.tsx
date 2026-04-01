@@ -1,12 +1,24 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUpdateShepherdingVisit } from '../../hooks/useShepherdingVisit';
-import { toast } from 'sonner';
-import type { ShepherdingVisit, Publisher } from '../../backend';
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { Publisher, ShepherdingVisit } from "../../backend";
+import { useUpdateShepherdingVisit } from "../../hooks/useShepherdingVisit";
 
 interface EditShepherdingVisitModalProps {
   open: boolean;
@@ -15,10 +27,15 @@ interface EditShepherdingVisitModalProps {
   publishers: Publisher[];
 }
 
-export function EditShepherdingVisitModal({ open, onOpenChange, visit, publishers }: EditShepherdingVisitModalProps) {
-  const [publisherId, setPublisherId] = useState('');
-  const [visitDate, setVisitDate] = useState('');
-  const [eldersPresent, setEldersPresent] = useState('');
+export function EditShepherdingVisitModal({
+  open,
+  onOpenChange,
+  visit,
+  publishers,
+}: EditShepherdingVisitModalProps) {
+  const [publisherId, setPublisherId] = useState("");
+  const [visitDate, setVisitDate] = useState("");
+  const [eldersPresent, setEldersPresent] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const updateVisit = useUpdateShepherdingVisit();
@@ -27,14 +44,14 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
   useEffect(() => {
     if (open && visit) {
       setPublisherId(visit.publisherId);
-      
+
       // Convert timestamp to date string (YYYY-MM-DD)
       const dateObj = new Date(Number(visit.visitDate) * 1000);
       const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const day = String(dateObj.getDate()).padStart(2, "0");
       setVisitDate(`${year}-${month}-${day}`);
-      
+
       setEldersPresent(visit.eldersPresent);
       setErrors({});
     }
@@ -44,13 +61,13 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
     const newErrors: { [key: string]: string } = {};
 
     if (!publisherId) {
-      newErrors.publisherId = 'Publisher is required';
+      newErrors.publisherId = "Publisher is required";
     }
     if (!visitDate) {
-      newErrors.visitDate = 'Visit date is required';
+      newErrors.visitDate = "Visit date is required";
     }
     if (!eldersPresent.trim()) {
-      newErrors.eldersPresent = 'Elders present is required';
+      newErrors.eldersPresent = "Elders present is required";
     }
 
     setErrors(newErrors);
@@ -59,13 +76,15 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    const selectedPublisher = publishers.find((p) => p.id.toString() === publisherId);
+    const selectedPublisher = publishers.find(
+      (p) => p.id.toString() === publisherId,
+    );
     if (!selectedPublisher) {
-      toast.error('Selected publisher not found');
+      toast.error("Selected publisher not found");
       return;
     }
 
@@ -83,18 +102,18 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
         notes: visit.notes, // Keep existing notes
       });
 
-      toast.success('Visit updated successfully!', {
+      toast.success("Visit updated successfully!", {
         duration: 3000,
         style: {
-          backgroundColor: 'hsl(142.1 76.2% 36.3%)',
-          color: 'white',
+          backgroundColor: "hsl(142.1 76.2% 36.3%)",
+          color: "white",
         },
       });
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Error updating visit:', error);
-      toast.error('Failed to update visit. Please try again.');
+      console.error("Error updating visit:", error);
+      toast.error("Failed to update visit. Please try again.");
     }
   };
 
@@ -116,12 +135,18 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
               Publisher <span className="text-destructive">*</span>
             </Label>
             <Select value={publisherId} onValueChange={setPublisherId}>
-              <SelectTrigger id="publisher" className={errors.publisherId ? 'border-destructive' : ''}>
+              <SelectTrigger
+                id="publisher"
+                className={errors.publisherId ? "border-destructive" : ""}
+              >
                 <SelectValue placeholder="Select a publisher" />
               </SelectTrigger>
               <SelectContent>
                 {publishers.map((publisher) => (
-                  <SelectItem key={publisher.id.toString()} value={publisher.id.toString()}>
+                  <SelectItem
+                    key={publisher.id.toString()}
+                    value={publisher.id.toString()}
+                  >
                     {publisher.fullName}
                   </SelectItem>
                 ))}
@@ -142,7 +167,7 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
               type="date"
               value={visitDate}
               onChange={(e) => setVisitDate(e.target.value)}
-              className={errors.visitDate ? 'border-destructive' : ''}
+              className={errors.visitDate ? "border-destructive" : ""}
             />
             {errors.visitDate && (
               <p className="text-sm text-destructive">{errors.visitDate}</p>
@@ -160,7 +185,7 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
               placeholder="e.g., Sunny Trevino, Miguel Guerrero"
               value={eldersPresent}
               onChange={(e) => setEldersPresent(e.target.value)}
-              className={errors.eldersPresent ? 'border-destructive' : ''}
+              className={errors.eldersPresent ? "border-destructive" : ""}
             />
             {errors.eldersPresent && (
               <p className="text-sm text-destructive">{errors.eldersPresent}</p>
@@ -169,16 +194,20 @@ export function EditShepherdingVisitModal({ open, onOpenChange, visit, publisher
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel} disabled={updateVisit.isPending}>
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            disabled={updateVisit.isPending}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={updateVisit.isPending}
-            style={{ backgroundColor: '#43587A', color: 'white' }}
+            style={{ backgroundColor: "#43587A", color: "white" }}
             className="hover:opacity-90"
           >
-            {updateVisit.isPending ? 'Saving...' : 'Save'}
+            {updateVisit.isPending ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

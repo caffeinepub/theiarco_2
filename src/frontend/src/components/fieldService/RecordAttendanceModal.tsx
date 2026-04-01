@@ -1,14 +1,26 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
-import { useAddMeetingAttendance } from '../../hooks/useAddMeetingAttendance';
-import { useUpdateMeetingAttendance } from '../../hooks/useUpdateMeetingAttendance';
-import type { Publisher, MeetingAttendance } from '../../backend';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { MeetingAttendance, Publisher } from "../../backend";
+import { useAddMeetingAttendance } from "../../hooks/useAddMeetingAttendance";
+import { useUpdateMeetingAttendance } from "../../hooks/useUpdateMeetingAttendance";
 
 interface RecordAttendanceModalProps {
   open: boolean;
@@ -18,16 +30,18 @@ interface RecordAttendanceModalProps {
   attendanceToEdit?: MeetingAttendance | null;
 }
 
-export default function RecordAttendanceModal({ 
-  open, 
-  onOpenChange, 
+export default function RecordAttendanceModal({
+  open,
+  onOpenChange,
   groupNumber,
   publishers,
-  attendanceToEdit
+  attendanceToEdit,
 }: RecordAttendanceModalProps) {
-  const [meetingDate, setMeetingDate] = useState('');
-  const [meetingType, setMeetingType] = useState('');
-  const [selectedPublishers, setSelectedPublishers] = useState<Set<string>>(new Set());
+  const [meetingDate, setMeetingDate] = useState("");
+  const [meetingType, setMeetingType] = useState("");
+  const [selectedPublishers, setSelectedPublishers] = useState<Set<string>>(
+    new Set(),
+  );
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const addMeetingAttendance = useAddMeetingAttendance();
@@ -41,13 +55,14 @@ export default function RecordAttendanceModal({
       // Convert bigint timestamp (seconds) to date string
       const dateMs = Number(attendanceToEdit.meetingDate) * 1000;
       const date = new Date(dateMs);
-      const dateString = date.toISOString().split('T')[0];
-      
+      const dateString = date.toISOString().split("T")[0];
+
       setMeetingDate(dateString);
       // Normalize legacy "Weekday Meeting" to "Mid-week Meeting"
-      const normalizedType = attendanceToEdit.meetingType === 'Weekday Meeting' 
-        ? 'Mid-week Meeting' 
-        : attendanceToEdit.meetingType;
+      const normalizedType =
+        attendanceToEdit.meetingType === "Weekday Meeting"
+          ? "Mid-week Meeting"
+          : attendanceToEdit.meetingType;
       setMeetingType(normalizedType);
       setSelectedPublishers(new Set(attendanceToEdit.publishersPresent));
     }
@@ -56,8 +71,8 @@ export default function RecordAttendanceModal({
   // Reset form when modal closes
   useEffect(() => {
     if (!open) {
-      setMeetingDate('');
-      setMeetingType('');
+      setMeetingDate("");
+      setMeetingType("");
       setSelectedPublishers(new Set());
       setErrors({});
     }
@@ -67,10 +82,10 @@ export default function RecordAttendanceModal({
     const newErrors: { [key: string]: string } = {};
 
     if (!meetingDate) {
-      newErrors.meetingDate = 'Meeting date is required';
+      newErrors.meetingDate = "Meeting date is required";
     }
     if (!meetingType) {
-      newErrors.meetingType = 'Meeting type is required';
+      newErrors.meetingType = "Meeting type is required";
     }
 
     setErrors(newErrors);
@@ -89,18 +104,18 @@ export default function RecordAttendanceModal({
 
   const handleSubmit = async () => {
     if (!validateForm()) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
 
     // Get publisher names for selected publishers
     const publisherIds = Array.from(selectedPublishers);
     const publisherNames = publisherIds
-      .map(id => {
-        const publisher = publishers.find(p => p.id.toString() === id);
-        return publisher?.fullName || '';
+      .map((id) => {
+        const publisher = publishers.find((p) => p.id.toString() === id);
+        return publisher?.fullName || "";
       })
-      .filter(name => name !== '');
+      .filter((name) => name !== "");
 
     try {
       if (isEditMode && attendanceToEdit) {
@@ -124,7 +139,7 @@ export default function RecordAttendanceModal({
       onOpenChange(false);
     } catch (error) {
       // Error handling is done in the mutation hooks
-      console.error('Error submitting attendance:', error);
+      console.error("Error submitting attendance:", error);
     }
   };
 
@@ -132,14 +147,15 @@ export default function RecordAttendanceModal({
     onOpenChange(false);
   };
 
-  const isPending = addMeetingAttendance.isPending || updateMeetingAttendance.isPending;
+  const isPending =
+    addMeetingAttendance.isPending || updateMeetingAttendance.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditMode ? 'Edit' : 'Record'} Attendance - Group {groupNumber}
+            {isEditMode ? "Edit" : "Record"} Attendance - Group {groupNumber}
           </DialogTitle>
         </DialogHeader>
 
@@ -156,10 +172,10 @@ export default function RecordAttendanceModal({
               onChange={(e) => {
                 setMeetingDate(e.target.value);
                 if (errors.meetingDate) {
-                  setErrors({ ...errors, meetingDate: '' });
+                  setErrors({ ...errors, meetingDate: "" });
                 }
               }}
-              className={errors.meetingDate ? 'border-destructive' : ''}
+              className={errors.meetingDate ? "border-destructive" : ""}
             />
             {errors.meetingDate && (
               <p className="text-sm text-destructive">{errors.meetingDate}</p>
@@ -176,18 +192,20 @@ export default function RecordAttendanceModal({
               onValueChange={(value) => {
                 setMeetingType(value);
                 if (errors.meetingType) {
-                  setErrors({ ...errors, meetingType: '' });
+                  setErrors({ ...errors, meetingType: "" });
                 }
               }}
             >
-              <SelectTrigger 
+              <SelectTrigger
                 id="meetingType"
-                className={errors.meetingType ? 'border-destructive' : ''}
+                className={errors.meetingType ? "border-destructive" : ""}
               >
                 <SelectValue placeholder="Select meeting type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Mid-week Meeting">Mid-week Meeting</SelectItem>
+                <SelectItem value="Mid-week Meeting">
+                  Mid-week Meeting
+                </SelectItem>
                 <SelectItem value="Weekend Meeting">Weekend Meeting</SelectItem>
               </SelectContent>
             </Select>
@@ -200,15 +218,22 @@ export default function RecordAttendanceModal({
           <div className="space-y-2">
             <Label>Publishers Present</Label>
             {publishers.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No publishers in this group</p>
+              <p className="text-sm text-muted-foreground">
+                No publishers in this group
+              </p>
             ) : (
               <div className="border rounded-md p-3 max-h-[200px] overflow-y-auto space-y-2">
                 {publishers.map((publisher) => (
-                  <div key={publisher.id.toString()} className="flex items-center space-x-2">
+                  <div
+                    key={publisher.id.toString()}
+                    className="flex items-center space-x-2"
+                  >
                     <Checkbox
                       id={`publisher-${publisher.id}`}
                       checked={selectedPublishers.has(publisher.id.toString())}
-                      onCheckedChange={() => handlePublisherToggle(publisher.id.toString())}
+                      onCheckedChange={() =>
+                        handlePublisherToggle(publisher.id.toString())
+                      }
                     />
                     <label
                       htmlFor={`publisher-${publisher.id}`}
@@ -232,12 +257,12 @@ export default function RecordAttendanceModal({
           >
             Cancel
           </Button>
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isPending}
-          >
-            {isPending ? 'Submitting...' : isEditMode ? 'Save Changes' : 'Submit'}
+          <Button type="button" onClick={handleSubmit} disabled={isPending}>
+            {isPending
+              ? "Submitting..."
+              : isEditMode
+                ? "Save Changes"
+                : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>

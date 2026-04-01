@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import { toast } from 'sonner';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useActor } from "./useActor";
 
 /**
  * React Query mutation hook for deleting a trained conductor.
@@ -12,15 +12,17 @@ export function useDeleteTrainedConductor() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.deleteTrainedConductor(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['trainedConductors'] });
-      toast.success('Conductor deleted successfully!', { duration: 3000 });
+      queryClient.invalidateQueries({ queryKey: ["trainedConductors"] });
+      toast.success("Conductor deleted successfully!", { duration: 3000 });
     },
     onError: (error: Error) => {
-      toast.error(`Failed to delete conductor: ${error.message}`, { duration: 3000 });
+      toast.error(`Failed to delete conductor: ${error.message}`, {
+        duration: 3000,
+      });
     },
   });
 }

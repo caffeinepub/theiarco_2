@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { CreateTaskInput } from '../backend';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { CreateTaskInput } from "../backend";
+import { useActor } from "./useActor";
 
 interface CreateTaskParams {
   title: string;
@@ -15,8 +15,8 @@ export function useCreateTask() {
 
   return useMutation({
     mutationFn: async (params: CreateTaskParams) => {
-      if (!actor) throw new Error('Actor not available');
-      
+      if (!actor) throw new Error("Actor not available");
+
       const input: CreateTaskInput = {
         title: params.title,
         dueDate: params.dueDate,
@@ -24,12 +24,12 @@ export function useCreateTask() {
         notes: params.notes,
         parentTaskId: undefined,
       };
-      
+
       return actor.createTask(input);
     },
     onSuccess: () => {
       // Invalidate all task queries to refetch from backend
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 }

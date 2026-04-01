@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useActor } from "./useActor";
 
 interface UpdateGroupVisitInput {
   id: string;
@@ -20,7 +20,7 @@ export function useUpdateGroupVisit() {
   return useMutation({
     mutationFn: async (input: UpdateGroupVisitInput) => {
       if (!actor) {
-        throw new Error('Actor not available');
+        throw new Error("Actor not available");
       }
 
       await actor.updateGroupVisit(
@@ -32,16 +32,18 @@ export function useUpdateGroupVisit() {
         input.publisherNamesPresent,
         input.notesForOverseer,
         input.notesForAssistant,
-        input.nextPlannedVisitDate
+        input.nextPlannedVisitDate,
       );
     },
     onSuccess: (_, variables) => {
       // Invalidate the specific group's visits
-      queryClient.invalidateQueries({ queryKey: ['groupVisits', variables.groupNumber] });
+      queryClient.invalidateQueries({
+        queryKey: ["groupVisits", variables.groupNumber],
+      });
       // Invalidate the base groupVisits query
-      queryClient.invalidateQueries({ queryKey: ['groupVisits'] });
+      queryClient.invalidateQueries({ queryKey: ["groupVisits"] });
       // Invalidate the specific visit detail
-      queryClient.invalidateQueries({ queryKey: ['groupVisit', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["groupVisit", variables.id] });
     },
   });
 }
